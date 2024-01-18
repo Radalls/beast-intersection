@@ -9,9 +9,12 @@ export const createEntity = (): number => {
     return id;
 }
 
-export const getEntity = (id: number): Entity | undefined => entities[id];
+export const getEntity = (entityId: number): Entity | undefined => entities[entityId];
 
-export const addComponent = <T extends keyof Component>(entityId: number, component: Component[T]): void => {
+export const addComponent = <T extends keyof Component>({ entityId, component }: {
+    entityId: number,
+    component: Component[T],
+}): void => {
     const entity = getEntity(entityId);
     if (!(entity)) {
         throw new Error(`Entity ${entityId} does not exist`);
@@ -21,7 +24,10 @@ export const addComponent = <T extends keyof Component>(entityId: number, compon
     entity[component._] = component;
 };
 
-export const getComponent = <T extends keyof Component>(entityId: number, componentId: T): Component[T] => {
+export const getComponent = <T extends keyof Component>({ entityId, componentId }: {
+    entityId: number,
+    componentId: T,
+}): Component[T] => {
     const entity = getEntity(entityId);
     if (!(entity)) {
         throw new Error(`Entity ${entityId} does not exist`);
