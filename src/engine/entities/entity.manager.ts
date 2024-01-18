@@ -13,13 +13,24 @@ export const getEntity = (id: number): Entity | undefined => entities[id];
 
 export const addComponent = <T extends keyof Component>(entityId: number, component: Component[T]): void => {
     const entity = getEntity(entityId);
-    if (entity) {
-        // @ts-ignore - Component[T] is not assignable to type 'undefined'
-        entity[component._] = component;
+    if (!(entity)) {
+        throw new Error(`Entity ${entityId} does not exist`);
     }
+
+    // @ts-ignore - Component[T] is not assignable to type 'undefined'
+    entity[component._] = component;
 };
 
-export const getComponent = <T extends keyof Component>(entityId: number, component: T): Component[T] | undefined => {
+export const getComponent = <T extends keyof Component>(entityId: number, componentId: T): Component[T] => {
     const entity = getEntity(entityId);
-    return entity ? entity[component] as Component[T] : undefined;
+    if (!(entity)) {
+        throw new Error(`Entity ${entityId} does not exist`);
+    }
+
+    const component = entity[componentId];
+    if (!(component)) {
+        throw new Error(`Entity ${entityId} does not have component ${componentId}`);
+    }
+
+    return component;
 };
