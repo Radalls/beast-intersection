@@ -4,7 +4,7 @@ import { Sprite } from "./sprite";
 export type Item = {
     _: 'Item';
     _amount: number;
-    _amountPerSlot: number;
+    _maxAmount: number;
     info: Info;
     sprite?: Sprite;
 };
