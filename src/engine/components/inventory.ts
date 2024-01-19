@@ -1,7 +1,13 @@
 import { Item } from "./item";
 
 export type Inventory = {
-    _: 'Inventory'
-    _nbItems: number;
-    items: Item[];
+    _: 'Inventory';
+    _maxSlots: number;
+    slots: InventorySlot[];
+};
+
+type InventorySlot = {
+    _amount: number;
+    _maxAmount: number;
+    item: Item;
 };
