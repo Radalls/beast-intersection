@@ -9,7 +9,7 @@ export const createEntity = (): number => {
     return id;
 }
 
-export const getEntity = (entityId: number): Entity | undefined => entities[entityId];
+export const getEntity = (entityId: number): Entity | null => entities[entityId];
 
 export const addComponent = <T extends keyof Component>({ entityId, component }: {
     entityId: number,
