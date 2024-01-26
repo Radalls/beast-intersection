@@ -1,47 +1,28 @@
 import { createEntity, addComponent, getComponent } from "./entities/entity.manager";
-import { addItemToInventory } from "./systems/inventory";
+import { createGameEntity } from "./entity";
 
 export const engine = () => {
     const playerEntity = createEntity();
+    createGameEntity(playerEntity, 'Player');
 
-    addComponent(
-        playerEntity,
-        {
-            _: 'Info',
-            _description: 'Player',
-            _name: 'Player',
-        },
-    );
-
-    addComponent(
-        playerEntity,
-        {
+    addComponent({
+        entityId: playerEntity,
+        component: {
             _: 'Inventory',
-            _nbSlots: 3,
+            _maxSlots: 10,
             slots: [],
         },
-    );
+    });
 
-    console.log('before')
-    console.dir(getComponent(playerEntity, 'Inventory'), { depth: null });
+    addComponent({
+        entityId: playerEntity,
+        component: {
+            _: 'Position',
+            _x: 0,
+            _y: 0,
+        },
+    });
 
-    try {
-        addItemToInventory(
-            playerEntity,
-            {
-                _: 'Item',
-                _amount: 1,
-                _amountPerSlot: 5,
-                info: {
-                    _: 'Info',
-                    _name: 'Leaf',
-                },
-            },
-        );
-    } catch (e) {
-        console.error(e);
-    }
-
-    console.log('after')
-    console.dir(getComponent(playerEntity, 'Inventory'), { depth: null });
+    const inventory = getComponent({ entityId: playerEntity, componentId: 'Inventory' });
+    console.log(inventory);
 };
