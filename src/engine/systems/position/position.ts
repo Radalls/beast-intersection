@@ -1,4 +1,7 @@
+import { emit } from "../../../render/render";
 import { getComponent } from "../../entities/entity.manager";
+import { getGameEntityById } from "../../entity";
+import { EventTypes } from "../../event";
 
 const invalidPosition = (x: number, y: number) => x < 0 || y < 0;
 const samePosition = ({ entityPosition, inputPosition }: {
@@ -25,4 +28,10 @@ export const updatePosition = ({ entityId, x, y }: {
 
     position._x = x;
     position._y = y;
+
+    emit({
+        type: EventTypes.ENTITY_POSITION_UPDATE,
+        entityName: getGameEntityById(entityId),
+        data: { x: position._x, y: position._y },
+    });
 }
