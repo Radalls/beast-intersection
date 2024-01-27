@@ -1,4 +1,4 @@
-import { emit } from "../render/main";
+import { emit } from "../render/render";
 import { getComponent } from "./entities/entity.manager";
 import { getGameEntity } from "./entity";
 import { updatePosition } from "./systems/position/position";
