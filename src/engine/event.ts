@@ -5,9 +5,9 @@ import { updatePosition } from "./systems/position/position";
 
 export enum InputKeys {
     UP = 'z',
-    DOWN = 'd',
     LEFT = 'q',
-    RIGHT = 's',
+    DOWN = 's',
+    RIGHT = 'd',
 }
 
 export enum Events {
@@ -26,18 +26,18 @@ export const onInputKeyDown = (inputKey: InputKeys) => {
                 y: playerPosition._y - 1,
             });
         }
-        if (inputKey === InputKeys.DOWN) {
-            updatePosition({
-                entityId: playerEntity,
-                x: playerPosition._x,
-                y: playerPosition._y + 1,
-            });
-        }
         if (inputKey === InputKeys.LEFT) {
             updatePosition({
                 entityId: playerEntity,
                 x: playerPosition._x - 1,
                 y: playerPosition._y,
+            });
+        }
+        if (inputKey === InputKeys.DOWN) {
+            updatePosition({
+                entityId: playerEntity,
+                x: playerPosition._x,
+                y: playerPosition._y + 1,
             });
         }
         if (inputKey === InputKeys.RIGHT) {
