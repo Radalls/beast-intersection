@@ -1,54 +1,61 @@
-import { emit } from "../render/render";
 import { getComponent } from "./entities/entity.manager";
-import { getGameEntity } from "./entity";
+import { getGameEntityByName } from "./entity";
 import { updatePosition } from "./systems/position/position";
 
-export enum InputKeys {
+export enum EventInputKeys {
     UP = 'z',
     LEFT = 'q',
     DOWN = 's',
     RIGHT = 'd',
 }
 
-export enum Events {
+export enum EventTypes {
+    ENTITY_CREATE = 'ENTITY_CREATE',
+    ENTITY_INVENTORY_CREATE = 'ENTITY_INVENTORY_CREATE',
+    ENTITY_POSITION_CREATE = 'ENTITY_POSITION_CREATE',
     ENTITY_POSITION_UPDATE = 'ENTITY_POSITION_UPDATE',
+    ENTITY_SPRITE_CREATE = 'ENTITY_SPRITE_CREATE',
 }
 
-export const onInputKeyDown = (inputKey: InputKeys) => {
-    const playerEntity = getGameEntity('Player');
+export type Event = {
+    type: EventTypes,
+    entityName: string,
+    data?: Object,
+};
+
+export const onInputKeyDown = (inputKey: EventInputKeys) => {
+    const playerEntity = getGameEntityByName('Player');
     const playerPosition = getComponent({ entityId: playerEntity, componentId: 'Position' });
 
     try {
-        if (inputKey === InputKeys.UP) {
+        if (inputKey === EventInputKeys.UP) {
             updatePosition({
                 entityId: playerEntity,
                 x: playerPosition._x,
                 y: playerPosition._y - 1,
             });
         }
-        if (inputKey === InputKeys.LEFT) {
+        if (inputKey === EventInputKeys.LEFT) {
             updatePosition({
                 entityId: playerEntity,
                 x: playerPosition._x - 1,
                 y: playerPosition._y,
             });
         }
-        if (inputKey === InputKeys.DOWN) {
+        if (inputKey === EventInputKeys.DOWN) {
             updatePosition({
                 entityId: playerEntity,
                 x: playerPosition._x,
                 y: playerPosition._y + 1,
             });
         }
-        if (inputKey === InputKeys.RIGHT) {
+        if (inputKey === EventInputKeys.RIGHT) {
             updatePosition({
                 entityId: playerEntity,
                 x: playerPosition._x + 1,
                 y: playerPosition._y,
             });
         }
-
-        emit(Events.ENTITY_POSITION_UPDATE, { entityName: 'Player', x: playerPosition._x, y: playerPosition._y });
     } catch (e) {
         console.error(e);
     }
