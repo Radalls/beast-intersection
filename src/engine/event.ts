@@ -1,3 +1,4 @@
+import { emit } from "../render/main";
 import { getComponent } from "./entities/entity.manager";
 import { getGameEntity } from "./entity";
 import { updatePosition } from "./systems/position/position";
@@ -28,6 +29,3 @@ export const onInputKeyDown = (inputKey: string) => {
     }
 };
 
-export const emit = (eventName: string, data: Object) => {
-    console.log(`Event ${eventName} emitted with data ${JSON.stringify(data)}`);
-};
