@@ -5,7 +5,6 @@ let app = null;
 export const render = () => {
     app = document.getElementById("app");
     document.addEventListener("keydown", onKeydown);
-    createHtml('player');
 };
 
 export const emit = ({ type, entityId, data }: {
@@ -15,24 +14,40 @@ export const emit = ({ type, entityId, data }: {
 }) => {
     console.log(`[${type}] - ${entityId}: ${JSON.stringify(data)}`);
 
-    if (type === EventTypes.ENTITY_POSITION_UPDATE) {
-        onEntityPositionUpdate(data);
+    if (type === EventTypes.ENTITY_CREATE) {
+        createHtml(entityId);
+    }
+
+    if (type === EventTypes.ENTITY_SPRITE_CREATE) {
+        createSprite(entityId, data);
+    }
+
+    if ([EventTypes.ENTITY_POSITION_CREATE, EventTypes.ENTITY_POSITION_UPDATE].includes(type)) {
+        onEntityPositionUpdate(entityId, data);
     }
 };
 
 export const onKeydown = (e: any) => { onInputKeyDown(e.key); };
 
-const createHtml = (entityName: string) => {
-    const newPlayer = document.createElement("div");
-    newPlayer.setAttribute("id", entityName);
-    newPlayer.setAttribute("class", entityName);
-    app!.appendChild(newPlayer);
+const createHtml = (entityId: string) => {
+    const entity = document.createElement("div");
+    entity.setAttribute("id", entityId);
+    entity.setAttribute("class", "entity");
+    app!.appendChild(entity);
 };
 
-const onEntityPositionUpdate = (data: any) => {
-    const entity = document.getElementById(data.entityName.toLowerCase());
-    if (entity) {
-        entity.style.left = `${data.x * 64}px`;
-        entity.style.top = `${data.y * 64}px`;
-    }
+const createSprite = (entityId: string, data: any) => {
+    const entity = document.getElementById(entityId);
+    if (!entity) return;
+
+    entity.style.height = `${data.height}px`;
+    entity.style.width = `${data.width}px`;
+};
+
+const onEntityPositionUpdate = (entityId: string, data: any) => {
+    const entity = document.getElementById(entityId);
+    if (!entity) return;
+
+    entity.style.left = `${data.x * 64}px`;
+    entity.style.top = `${data.y * 64}px`;
 };
