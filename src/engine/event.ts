@@ -1,5 +1,4 @@
-import { getComponent } from "./entities/entity.manager";
-import { getGameEntityByName } from "./entity";
+import { getComponent, checkEntityId } from "./entities/entity.manager";
 import { updatePosition } from "./systems/position/position";
 
 export enum EventInputKeys {
@@ -24,34 +23,38 @@ export type Event = {
 };
 
 export const onInputKeyDown = (inputKey: EventInputKeys) => {
-    const playerEntity = getGameEntityByName('Player');
-    const playerPosition = getComponent({ entityId: playerEntity, componentId: 'Position' });
+    const playerEntityId = checkEntityId('Player');
+    if (!(playerEntityId)) {
+        throw new Error('Player does not exist');
+    }
+
+    const playerPosition = getComponent({ entityId: playerEntityId, componentId: 'Position' });
 
     try {
         if (inputKey === EventInputKeys.UP) {
             updatePosition({
-                entityId: playerEntity,
+                entityId: playerEntityId,
                 x: playerPosition._x,
                 y: playerPosition._y - 1,
             });
         }
         if (inputKey === EventInputKeys.LEFT) {
             updatePosition({
-                entityId: playerEntity,
+                entityId: playerEntityId,
                 x: playerPosition._x - 1,
                 y: playerPosition._y,
             });
         }
         if (inputKey === EventInputKeys.DOWN) {
             updatePosition({
-                entityId: playerEntity,
+                entityId: playerEntityId,
                 x: playerPosition._x,
                 y: playerPosition._y + 1,
             });
         }
         if (inputKey === EventInputKeys.RIGHT) {
             updatePosition({
-                entityId: playerEntity,
+                entityId: playerEntityId,
                 x: playerPosition._x + 1,
                 y: playerPosition._y,
             });

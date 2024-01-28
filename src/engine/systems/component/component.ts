@@ -3,11 +3,10 @@ import { Inventory } from "../../components/inventory";
 import { Position } from "../../components/position";
 import { Sprite } from "../../components/sprite";
 import { addComponent } from "../../entities/entity.manager";
-import { getGameEntityById } from "../../entity";
 import { EventTypes } from "../../event";
 
 export const addInventory = ({ entityId, maxSlots = 10 }: {
-    entityId: number,
+    entityId: string,
     maxSlots?: number,
 }) => {
     const inventory: Inventory = {
@@ -20,12 +19,12 @@ export const addInventory = ({ entityId, maxSlots = 10 }: {
 
     emit({
         type: EventTypes.ENTITY_INVENTORY_CREATE,
-        entityName: getGameEntityById(entityId),
+        entityId,
     });
 };
 
 export const addPosition = ({ entityId, x = 0, y = 0 }: {
-    entityId: number,
+    entityId: string,
     x?: number,
     y?: number,
 }) => {
@@ -39,13 +38,13 @@ export const addPosition = ({ entityId, x = 0, y = 0 }: {
 
     emit({
         type: EventTypes.ENTITY_POSITION_CREATE,
-        entityName: getGameEntityById(entityId),
+        entityId,
         data: { x: position._x, y: position._y },
     })
 };
 
 export const addSprite = ({ entityId, height = 64, image, width = 64 }: {
-    entityId: number,
+    entityId: string,
     height?: number,
     image: string,
     width?: number,
@@ -61,7 +60,7 @@ export const addSprite = ({ entityId, height = 64, image, width = 64 }: {
 
     emit({
         type: EventTypes.ENTITY_SPRITE_CREATE,
-        entityName: getGameEntityById(entityId),
+        entityId,
         data: {
             height: sprite._height,
             image: sprite._image,

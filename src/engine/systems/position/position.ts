@@ -1,6 +1,5 @@
 import { emit } from "../../../render/render";
 import { getComponent } from "../../entities/entity.manager";
-import { getGameEntityById } from "../../entity";
 import { EventTypes } from "../../event";
 
 const invalidPosition = (x: number, y: number) => x < 0 || y < 0;
@@ -10,7 +9,7 @@ const samePosition = ({ entityPosition, inputPosition }: {
 }) => entityPosition.x === inputPosition.x && entityPosition.y === inputPosition.y
 
 export const updatePosition = ({ entityId, x, y }: {
-    entityId: number,
+    entityId: string,
     x: number,
     y: number,
 }) => {
@@ -31,7 +30,7 @@ export const updatePosition = ({ entityId, x, y }: {
 
     emit({
         type: EventTypes.ENTITY_POSITION_UPDATE,
-        entityName: getGameEntityById(entityId),
+        entityId,
         data: { x: position._x, y: position._y },
     });
 }

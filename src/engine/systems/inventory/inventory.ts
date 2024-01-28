@@ -35,7 +35,7 @@ const removeSlots = ({ inventory, slotsToRemove }: {
  * @returns whether the item was added to the inventory
  */
 export const addItemToInventory = ({ entityId, item, itemAmount }: {
-    entityId: number,
+    entityId: string,
     item: Item,
     itemAmount: number,
 }): {
@@ -111,7 +111,7 @@ export const addItemToInventory = ({ entityId, item, itemAmount }: {
  * @returns whether the item was removed from the inventory
  */
 export const removeItemFromInventory = ({ entityId, itemName, itemAmount }: {
-    entityId: number,
+    entityId: string,
     itemName: string,
     itemAmount: number,
 }): boolean => {

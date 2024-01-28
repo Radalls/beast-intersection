@@ -8,12 +8,12 @@ export const render = () => {
     createHtml('player');
 };
 
-export const emit = ({ type, entityName, data }: {
+export const emit = ({ type, entityId, data }: {
     type: EventTypes,
-    entityName: string,
+    entityId: string,
     data?: Object,
 }) => {
-    console.log(`[${type}] - ${entityName}: ${JSON.stringify(data)}`);
+    console.log(`[${type}] - ${entityId}: ${JSON.stringify(data)}`);
 
     if (type === EventTypes.ENTITY_POSITION_UPDATE) {
         onEntityPositionUpdate(data);

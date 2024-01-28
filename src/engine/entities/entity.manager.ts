@@ -1,18 +1,32 @@
+import { emit } from "../../render/render";
 import { Component } from "../components/component";
+import { EventTypes } from "../event";
 import { Entity } from "./entity";
 
-export const entities: Record<number, Entity> = {};
+export const entities: Record<string, Entity> = {};
 
-export const createEntity = (): number => {
-    const id = Object.keys(entities).length + 1;
-    entities[id] = {} as Entity;
-    return id;
+export const createEntity = (entityId: string): string => {
+    const existingEntity = getEntity(entityId);
+    if (existingEntity) {
+        throw new Error(`Entity ${entityId} already exists`);
+    }
+
+    entities[entityId] = {} as Entity;
+
+    emit({
+        type: EventTypes.ENTITY_CREATE,
+        entityId,
+    });
+
+    return entityId;
 }
 
-export const getEntity = (entityId: number): Entity | null => entities[entityId];
+export const getEntity = (entityId: string): Entity | null => entities[entityId];
+
+export const checkEntityId = (entityId: string): string | null => entities[entityId] ? entityId : null;
 
 export const addComponent = <T extends keyof Component>({ entityId, component }: {
-    entityId: number,
+    entityId: string,
     component: Component[T],
 }): void => {
     const entity = getEntity(entityId);
@@ -25,7 +39,7 @@ export const addComponent = <T extends keyof Component>({ entityId, component }:
 };
 
 export const getComponent = <T extends keyof Component>({ entityId, componentId }: {
-    entityId: number,
+    entityId: string,
     componentId: T,
 }): Component[T] => {
     const entity = getEntity(entityId);
