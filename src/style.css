@@ -1,6 +1,4 @@
-.player {
+.entity {
   position: absolute;
-  height: 64px;
-  width: 64px;
   background-color: red;
 }
