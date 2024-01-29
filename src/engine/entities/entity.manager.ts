@@ -1,4 +1,4 @@
-import { emit } from "../../render/render";
+import { event } from "../../render/event";
 import { Component } from "../components/component";
 import { EventTypes } from "../event";
 import { Entity } from "./entity";
@@ -13,7 +13,7 @@ export const createEntity = (entityId: string): string => {
 
     entities[entityId] = {} as Entity;
 
-    emit({
+    event({
         type: EventTypes.ENTITY_CREATE,
         entityId,
     });

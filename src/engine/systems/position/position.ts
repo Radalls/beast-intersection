@@ -1,4 +1,4 @@
-import { emit } from "../../../render/render";
+import { event } from "../../../render/event";
 import { getComponent } from "../../entities/entity.manager";
 import { EventTypes } from "../../event";
 
@@ -28,7 +28,7 @@ export const updatePosition = ({ entityId, x, y }: {
     position._x = x;
     position._y = y;
 
-    emit({
+    event({
         type: EventTypes.ENTITY_POSITION_UPDATE,
         entityId,
         data: { x: position._x, y: position._y },
