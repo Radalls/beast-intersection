@@ -1,7 +1,8 @@
-import { emit } from "../../../render/render";
+import { event } from "../../../render/event";
 import { Inventory } from "../../components/inventory";
 import { Position } from "../../components/position";
 import { Sprite } from "../../components/sprite";
+import { TileMap } from "../../components/tilemap";
 import { addComponent } from "../../entities/entity.manager";
 import { EventTypes } from "../../event";
 
@@ -17,7 +18,7 @@ export const addInventory = ({ entityId, maxSlots = 10 }: {
 
     addComponent({ entityId, component: inventory });
 
-    emit({
+    event({
         type: EventTypes.ENTITY_INVENTORY_CREATE,
         entityId,
     });
@@ -36,7 +37,7 @@ export const addPosition = ({ entityId, x = 0, y = 0 }: {
 
     addComponent({ entityId, component: position });
 
-    emit({
+    event({
         type: EventTypes.ENTITY_POSITION_CREATE,
         entityId,
         data: { x: position._x, y: position._y },
@@ -58,7 +59,7 @@ export const addSprite = ({ entityId, height = 64, image, width = 64 }: {
 
     addComponent({ entityId, component: sprite });
 
-    emit({
+    event({
         type: EventTypes.ENTITY_SPRITE_CREATE,
         entityId,
         data: {
@@ -68,3 +69,27 @@ export const addSprite = ({ entityId, height = 64, image, width = 64 }: {
         },
     });
 };
+
+export const addTileMap = ({ entityId, height = 10, width = 10 }: {
+    entityId: string,
+    height?: number,
+    width?: number,
+}) => {
+    const tilemap: TileMap = {
+        _: 'TileMap',
+        _height: height,
+        _width: width,
+        tiles: [],
+    };
+
+    addComponent({ entityId, component: tilemap });
+
+    event({
+        type: EventTypes.TILEMAP_CREATE,
+        entityId,
+        data: {
+            height: tilemap._height,
+            width: tilemap._width,
+        },
+    });
+}

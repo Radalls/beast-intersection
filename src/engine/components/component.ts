@@ -3,6 +3,7 @@ import { Inventory } from "./inventory";
 import { Item } from "./item";
 import { Position } from "./position";
 import { Sprite } from "./sprite";
+import { TileMap } from "./tilemap";
 
 export type Component = {
     'Info': Info;
@@ -10,4 +11,5 @@ export type Component = {
     'Item': Item;
     'Sprite': Sprite;
     'Position': Position;
+    'TileMap': TileMap;
 };
