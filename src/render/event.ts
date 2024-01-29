@@ -2,7 +2,7 @@ import { Position } from "../engine/components/position";
 import { Sprite } from "../engine/components/sprite";
 import { TileMap } from "../engine/components/tilemap";
 import { EventTypes, onInputKeyDown as engineOnInputKeyDown } from "../engine/event";
-import { createEntity, getEntity } from "./template";
+import { createEntity, updateSprite, updatePosition } from "./template";
 
 export const onInputKeyDown = (e: any) => { engineOnInputKeyDown(e.key); };
 
@@ -59,26 +59,21 @@ const onEntityPositionCreate = ({ entityId, position }: {
     entityId: string,
     position: Omit<Position, '_'>
 }) => {
-    const entity = getEntity(entityId);
-    entity.style.left = `${position._x * 64}px`;
-    entity.style.top = `${position._y * 64}px`;
+    updatePosition(entityId, position);
 }
 
 const onEntityPositionUpdate = ({ entityId, position }: {
     entityId: string,
     position: Omit<Position, '_'>
 }) => {
-    onEntityPositionCreate({ entityId, position });
+    updatePosition(entityId, position);
 };
 
 const onEntitySpriteCreate = ({ entityId, sprite }: {
     entityId: string,
     sprite: Omit<Sprite, '_'>
 }) => {
-    const entity = getEntity(entityId);
-    entity.style.height = `${sprite._height}px`;
-    entity.style.backgroundImage = `url(${sprite._image})`;
-    entity.style.width = `${sprite._width}px`;
+    updateSprite(entityId, sprite);
 };
 
 const onTileMapCreate = ({ entityId, tilemap }: {
