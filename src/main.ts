@@ -1,6 +1,6 @@
-import { engine } from "./engine/engine";
-import { render } from "./render/render";
+import { main as engineMain } from "./engine/main";
+import { main as renderMain } from "./render/main";
 import "./style.css";
 
-engine();
-render();
+renderMain();
+engineMain();
