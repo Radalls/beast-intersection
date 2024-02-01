@@ -40,11 +40,11 @@ export const addPosition = ({ entityId, x = 0, y = 0 }: {
     event({
         type: EventTypes.ENTITY_POSITION_CREATE,
         entityId,
-        data: { x: position._x, y: position._y },
+        data: (({ _, ...positionData }) => positionData)(position),
     })
 };
 
-export const addSprite = ({ entityId, height = 64, image, width = 64 }: {
+export const addSprite = ({ entityId, height = 1, image, width = 1 }: {
     entityId: string,
     height?: number,
     image: string,
@@ -62,11 +62,7 @@ export const addSprite = ({ entityId, height = 64, image, width = 64 }: {
     event({
         type: EventTypes.ENTITY_SPRITE_CREATE,
         entityId,
-        data: {
-            height: sprite._height,
-            image: sprite._image,
-            width: sprite._width,
-        },
+        data: (({ _, ...spriteData }) => spriteData)(sprite),
     });
 };
 
@@ -87,9 +83,6 @@ export const addTileMap = ({ entityId, height = 10, width = 10 }: {
     event({
         type: EventTypes.TILEMAP_CREATE,
         entityId,
-        data: {
-            height: tilemap._height,
-            width: tilemap._width,
-        },
+        data: (({ _, tiles, ...tilemapData }) => tilemapData)(tilemap),
     });
 }

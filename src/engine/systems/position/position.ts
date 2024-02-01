@@ -31,6 +31,6 @@ export const updatePosition = ({ entityId, x, y }: {
     event({
         type: EventTypes.ENTITY_POSITION_UPDATE,
         entityId,
-        data: { x: position._x, y: position._y },
+        data: (({ _, ...positionData }) => positionData)(position),
     });
 }
