@@ -9,6 +9,6 @@ export const main = () => {
 
     const playerEntityId = createEntity('Player');
     addPosition({ entityId: playerEntityId });
-    addSprite({ entityId: playerEntityId, image: 'player.png' });
+    addSprite({ entityId: playerEntityId, height: 2, image: 'player.png' });
     addInventory({ entityId: playerEntityId, maxSlots: 20 });
 };
