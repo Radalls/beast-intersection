@@ -8,7 +8,7 @@ export type TileMap = {
     tiles: Tile[],
 };
 
-type Tile = {
+export type Tile = {
     _entityIds: string[],
     position: Position,
     sprite: Sprite,
