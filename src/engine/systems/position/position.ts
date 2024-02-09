@@ -2,7 +2,11 @@ import { event } from "../../../render/event";
 import { getComponent } from "../../entities/entity.manager";
 import { EventTypes } from "../../event";
 
-const invalidPosition = (x: number, y: number) => x < 0 || y < 0;
+const invalidPosition = ({ x, y }: {
+    x: number,
+    y: number,
+}) => x < 0 || y < 0;
+
 const samePosition = ({ entityPosition, inputPosition }: {
     entityPosition: { x: number, y: number },
     inputPosition: { x: number, y: number },
@@ -13,7 +17,7 @@ export const updatePosition = ({ entityId, x, y }: {
     x: number,
     y: number,
 }) => {
-    if (invalidPosition(x, y)) {
+    if (invalidPosition({ x, y })) {
         throw new Error(`Position (${x}-${y}) is invalid`);
     }
 
