@@ -2,6 +2,7 @@ import { Sprite } from "../engine/components/sprite";
 import { TILE_PIXEL_SIZE, app } from "./main";
 import { Position } from '../engine/components/position';
 import { Tile, TileMap } from "../engine/components/tilemap";
+import { getComponent } from "../engine/entities/entity.manager";
 
 const spritePath = new URL('../assets/sprites', import.meta.url).pathname;
 
@@ -33,9 +34,10 @@ export const updatePosition = ({ entityId, position }: {
     position: Omit<Position, '_'>,
 }) => {
     const entity = getEntity({ entityId });
+    const entitySprite = getComponent({ entityId: entityId, componentId: 'Sprite' });
 
-    entity.style.left = `${position._x * TILE_PIXEL_SIZE}px`;
-    entity.style.top = `${position._y * TILE_PIXEL_SIZE}px`;
+    entity.style.left = `${position._x * TILE_PIXEL_SIZE + TILE_PIXEL_SIZE}px`;
+    entity.style.top = `${position._y * TILE_PIXEL_SIZE + TILE_PIXEL_SIZE - ((entitySprite._height - 1) * TILE_PIXEL_SIZE)}px`;
 };
 
 export const updateSprite = ({ entityId, sprite }: {
@@ -55,8 +57,6 @@ export const createTileMap = ({ entityId, tilemap }: {
     entityId: string,
     tilemap: Omit<TileMap, '_' | 'tiles'>,
 }) => {
-    createEntity({ entityId });
-
     const tilemapEntity = getEntity({ entityId });
 
     tilemapEntity.style.height = `${tilemap._height * TILE_PIXEL_SIZE}px`;
@@ -65,7 +65,7 @@ export const createTileMap = ({ entityId, tilemap }: {
     tilemapEntity.style.width = `${tilemap._width * TILE_PIXEL_SIZE}px`;
 };
 
-export const updateTileMapTile = ({ entityId, tile }: {
+export const createTileMapTile = ({ entityId, tile }: {
     entityId: string,
     tile: {
         positionX: Tile['position']['_x'],
