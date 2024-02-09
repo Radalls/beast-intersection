@@ -2,7 +2,7 @@ import { Position } from "../engine/components/position";
 import { Sprite } from "../engine/components/sprite";
 import { Tile, TileMap } from "../engine/components/tilemap";
 import { EventTypes, onInputKeyDown as engineOnInputKeyDown } from "../engine/event";
-import { createEntity, updateSprite, updatePosition, createTileMap, updateTileMapTile } from "./template";
+import { createEntity, updateSprite, updatePosition, createTileMap, createTileMapTile } from "./template";
 
 export const onInputKeyDown = (e: any) => { engineOnInputKeyDown(e.key); };
 
@@ -45,16 +45,6 @@ export const event = ({ type, entityId, data }: {
     }
     else if (type === EventTypes.TILEMAP_TILE_CREATE) {
         onTileMapTileCreate({
-            entityId,
-            tile: data as {
-                positionX: Tile['position']['_x'],
-                positionY: Tile['position']['_y'],
-                sprite: Tile['sprite']['_image'],
-            },
-        });
-    }
-    else if (type === EventTypes.TILEMAP_TILE_UPDATE) {
-        onTileMapTileUpdate({
             entityId,
             tile: data as {
                 positionX: Tile['position']['_x'],
@@ -116,16 +106,5 @@ const onTileMapTileCreate = ({ entityId, tile }: {
         sprite: Tile['sprite']['_image'],
     },
 }) => {
-    updateTileMapTile({ entityId, tile });
-};
-
-const onTileMapTileUpdate = ({ entityId, tile }: {
-    entityId: string,
-    tile: {
-        positionX: Tile['position']['_x'],
-        positionY: Tile['position']['_y'],
-        sprite: Tile['sprite']['_image'],
-    },
-}) => {
-    updateTileMapTile({ entityId, tile });
+    createTileMapTile({ entityId, tile });
 };
