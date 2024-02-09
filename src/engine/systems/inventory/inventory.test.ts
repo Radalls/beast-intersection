@@ -3,11 +3,15 @@ import { Item } from "../../components/item";
 import { addComponent, createEntity } from "../../entities/entity.manager";
 import { addItemToInventory, removeItemFromInventory } from "./inventory";
 
+jest.mock('../../../render/event.ts', () => ({
+    event: jest.fn(),
+}));
+
 // maxAmount is always 2
 jest.mock('./inventory.data');
 
 describe('Inventory system', () => {
-    const entityId = createEntity();
+    const entityId = createEntity('Entity');
     const inventory: Inventory = {
         _: 'Inventory',
         _maxSlots: 2,

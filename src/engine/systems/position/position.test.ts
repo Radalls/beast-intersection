@@ -2,8 +2,12 @@ import { Position } from "../../components/position";
 import { addComponent, createEntity } from "../../entities/entity.manager";
 import { updatePosition } from "./position";
 
+jest.mock('../../../render/event.ts', () => ({
+    event: jest.fn(),
+}));
+
 describe('Position System', () => {
-    const entityId = createEntity();
+    const entityId = createEntity('Entity');
     const position: Position = {
         _: 'Position',
         _x: 0,
