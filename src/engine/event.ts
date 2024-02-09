@@ -1,5 +1,5 @@
 import { getComponent, checkEntityId } from "./entities/entity.manager";
-import { updatePosition } from "./systems/position/position";
+import { updateTile } from "./systems/tilemap/tilemap";
 
 export enum EventInputKeys {
     UP = 'z',
@@ -16,7 +16,6 @@ export enum EventTypes {
     ENTITY_SPRITE_CREATE = 'ENTITY_SPRITE_CREATE',
     TILEMAP_CREATE = 'TILEMAP_CREATE',
     TILEMAP_TILE_CREATE = 'TILEMAP_TILE_CREATE',
-    TILEMAP_TILE_UPDATE = 'TILEMAP_TILE_UPDATE',
 }
 
 export type Event = {
@@ -26,6 +25,11 @@ export type Event = {
 };
 
 export const onInputKeyDown = (inputKey: EventInputKeys) => {
+    const tilemapEntityId = checkEntityId('TileMap');
+    if (!(tilemapEntityId)) {
+        throw new Error('TileMap does not exist');
+    }
+
     const playerEntityId = checkEntityId('Player');
     if (!(playerEntityId)) {
         throw new Error('Player does not exist');
@@ -35,32 +39,36 @@ export const onInputKeyDown = (inputKey: EventInputKeys) => {
 
     try {
         if (inputKey === EventInputKeys.UP) {
-            updatePosition({
+            updateTile({
+                tilemapEntityId,
                 entityId: playerEntityId,
-                x: playerPosition._x,
-                y: playerPosition._y - 1,
-            });
+                targetX: playerPosition._x,
+                targetY: playerPosition._y - 1,
+            })
         }
         if (inputKey === EventInputKeys.LEFT) {
-            updatePosition({
+            updateTile({
+                tilemapEntityId,
                 entityId: playerEntityId,
-                x: playerPosition._x - 1,
-                y: playerPosition._y,
-            });
+                targetX: playerPosition._x - 1,
+                targetY: playerPosition._y,
+            })
         }
         if (inputKey === EventInputKeys.DOWN) {
-            updatePosition({
+            updateTile({
+                tilemapEntityId,
                 entityId: playerEntityId,
-                x: playerPosition._x,
-                y: playerPosition._y + 1,
-            });
+                targetX: playerPosition._x,
+                targetY: playerPosition._y + 1,
+            })
         }
         if (inputKey === EventInputKeys.RIGHT) {
-            updatePosition({
+            updateTile({
+                tilemapEntityId,
                 entityId: playerEntityId,
-                x: playerPosition._x + 1,
-                y: playerPosition._y,
-            });
+                targetX: playerPosition._x + 1,
+                targetY: playerPosition._y,
+            })
         }
     } catch (e) {
         console.error(e);
