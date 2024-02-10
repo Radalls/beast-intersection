@@ -6,7 +6,12 @@ import { getComponent } from "../engine/entities/entity.manager";
 
 const spritePath = new URL('../assets/sprites', import.meta.url).pathname;
 
-export const getEntity = ({ entityId }: {
+const getSpritePath = (spriteName: string) => {
+    const spriteFolderPath = spriteName.replace(/^(.*?)(\/[^\/]+)?(\.[^\.\/]+)?$/, '$1').split('_')[0];
+    return `${spritePath}/${spriteFolderPath}/${spriteName}`;
+}
+
+const getEntity = ({ entityId }: {
     entityId: string,
 }) => {
     const entity = document.getElementById(entityId);
@@ -17,16 +22,23 @@ export const getEntity = ({ entityId }: {
     return entity;
 }
 
-export const createEntity = ({ entityId }: {
+export const createEntity = ({ entityId, htmlId, htmlClass, htmlParent }: {
     entityId: string,
+    htmlId?: string,
+    htmlClass?: string,
+    htmlParent?: HTMLElement,
 }) => {
     const entity = document.createElement("div");
-    entity.setAttribute("id", entityId);
-    entity.setAttribute("class", entityId);
+
+    entity.setAttribute("id", htmlId ?? entityId);
+    entity.setAttribute("class", htmlClass ?? entityId);
 
     entity.style.position = "absolute";
 
-    app.appendChild(entity);
+    const parent = htmlParent ?? app;
+    parent.appendChild(entity);
+
+    return entity;
 };
 
 export const updatePosition = ({ entityId, position }: {
@@ -36,8 +48,8 @@ export const updatePosition = ({ entityId, position }: {
     const entity = getEntity({ entityId });
     const entitySprite = getComponent({ entityId: entityId, componentId: 'Sprite' });
 
-    entity.style.left = `${position._x * TILE_PIXEL_SIZE + TILE_PIXEL_SIZE}px`;
     entity.style.top = `${position._y * TILE_PIXEL_SIZE + TILE_PIXEL_SIZE - ((entitySprite._height - 1) * TILE_PIXEL_SIZE)}px`;
+    entity.style.left = `${position._x * TILE_PIXEL_SIZE + TILE_PIXEL_SIZE}px`;
 };
 
 export const updateSprite = ({ entityId, sprite }: {
@@ -46,11 +58,10 @@ export const updateSprite = ({ entityId, sprite }: {
 }) => {
     const entity = getEntity({ entityId });
 
-    const spriteName = sprite._image.replace(/^(.*?)(\/[^\/]+)?(\.[^\.\/]+)?$/, '$1');
+    entity.style.backgroundImage = `url(${getSpritePath(sprite._image)})`;
 
-    entity.style.height = `${sprite._height * TILE_PIXEL_SIZE}px`;
-    entity.style.backgroundImage = `url(${spritePath}/${spriteName}/${sprite._image})`;
     entity.style.width = `${sprite._width * TILE_PIXEL_SIZE}px`;
+    entity.style.height = `${sprite._height * TILE_PIXEL_SIZE}px`;
 };
 
 export const createTileMap = ({ entityId, tilemap }: {
@@ -59,10 +70,10 @@ export const createTileMap = ({ entityId, tilemap }: {
 }) => {
     const tilemapEntity = getEntity({ entityId });
 
-    tilemapEntity.style.height = `${tilemap._height * TILE_PIXEL_SIZE}px`;
-    tilemapEntity.style.left = `${TILE_PIXEL_SIZE * 1}px`;
-    tilemapEntity.style.top = `${TILE_PIXEL_SIZE * 1}px`;
+    tilemapEntity.style.top = `${TILE_PIXEL_SIZE}px`;
+    tilemapEntity.style.left = `${TILE_PIXEL_SIZE}px`;
     tilemapEntity.style.width = `${tilemap._width * TILE_PIXEL_SIZE}px`;
+    tilemapEntity.style.height = `${tilemap._height * TILE_PIXEL_SIZE}px`;
 };
 
 export const createTileMapTile = ({ entityId, tile }: {
@@ -75,16 +86,16 @@ export const createTileMapTile = ({ entityId, tile }: {
 }) => {
     const tilemapEntity = getEntity({ entityId });
 
-    const tileEntity = document.createElement("div");
+    const tileEntity = createEntity({
+        entityId,
+        htmlId: `${entityId}-${tile.positionX}-${tile.positionY}`,
+        htmlClass: "tile",
+        htmlParent: tilemapEntity,
+    });
 
-    tileEntity.setAttribute("id", `${entityId}-${tile.positionX}-${tile.positionY}`);
-    tileEntity.setAttribute("class", "tile");
-    tileEntity.style.backgroundImage = `url(${spritePath}/tile/${tile.sprite})`;
-    tileEntity.style.height = `${TILE_PIXEL_SIZE}px`;
-    tileEntity.style.left = `${tile.positionX * TILE_PIXEL_SIZE}px`;
-    tileEntity.style.position = "absolute";
+    tileEntity.style.backgroundImage = `url(${getSpritePath(tile.sprite)})`;
     tileEntity.style.top = `${tile.positionY * TILE_PIXEL_SIZE}px`;
+    tileEntity.style.left = `${tile.positionX * TILE_PIXEL_SIZE}px`;
     tileEntity.style.width = `${TILE_PIXEL_SIZE}px`;
-
-    tilemapEntity.appendChild(tileEntity);
+    tileEntity.style.height = `${TILE_PIXEL_SIZE}px`;
 };
