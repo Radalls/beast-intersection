@@ -1,4 +1,4 @@
-import { Item } from "./item";
+import { Sprite } from "./sprite";
 
 export type Inventory = {
     _: 'Inventory';
@@ -10,4 +10,16 @@ type InventorySlot = {
     _amount: number;
     _maxAmount: number;
     item: Item;
+};
+
+export type Item = {
+    _: 'Item';
+    info: ItemInfo;
+    sprite: Sprite;
+};
+
+type ItemInfo = {
+    _: 'Info';
+    _description?: string;
+    _name: string;
 };
