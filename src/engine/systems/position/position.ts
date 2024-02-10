@@ -32,9 +32,13 @@ export const updatePosition = ({ entityId, x, y }: {
     position._x = x;
     position._y = y;
 
+    const sprite = getComponent({ entityId, componentId: 'Sprite' });
     event({
         type: EventTypes.ENTITY_POSITION_UPDATE,
         entityId,
-        data: (({ _, ...positionData }) => positionData)(position),
+        data: {
+            position: (({ _, ...positionData }) => positionData)(position),
+            sprite: (({ _, _image, ...spriteData }) => spriteData)(sprite),
+        },
     });
 }
