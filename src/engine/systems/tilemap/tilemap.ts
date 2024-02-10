@@ -39,11 +39,7 @@ export const generateTiles = (tilemapEntityId: string) => {
             event({
                 type: EventTypes.TILEMAP_TILE_CREATE,
                 entityId: tilemapEntityId,
-                data: {
-                    positionX: tile.position._x,
-                    positionY: tile.position._y,
-                    sprite: tile.sprite._image,
-                },
+                data: (({ _entityIds, ...tileData }) => tileData)(tile),
             });
         }
     }
