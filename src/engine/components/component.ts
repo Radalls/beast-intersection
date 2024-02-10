@@ -1,15 +1,15 @@
-import { Info } from "./info";
 import { Inventory } from "./inventory";
-import { Item } from "./item";
 import { Position } from "./position";
+import { Resource } from "./resource";
 import { Sprite } from "./sprite";
 import { TileMap } from "./tilemap";
+import { Trigger } from "./trigger";
 
 export type Component = {
-    'Info': Info;
     'Inventory': Inventory;
-    'Item': Item;
     'Sprite': Sprite;
     'Position': Position;
+    'Resource': Resource;
     'TileMap': TileMap;
+    'Trigger': Trigger;
 };
