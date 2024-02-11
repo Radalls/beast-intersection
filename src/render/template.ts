@@ -57,6 +57,7 @@ export const updatePosition = ({ entityId, position, sprite }: {
 
     entity.style.left = `${position._x * TILE_PIXEL_SIZE + TILE_PIXEL_SIZE}px`;
     entity.style.top = `${position._y * TILE_PIXEL_SIZE + TILE_PIXEL_SIZE - ((sprite._height - 1) * TILE_PIXEL_SIZE)}px`;
+    entity.style.zIndex = `${position._y}`;
 };
 
 export const createSprite = ({ entityId, sprite }: {
