@@ -1,5 +1,4 @@
-import { Inventory } from './../../components/inventory';
-import { Item } from "../../components/item";
+import { Inventory, Item } from './../../components/inventory';
 import { addComponent, createEntity } from "../../entities/entity.manager";
 import { addItemToInventory, removeItemFromInventory } from "./inventory";
 
@@ -18,18 +17,12 @@ describe('Inventory system', () => {
         slots: [],
     };
     const item1: Item = {
-        _: 'Item',
-        info: {
-            _: 'Info',
-            _name: 'item1',
-        },
+        info: { _name: 'item1' },
+        sprite: { _image: 'item1.png' },
     };
     const item2: Item = {
-        _: 'Item',
-        info: {
-            _: 'Info',
-            _name: 'item2',
-        },
+        info: { _name: 'item2' },
+        sprite: { _image: 'item2.png' },
     };
 
     beforeAll(() => {
@@ -51,7 +44,19 @@ describe('Inventory system', () => {
         test('Should throw if parameters are invalid', () => {
             expect(() => addItemToInventory({
                 entityId,
-                item: { _: 'Item', info: { _: 'Info', _name: '' } },
+                item: {
+                    info: { _name: '' },
+                    sprite: { _image: 'item.png' },
+                },
+                itemAmount: 1,
+            })).toThrow();
+
+            expect(() => addItemToInventory({
+                entityId,
+                item: {
+                    info: { _name: 'ItemTest' },
+                    sprite: { _image: '' },
+                },
                 itemAmount: 1,
             })).toThrow();
 
