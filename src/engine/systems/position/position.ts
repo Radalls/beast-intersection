@@ -2,6 +2,7 @@ import { event } from "../../../render/event";
 import { getComponent } from "../../entities/entity.manager";
 import { EventTypes } from "../../event";
 
+//#region CHECKS
 const invalidPosition = ({ x, y }: {
     x: number,
     y: number,
@@ -11,7 +12,9 @@ const samePosition = ({ entityPosition, inputPosition }: {
     entityPosition: { x: number, y: number },
     inputPosition: { x: number, y: number },
 }) => entityPosition.x === inputPosition.x && entityPosition.y === inputPosition.y
+//#endregion
 
+//#region ACTIONS
 export const updatePosition = ({ entityId, x, y }: {
     entityId: string,
     x: number,
@@ -42,3 +45,4 @@ export const updatePosition = ({ entityId, x, y }: {
         },
     });
 }
+//#endregion
