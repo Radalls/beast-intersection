@@ -1,20 +1,24 @@
 import { event } from "../../../render/event";
 import { Tile } from "../../components/tilemap";
-import { getComponent } from "../../entities/entity.manager"
+import { checkComponent, getComponent } from "../../entities/entity.manager"
 import { EventTypes } from "../../event";
 import { updatePosition } from "../position/position";
+import { setTrigger } from "../trigger/trigger";
 
-const findTileByPosition = ({ tiles, x, y }: {
-    tiles: Tile[],
-    x: number,
-    y: number,
-}) => tiles.find(tile => tile.position._x === x && tile.position._y === y);
-
+//#region HELPERS
 const findTileByEntityId = ({ tiles, entityId }: {
     tiles: Tile[],
     entityId: string,
 }) => tiles.find(tile => tile._entityIds.includes(entityId));
 
+export const findTileByPosition = ({ tiles, x, y }: {
+    tiles: Tile[],
+    x: number,
+    y: number,
+}) => tiles.find(tile => tile.position._x === x && tile.position._y === y);
+//#endregion
+
+//#region ACTIONS
 export const generateTiles = (tilemapEntityId: string) => {
     const tilemap = getComponent({ entityId: tilemapEntityId, componentId: 'TileMap' });
 
@@ -22,16 +26,13 @@ export const generateTiles = (tilemapEntityId: string) => {
         for (let j = 0; j < tilemap._height; j++) {
             const tile: Tile = {
                 _entityIds: [],
+                _triggerEntityIds: [],
                 position: {
-                    _: 'Position',
                     _x: j,
                     _y: i,
                 },
                 sprite: { // temp
-                    _: 'Sprite',
-                    _height: 1,
                     _image: 'tile_grass.png',
-                    _width: 1,
                 },
             }
             tilemap.tiles.push(tile);
@@ -51,6 +52,7 @@ export const setTile = ({ tilemapEntityId, entityId }: {
 }) => {
     const tilemap = getComponent({ entityId: tilemapEntityId, componentId: 'TileMap' });
     const entityPosition = getComponent({ entityId, componentId: 'Position' });
+
     const targetTile = findTileByPosition({
         tiles: tilemap.tiles,
         x: entityPosition._x,
@@ -61,6 +63,11 @@ export const setTile = ({ tilemapEntityId, entityId }: {
     }
 
     targetTile._entityIds.push(entityId);
+
+    const entityTrigger = checkComponent({ entityId, componentId: 'Trigger' });
+    if (entityTrigger) {
+        setTrigger({ tilemapEntityId, entityId });
+    }
 }
 
 export const updateTile = ({ tilemapEntityId, entityId, targetX, targetY }: {
@@ -72,7 +79,10 @@ export const updateTile = ({ tilemapEntityId, entityId, targetX, targetY }: {
     const tilemap = getComponent({ entityId: tilemapEntityId, componentId: 'TileMap' });
     const entityTile = findTileByEntityId({ tiles: tilemap.tiles, entityId });
     if (!(entityTile)) {
-        throw new Error(`Tile ${entityId} not found`);
+        throw {
+            message: `Tile ${entityId} not found`,
+            where: updateTile.name,
+        }
     }
 
     const targetTile = findTileByPosition({
@@ -81,7 +91,10 @@ export const updateTile = ({ tilemapEntityId, entityId, targetX, targetY }: {
         y: targetY,
     });
     if (!(targetTile)) {
-        throw new Error(`Tile ${targetX}-${targetY} not found`);
+        throw {
+            message: `Tile [${targetX}:${targetY}] not found`,
+            where: updateTile.name,
+        }
     }
 
     targetTile._entityIds.push(entityId);
@@ -89,3 +102,4 @@ export const updateTile = ({ tilemapEntityId, entityId, targetX, targetY }: {
 
     updatePosition({ entityId, x: targetTile.position._x, y: targetTile.position._y });
 };
+//#endregion
