@@ -3,13 +3,16 @@ import { Position } from "../engine/components/position";
 import { Sprite } from "../engine/components/sprite";
 import { Tile, TileMap } from "../engine/components/tilemap";
 import { EventTypes, onInputKeyDown as engineOnInputKeyDown } from "../engine/event";
-import { createEntity, createSprite, updatePosition, createTileMap, createTileMapTile } from "./template";
+import { createEntity, createSprite, updatePosition, createTileMap, createTileMapTile, destroyEntity } from "./template";
 
 export const onInputKeyDown = (e: any) => { engineOnInputKeyDown(e.key); };
 
 export const event = (event: Event) => {
     if (event.type === EventTypes.ENTITY_CREATE) {
         onEntityCreate({ entityId: event.entityId });
+    }
+    else if (event.type === EventTypes.ENTITY_DESTROY) {
+        onEntityDestroy({ entityId: event.entityId });
     }
     else if (event.type === EventTypes.ENTITY_INVENTORY_CREATE) {
         onEntityInventoryCreate({ entityId: event.entityId });
@@ -50,6 +53,12 @@ const onEntityCreate = ({ entityId }: {
     entityId: string,
 }) => {
     createEntity({ entityId });
+};
+
+const onEntityDestroy = ({ entityId }: {
+    entityId: string,
+}) => {
+    destroyEntity({ entityId });
 };
 
 const onEntityInventoryCreate = ({ entityId }: {
