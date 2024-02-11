@@ -1,4 +1,5 @@
 import { Position } from "../../components/position";
+import { Sprite } from "../../components/sprite";
 import { TileMap } from "../../components/tilemap";
 import { addComponent, createEntity } from "../../entities/entity.manager";
 import { generateTiles, setTile, updateTile } from "./tilemap";
@@ -22,6 +23,12 @@ describe('TileMap System', () => {
         _x: 1,
         _y: 1,
     };
+    const playerSprite: Sprite = {
+        _: 'Sprite',
+        _height: 1,
+        _image: 'player.png',
+        _width: 1,
+    };
 
     const playerStartTileId = 4;
 
@@ -34,6 +41,10 @@ describe('TileMap System', () => {
         addComponent({
             entityId: playerEntityId,
             component: playerPosition,
+        });
+        addComponent({
+            entityId: playerEntityId,
+            component: playerSprite,
         });
     });
 
