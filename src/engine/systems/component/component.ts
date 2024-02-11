@@ -40,6 +40,7 @@ export const addPosition = ({ entityId, x = 0, y = 0 }: {
     addComponent({ entityId, component: position });
 
     const sprite = getComponent({ entityId, componentId: 'Sprite' });
+
     event({
         type: EventTypes.ENTITY_POSITION_UPDATE,
         entityId,
@@ -59,16 +60,11 @@ export const addResource = ({ entityId, isTemporary = false, itemName }: {
         _: 'Resource',
         _isTemporary: isTemporary,
         item: {
-            _: 'Item',
             info: {
-                _: 'Info',
                 _name: itemName,
             },
             sprite: {
-                _: 'Sprite',
-                _height: 1,
                 _image: `${itemName.toLowerCase()}.png`,
-                _width: 1,
             },
         },
     };
@@ -119,15 +115,17 @@ export const addTileMap = ({ entityId, height = 10, width = 10 }: {
     });
 }
 
-export const addTrigger = ({ entityId, height = 1, width = 1 }: {
+export const addTrigger = ({ entityId, priority = 0, points }: {
     entityId: string,
-    height?: number,
-    width?: number,
+    priority?: number,
+    points?: { x: number, y: number }[],
 }) => {
     const trigger: Trigger = {
         _: 'Trigger',
-        _height: height,
-        _width: width,
+        _priority: priority,
+        points: (points)
+            ? points.map(({ x, y }) => ({ _offsetX: x, _offsetY: y }))
+            : [{ _offsetX: 0, _offsetY: 0 }],
     };
 
     addComponent({ entityId, component: trigger });
