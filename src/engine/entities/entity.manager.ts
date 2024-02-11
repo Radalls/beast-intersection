@@ -5,10 +5,13 @@ import { Entity } from "./entity";
 
 export const entities: Record<string, Entity> = {};
 
-export const createEntity = (entityId: string): string => {
+export const createEntity = (entityId: string) => {
     const existingEntity = getEntity(entityId);
     if (existingEntity) {
-        throw new Error(`Entity ${entityId} already exists`);
+        throw {
+            message: `Entity ${entityId} already exists`,
+            where: createEntity.name,
+        }
     }
 
     entities[entityId] = {} as Entity;
@@ -21,17 +24,20 @@ export const createEntity = (entityId: string): string => {
     return entityId;
 }
 
-export const getEntity = (entityId: string): Entity | null => entities[entityId];
+export const getEntity = (entityId: string) => entities[entityId] ? entities[entityId] : null;
 
-export const checkEntityId = (entityId: string): string | null => entities[entityId] ? entityId : null;
+export const checkEntityId = (entityId: string) => entities[entityId] ? entityId : null;
 
 export const addComponent = <T extends keyof Component>({ entityId, component }: {
     entityId: string,
     component: Component[T],
-}): void => {
+}) => {
     const entity = getEntity(entityId);
     if (!(entity)) {
-        throw new Error(`Entity ${entityId} does not exist`);
+        throw {
+            message: `Entity ${entityId} does not exist`,
+            where: addComponent.name,
+        }
     }
 
     // @ts-ignore - Component[T] is not assignable to type 'undefined'
@@ -44,13 +50,45 @@ export const getComponent = <T extends keyof Component>({ entityId, componentId 
 }): Component[T] => {
     const entity = getEntity(entityId);
     if (!(entity)) {
-        throw new Error(`Entity ${entityId} does not exist`);
+        throw {
+            message: `Entity ${entityId} does not exist`,
+            where: getComponent.name,
+        }
     }
 
     const component = entity[componentId];
     if (!(component)) {
-        throw new Error(`Entity ${entityId} does not have component ${componentId}`);
+        throw {
+            message: `Entity ${entityId} does not have a ${componentId}`,
+            where: getComponent.name,
+        }
     }
 
     return component;
 };
+
+export const checkComponent = <T extends keyof Component>({ entityId, componentId }: {
+    entityId: string,
+    componentId: T,
+}) => {
+    const entity = getEntity(entityId);
+    if (!(entity)) {
+        throw {
+            message: `Entity ${entityId} does not exist`,
+            where: checkComponent.name,
+        }
+    }
+
+    return entity[componentId] ? componentId : null;
+}
+
+export const destroyEntity = ({ entityId }: {
+    entityId: string,
+}) => {
+    delete entities[entityId];
+
+    event({
+        type: EventTypes.ENTITY_DESTROY,
+        entityId,
+    });
+}
