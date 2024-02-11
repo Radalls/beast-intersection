@@ -1,12 +1,15 @@
-import { Inventory } from "../../components/inventory";
-import { Item } from "../../components/item";
+import { Inventory, Item } from "../../components/inventory";
 import { getComponent } from "../../entities/entity.manager";
 import { findItemRule } from "./inventory.data";
 
-const invalidItemName = (itemName: string): boolean => !(itemName) || itemName === '';
-const invalidItemAmount = (itemAmount: number): boolean => itemAmount <= 0;
-const slotAvailable = (inventory: Inventory): boolean => inventory.slots.length < inventory._maxSlots;
+//#region CHECKS
+const invalidItemName = (itemName: string) => !(itemName) || itemName === '';
+const invalidItemAmount = (itemAmount: number) => itemAmount <= 0;
+const invalidItemSprite = (itemSprite: string) => !(itemSprite) || itemSprite === '';
+const slotAvailable = (inventory: Inventory) => inventory.slots.length < inventory._maxSlots;
+//#endregion
 
+//#region HELPERS
 const findSlotsWithItem = ({ inventory, itemName }: {
     inventory: Inventory,
     itemName: string,
@@ -27,7 +30,9 @@ const removeSlots = ({ inventory, slotsToRemove }: {
     inventory: Inventory,
     slotsToRemove: number[],
 }) => inventory.slots = inventory.slots.filter((_, index) => !(slotsToRemove.includes(index)));
+//#endregion
 
+//#region ACTIONS
 /**
  * Adds an item to an inventory.
  * @param entityId needs to have an inventory
@@ -42,13 +47,19 @@ export const addItemToInventory = ({ entityId, item, itemAmount }: {
     success: boolean,
     amountRemaining?: number
 } => {
-    if (invalidItemName(item.info._name) || invalidItemAmount(itemAmount)) {
-        throw new Error(`Item ${item} is invalid`);
+    if (invalidItemName(item.info._name) || invalidItemAmount(itemAmount) || invalidItemSprite(item.sprite._image)) {
+        throw {
+            message: `Item ${item.info._name} is invalid`,
+            where: addItemToInventory.name,
+        }
     }
 
     const itemRule = findItemRule(item.info._name);
     if (!itemRule) {
-        throw new Error(`Item ${item} no data found`);
+        throw {
+            message: `Item ${item.info._name} does not exist`,
+            where: addItemToInventory.name,
+        }
     }
 
     const inventory = getComponent({ entityId, componentId: 'Inventory' });
@@ -151,3 +162,4 @@ export const removeItemFromInventory = ({ entityId, itemName, itemAmount }: {
     removeSlots({ inventory, slotsToRemove });
     return true;
 }
+//#endregion
