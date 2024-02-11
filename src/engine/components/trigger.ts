@@ -1,5 +1,10 @@
 export type Trigger = {
     _: 'Trigger',
-    _height: number,
-    _width: number,
+    _priority: number,
+    points: TriggerPoint[],
+};
+
+export type TriggerPoint = {
+    _offsetX: number,
+    _offsetY: number,
 };
