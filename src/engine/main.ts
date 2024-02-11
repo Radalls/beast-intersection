@@ -11,7 +11,6 @@ export const main = () => {
     addSprite({ entityId: playerEntityId, height: 2, image: 'player.png' });
     addPosition({ entityId: playerEntityId });
     addInventory({ entityId: playerEntityId, maxSlots: 20 });
-
     setTile({ tilemapEntityId, entityId: playerEntityId });
 
     const stickEntityId = createEntity('ResourceStick');
@@ -23,6 +22,5 @@ export const main = () => {
         itemName: 'Stick',
     });
     addTrigger({ entityId: stickEntityId });
-
     setTile({ tilemapEntityId, entityId: stickEntityId });
 };
