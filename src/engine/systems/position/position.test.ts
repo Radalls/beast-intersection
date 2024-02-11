@@ -19,6 +19,15 @@ describe('Position System', () => {
             entityId,
             component: position,
         });
+        addComponent({
+            entityId,
+            component: {
+                _: 'Sprite',
+                _height: 1,
+                _image: 'sprite.png',
+                _width: 1,
+            },
+        });
     });
 
     beforeEach(() => {
