@@ -40,6 +40,14 @@ export const createEntity = ({ entityId, htmlId, htmlClass, htmlParent }: {
     return entity;
 };
 
+export const destroyEntity = ({ entityId }: {
+    entityId: string,
+}) => {
+    const entity = getEntity({ entityId });
+
+    entity.remove();
+};
+
 export const updatePosition = ({ entityId, position, sprite }: {
     entityId: string,
     position: Pick<Position, '_x' | '_y'>,
