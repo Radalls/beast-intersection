@@ -7,7 +7,7 @@
         "build": "tsc && vite build",
         "dev": "vite",
         "preview": "vite preview",
-        "test": "jest --config jest.config.cjs"
+        "test": "jest --watch --config jest.config.cjs"
     },
     "devDependencies": {
         "@types/jest": "^29.5.11",
