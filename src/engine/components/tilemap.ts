@@ -10,6 +10,11 @@ export type TileMap = {
 
 export type Tile = {
     _entityIds: string[],
-    position: Position,
-    sprite: Sprite,
+    _triggerEntityIds: string[],
+    position: TilePosition,
+    sprite: TileSprite,
 };
+
+type TilePosition = Pick<Position, '_x' | '_y'>;
+
+type TileSprite = Pick<Sprite, '_image'>;
