@@ -1,17 +1,21 @@
-import { getComponent, checkEntityId } from "./entities/entity.manager";
+import { getComponent, checkEntityId, checkComponent } from "./entities/entity.manager";
+import { useResource } from "./systems/resource/resource";
 import { updateTile } from "./systems/tilemap/tilemap";
+import { checkTrigger } from "./systems/trigger/trigger";
 
 export enum EventInputKeys {
     UP = 'z',
     LEFT = 'q',
     DOWN = 's',
     RIGHT = 'd',
+    ACT = 'e',
+    INVENTORY = 'i',
 }
 
 export enum EventTypes {
     ENTITY_CREATE = 'ENTITY_CREATE',
+    ENTITY_DESTROY = 'ENTITY_DESTROY',
     ENTITY_INVENTORY_CREATE = 'ENTITY_INVENTORY_CREATE',
-    ENTITY_POSITION_CREATE = 'ENTITY_POSITION_CREATE',
     ENTITY_POSITION_UPDATE = 'ENTITY_POSITION_UPDATE',
     ENTITY_SPRITE_CREATE = 'ENTITY_SPRITE_CREATE',
     TILEMAP_CREATE = 'TILEMAP_CREATE',
@@ -20,7 +24,7 @@ export enum EventTypes {
 
 export type Event = {
     type: EventTypes,
-    entityName: string,
+    entityId: string,
     data?: Object,
 };
 
@@ -46,7 +50,7 @@ export const onInputKeyDown = (inputKey: EventInputKeys) => {
                 targetY: playerPosition._y - 1,
             })
         }
-        if (inputKey === EventInputKeys.LEFT) {
+        else if (inputKey === EventInputKeys.LEFT) {
             updateTile({
                 tilemapEntityId,
                 entityId: playerEntityId,
@@ -54,7 +58,7 @@ export const onInputKeyDown = (inputKey: EventInputKeys) => {
                 targetY: playerPosition._y,
             })
         }
-        if (inputKey === EventInputKeys.DOWN) {
+        else if (inputKey === EventInputKeys.DOWN) {
             updateTile({
                 tilemapEntityId,
                 entityId: playerEntityId,
@@ -62,7 +66,7 @@ export const onInputKeyDown = (inputKey: EventInputKeys) => {
                 targetY: playerPosition._y + 1,
             })
         }
-        if (inputKey === EventInputKeys.RIGHT) {
+        else if (inputKey === EventInputKeys.RIGHT) {
             updateTile({
                 tilemapEntityId,
                 entityId: playerEntityId,
@@ -70,7 +74,27 @@ export const onInputKeyDown = (inputKey: EventInputKeys) => {
                 targetY: playerPosition._y,
             })
         }
+        else if (inputKey === EventInputKeys.ACT) {
+            const triggeredEntityId = checkTrigger({ tilemapEntityId, entityId: playerEntityId });
+            if (triggeredEntityId) {
+                onTrigger({ entityId: playerEntityId, triggeredEntityId });
+            }
+        }
+        else if (inputKey === EventInputKeys.INVENTORY) { // temp
+            const playerInventory = getComponent({ entityId: playerEntityId, componentId: 'Inventory' });
+            console.log(playerInventory);
+        }
     } catch (e) {
         console.error(e);
+    }
+};
+
+export const onTrigger = ({ entityId, triggeredEntityId }: {
+    entityId: string,
+    triggeredEntityId: string,
+}) => {
+    const resource = checkComponent({ entityId: triggeredEntityId, componentId: 'Resource' });
+    if (resource) {
+        useResource({ entityId, triggeredEntityId });
     }
 };
