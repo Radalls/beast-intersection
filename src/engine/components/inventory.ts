@@ -13,13 +13,13 @@ type InventorySlot = {
 };
 
 export type Item = {
-    _: 'Item';
     info: ItemInfo;
-    sprite: Sprite;
+    sprite: ItemSprite;
 };
 
 type ItemInfo = {
-    _: 'Info';
     _description?: string;
     _name: string;
 };
+
+type ItemSprite = Pick<Sprite, '_image'>;
