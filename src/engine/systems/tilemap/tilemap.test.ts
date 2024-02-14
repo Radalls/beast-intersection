@@ -58,7 +58,7 @@ describe('TileMap System', () => {
         });
 
         test('Should generate tiles', () => {
-            generateTiles(tilemapEntityId);
+            generateTiles({ tilemapEntityId });
 
             expect(tilemap.tiles.length).toBe(9);
             expect(tilemap.tiles[0]._entityIds.length).toBe(0);
@@ -73,7 +73,7 @@ describe('TileMap System', () => {
 
     describe(setTile.name, () => {
         beforeAll(() => {
-            generateTiles(tilemapEntityId);
+            generateTiles({ tilemapEntityId });
         });
 
         beforeEach(() => {
@@ -107,7 +107,7 @@ describe('TileMap System', () => {
 
     describe(updateTile.name, () => {
         beforeAll(() => {
-            generateTiles(tilemapEntityId);
+            generateTiles({ tilemapEntityId });
         });
 
         beforeEach(() => {
