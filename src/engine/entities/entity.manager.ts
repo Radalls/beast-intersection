@@ -1,7 +1,8 @@
 import { event } from "../../render/event";
 import { Component } from "../components/component";
 import { EventTypes } from "../event";
-import { Entity } from "./entity";
+import { setTileMap, setPlayer } from "../store";
+import { Entity, TILEMAP_ENTITY_ID, PLAYER_ENTITY_ID } from "./entity";
 
 export const entities: Record<string, Entity> = {};
 
@@ -15,6 +16,13 @@ export const createEntity = (entityId: string) => {
     }
 
     entities[entityId] = {} as Entity;
+
+    if (entityId === PLAYER_ENTITY_ID) {
+        setPlayer(entityId);
+    }
+    else if (entityId === TILEMAP_ENTITY_ID) {
+        setTileMap(entityId);
+    }
 
     event({
         type: EventTypes.ENTITY_CREATE,
