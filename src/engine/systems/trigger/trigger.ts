@@ -1,36 +1,25 @@
 import { getComponent } from "../../entities/entity.manager";
+import { getPlayer } from "../../store";
 import { findTileByPosition } from "../tilemap/tilemap";
 
 //#region HELPERS
-const sortTriggersByPriority = ({ triggerEntityIds }: {
-    triggerEntityIds: string[],
-}) => {
-    return triggerEntityIds.sort((a, b) => {
+const sortTriggersByPriority = ({ triggerEntityIds }: { triggerEntityIds: string[] }) =>
+    triggerEntityIds.sort((a, b) => {
         const aTrigger = getComponent({ entityId: a, componentId: 'Trigger' });
         const bTrigger = getComponent({ entityId: b, componentId: 'Trigger' });
         return bTrigger._priority - aTrigger._priority;
     });
-}
 
-const findPriorityTriggerEntityId = ({ triggerEntityIds }: {
-    triggerEntityIds: string[],
-}) => {
-    return triggerEntityIds[0];
-}
+const findPriorityTriggerEntityId = ({ triggerEntityIds }: { triggerEntityIds: string[] }) => triggerEntityIds[0];
 //#endregion
 
 //#region ACTIONS
-export const setTrigger = ({ tilemapEntityId, entityId }: {
-    tilemapEntityId: string,
-    entityId: string,
-}) => {
-    const tilemap = getComponent({ entityId: tilemapEntityId, componentId: 'TileMap' });
+export const setTrigger = ({ entityId }: { entityId: string }) => {
     const entityPosition = getComponent({ entityId, componentId: 'Position' });
     const entityTrigger = getComponent({ entityId, componentId: 'Trigger' });
 
     for (const point of entityTrigger.points) {
         const pointTile = findTileByPosition({
-            tiles: tilemap.tiles,
             x: entityPosition._x + point._offsetX,
             y: entityPosition._y + point._offsetY,
         });
@@ -44,15 +33,18 @@ export const setTrigger = ({ tilemapEntityId, entityId }: {
     }
 }
 
-export const checkTrigger = ({ tilemapEntityId, entityId }: {
-    tilemapEntityId: string,
-    entityId: string,
-}) => {
-    const tilemap = getComponent({ entityId: tilemapEntityId, componentId: 'TileMap' });
+export const checkTrigger = ({ entityId }: { entityId?: string | null }) => {
+    entityId = entityId || getPlayer();
+    if (!(entityId)) {
+        throw {
+            message: `Entity does not exist`,
+            where: checkTrigger.name,
+        }
+    }
+
     const entityPosition = getComponent({ entityId, componentId: 'Position' });
 
     const entityTile = findTileByPosition({
-        tiles: tilemap.tiles,
         x: entityPosition._x,
         y: entityPosition._y,
     });
@@ -69,4 +61,20 @@ export const checkTrigger = ({ tilemapEntityId, entityId }: {
 
     return findPriorityTriggerEntityId({ triggerEntityIds: entityTile._triggerEntityIds });
 }
+
+export const destroyTrigger = ({ entityId }: { entityId: string }) => {
+    const entityPosition = getComponent({ entityId, componentId: 'Position' });
+    const entityTrigger = getComponent({ entityId, componentId: 'Trigger' });
+
+    for (const point of entityTrigger.points) {
+        const pointTile = findTileByPosition({
+            x: entityPosition._x + point._offsetX,
+            y: entityPosition._y + point._offsetY,
+        });
+
+        if (pointTile) {
+            pointTile._triggerEntityIds = pointTile._triggerEntityIds.filter((id) => id !== entityId);
+        }
+    }
+};
 //#endregion ACTIONS
