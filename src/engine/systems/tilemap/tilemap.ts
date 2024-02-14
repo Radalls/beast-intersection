@@ -2,24 +2,51 @@ import { event } from "../../../render/event";
 import { Tile } from "../../components/tilemap";
 import { checkComponent, getComponent } from "../../entities/entity.manager"
 import { EventTypes } from "../../event";
+import { getTileMap } from "../../store";
 import { updatePosition } from "../position/position";
 import { setTrigger } from "../trigger/trigger";
 
 //#region HELPERS
-const findTileByEntityId = ({ tiles, entityId }: {
-    tiles: Tile[],
-    entityId: string,
-}) => tiles.find(tile => tile._entityIds.includes(entityId));
+export const findTileByEntityId = ({ entityId }: { entityId: string }) => {
+    const tilemapEntityId = getTileMap();
+    if (!(tilemapEntityId)) {
+        throw {
+            message: `Tilemap does not exist`,
+            where: findTileByEntityId.name,
+        }
+    }
 
-export const findTileByPosition = ({ tiles, x, y }: {
-    tiles: Tile[],
+    return getComponent({ entityId: tilemapEntityId, componentId: 'TileMap' }).tiles
+        .find(tile => tile._entityIds.includes(entityId));
+}
+
+export const findTileByPosition = ({ x, y }: {
     x: number,
     y: number,
-}) => tiles.find(tile => tile.position._x === x && tile.position._y === y);
+}) => {
+    const tilemapEntityId = getTileMap();
+    if (!(tilemapEntityId)) {
+        throw {
+            message: `Tilemap does not exist`,
+            where: findTileByPosition.name,
+        }
+    }
+
+    return getComponent({ entityId: tilemapEntityId, componentId: 'TileMap' }).tiles
+        .find(tile => tile.position._x === x && tile.position._y === y);
+}
 //#endregion
 
 //#region ACTIONS
-export const generateTiles = (tilemapEntityId: string) => {
+export const generateTiles = ({ tilemapEntityId }: { tilemapEntityId?: string | null }) => {
+    if (!(tilemapEntityId)) tilemapEntityId = getTileMap();
+    if (!(tilemapEntityId)) {
+        throw {
+            message: `Tilemap does not exist`,
+            where: generateTiles.name,
+        }
+    }
+
     const tilemap = getComponent({ entityId: tilemapEntityId, componentId: 'TileMap' });
 
     for (let i = 0; i < tilemap._width; i++) {
@@ -47,14 +74,20 @@ export const generateTiles = (tilemapEntityId: string) => {
 }
 
 export const setTile = ({ tilemapEntityId, entityId }: {
-    tilemapEntityId: string,
+    tilemapEntityId?: string | null,
     entityId: string,
 }) => {
-    const tilemap = getComponent({ entityId: tilemapEntityId, componentId: 'TileMap' });
+    if (!(tilemapEntityId)) tilemapEntityId = getTileMap();
+    if (!(tilemapEntityId)) {
+        throw {
+            message: `Tilemap does not exist`,
+            where: generateTiles.name,
+        }
+    }
+
     const entityPosition = getComponent({ entityId, componentId: 'Position' });
 
     const targetTile = findTileByPosition({
-        tiles: tilemap.tiles,
         x: entityPosition._x,
         y: entityPosition._y,
     });
@@ -66,18 +99,25 @@ export const setTile = ({ tilemapEntityId, entityId }: {
 
     const entityTrigger = checkComponent({ entityId, componentId: 'Trigger' });
     if (entityTrigger) {
-        setTrigger({ tilemapEntityId, entityId });
+        setTrigger({ entityId });
     }
 }
 
 export const updateTile = ({ tilemapEntityId, entityId, targetX, targetY }: {
-    tilemapEntityId: string,
+    tilemapEntityId?: string | null,
     entityId: string,
     targetX: number,
     targetY: number,
 }) => {
-    const tilemap = getComponent({ entityId: tilemapEntityId, componentId: 'TileMap' });
-    const entityTile = findTileByEntityId({ tiles: tilemap.tiles, entityId });
+    if (!(tilemapEntityId)) tilemapEntityId = getTileMap();
+    if (!(tilemapEntityId)) {
+        throw {
+            message: `Tilemap does not exist`,
+            where: generateTiles.name,
+        }
+    }
+
+    const entityTile = findTileByEntityId({ entityId });
     if (!(entityTile)) {
         throw {
             message: `Tile ${entityId} not found`,
@@ -86,7 +126,6 @@ export const updateTile = ({ tilemapEntityId, entityId, targetX, targetY }: {
     }
 
     const targetTile = findTileByPosition({
-        tiles: tilemap.tiles,
         x: targetX,
         y: targetY,
     });
