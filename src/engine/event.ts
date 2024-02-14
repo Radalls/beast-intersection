@@ -1,4 +1,5 @@
-import { getComponent, checkEntityId, checkComponent } from "./entities/entity.manager";
+import { getComponent, checkComponent } from "./entities/entity.manager";
+import { getPlayer } from "./store";
 import { useResource } from "./systems/resource/resource";
 import { updateTile } from "./systems/tilemap/tilemap";
 import { checkTrigger } from "./systems/trigger/trigger";
@@ -29,14 +30,12 @@ export type Event = {
 };
 
 export const onInputKeyDown = (inputKey: EventInputKeys) => {
-    const tilemapEntityId = checkEntityId('TileMap');
-    if (!(tilemapEntityId)) {
-        throw new Error('TileMap does not exist');
-    }
-
-    const playerEntityId = checkEntityId('Player');
+    const playerEntityId = getPlayer();
     if (!(playerEntityId)) {
-        throw new Error('Player does not exist');
+        throw {
+            message: `Player does not exist`,
+            where: onInputKeyDown.name,
+        }
     }
 
     const playerPosition = getComponent({ entityId: playerEntityId, componentId: 'Position' });
@@ -44,7 +43,6 @@ export const onInputKeyDown = (inputKey: EventInputKeys) => {
     try {
         if (inputKey === EventInputKeys.UP) {
             updateTile({
-                tilemapEntityId,
                 entityId: playerEntityId,
                 targetX: playerPosition._x,
                 targetY: playerPosition._y - 1,
@@ -52,7 +50,6 @@ export const onInputKeyDown = (inputKey: EventInputKeys) => {
         }
         else if (inputKey === EventInputKeys.LEFT) {
             updateTile({
-                tilemapEntityId,
                 entityId: playerEntityId,
                 targetX: playerPosition._x - 1,
                 targetY: playerPosition._y,
@@ -60,7 +57,6 @@ export const onInputKeyDown = (inputKey: EventInputKeys) => {
         }
         else if (inputKey === EventInputKeys.DOWN) {
             updateTile({
-                tilemapEntityId,
                 entityId: playerEntityId,
                 targetX: playerPosition._x,
                 targetY: playerPosition._y + 1,
@@ -68,16 +64,15 @@ export const onInputKeyDown = (inputKey: EventInputKeys) => {
         }
         else if (inputKey === EventInputKeys.RIGHT) {
             updateTile({
-                tilemapEntityId,
                 entityId: playerEntityId,
                 targetX: playerPosition._x + 1,
                 targetY: playerPosition._y,
             })
         }
         else if (inputKey === EventInputKeys.ACT) {
-            const triggeredEntityId = checkTrigger({ tilemapEntityId, entityId: playerEntityId });
+            const triggeredEntityId = checkTrigger({});
             if (triggeredEntityId) {
-                onTrigger({ entityId: playerEntityId, triggeredEntityId });
+                onTrigger({ triggeredEntityId });
             }
         }
         else if (inputKey === EventInputKeys.INVENTORY) { // temp
@@ -90,11 +85,19 @@ export const onInputKeyDown = (inputKey: EventInputKeys) => {
 };
 
 export const onTrigger = ({ entityId, triggeredEntityId }: {
-    entityId: string,
+    entityId?: string | null,
     triggeredEntityId: string,
 }) => {
+    if (!(entityId)) entityId = getPlayer();
+    if (!(entityId)) {
+        throw {
+            message: `Entity does not exist`,
+            where: onTrigger.name,
+        }
+    }
+
     const resource = checkComponent({ entityId: triggeredEntityId, componentId: 'Resource' });
     if (resource) {
-        useResource({ entityId, triggeredEntityId });
+        useResource({ triggeredEntityId });
     }
 };
