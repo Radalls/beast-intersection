@@ -3,7 +3,8 @@ import { Position } from "../engine/components/position";
 import { Sprite } from "../engine/components/sprite";
 import { Tile, TileMap } from "../engine/components/tilemap";
 import { EventTypes, onInputKeyDown as engineOnInputKeyDown } from "../engine/event";
-import { createEntity, createSprite, updatePosition, createTileMap, createTileMapTile, destroyEntity } from "./template";
+import { createEntity, createSprite, updatePosition, createTileMap, createTileMapTile, destroyEntity, createInventory, displayInventory, updateInventory } from "./template";
+import { Inventory } from '../engine/components/inventory';
 
 export const onInputKeyDown = (e: any) => { engineOnInputKeyDown(e.key); };
 
@@ -14,8 +15,20 @@ export const event = (event: Event) => {
     else if (event.type === EventTypes.ENTITY_DESTROY) {
         onEntityDestroy({ entityId: event.entityId });
     }
-    else if (event.type === EventTypes.ENTITY_INVENTORY_CREATE) {
-        onEntityInventoryCreate({ entityId: event.entityId });
+    else if (event.type === EventTypes.ENTITY_INVENTORY_CREATE && event.data) {
+        onEntityInventoryCreate({
+            entityId: event.entityId,
+            inventory: event.data as Pick<Inventory, '_maxSlots'>,
+        });
+    }
+    else if (event.type === EventTypes.ENTITY_INVENTORY_DISPLAY) {
+        onEntityInventoryDisplay({ entityId: event.entityId });
+    }
+    else if (event.type === EventTypes.ENTITY_INVENTORY_UPDATE && event.data) {
+        onEntityInventoryUpdate({
+            entityId: event.entityId,
+            inventory: event.data as Pick<Inventory, 'slots'>,
+        });
     }
     else if (event.type === EventTypes.ENTITY_POSITION_UPDATE && event.data) {
         onEntityPositionUpdate({
@@ -61,11 +74,23 @@ const onEntityDestroy = ({ entityId }: {
     destroyEntity({ entityId });
 };
 
-const onEntityInventoryCreate = ({ entityId }: {
+const onEntityInventoryCreate = ({ entityId, inventory }: {
     entityId: string,
+    inventory: Pick<Inventory, '_maxSlots'>,
 }) => {
-    console.log('onEntityInventoryCreate', entityId);
+    createInventory({ entityId, inventory });
 }
+
+const onEntityInventoryDisplay = ({ entityId }: { entityId: string }) => {
+    displayInventory({ entityId });
+};
+
+const onEntityInventoryUpdate = ({ entityId, inventory }: {
+    entityId: string,
+    inventory: Pick<Inventory, 'slots'>,
+}) => {
+    updateInventory({ entityId, inventory });
+};
 
 const onEntityPositionUpdate = ({ entityId, data: { position, sprite } }: {
     entityId: string,
