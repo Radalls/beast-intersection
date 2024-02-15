@@ -1,4 +1,6 @@
+import { event } from "../render/event";
 import { getComponent, checkComponent } from "./entities/entity.manager";
+import { state } from "./state";
 import { getPlayer } from "./store";
 import { useResource } from "./systems/resource/resource";
 import { updateTile } from "./systems/tilemap/tilemap";
@@ -17,6 +19,8 @@ export enum EventTypes {
     ENTITY_CREATE = 'ENTITY_CREATE',
     ENTITY_DESTROY = 'ENTITY_DESTROY',
     ENTITY_INVENTORY_CREATE = 'ENTITY_INVENTORY_CREATE',
+    ENTITY_INVENTORY_DISPLAY = 'ENTITY_INVENTORY_DISPLAY',
+    ENTITY_INVENTORY_UPDATE = 'ENTITY_INVENTORY_UPDATE',
     ENTITY_POSITION_UPDATE = 'ENTITY_POSITION_UPDATE',
     ENTITY_SPRITE_CREATE = 'ENTITY_SPRITE_CREATE',
     TILEMAP_CREATE = 'TILEMAP_CREATE',
@@ -41,43 +45,49 @@ export const onInputKeyDown = (inputKey: EventInputKeys) => {
     const playerPosition = getComponent({ entityId: playerEntityId, componentId: 'Position' });
 
     try {
-        if (inputKey === EventInputKeys.UP) {
-            updateTile({
+        if (inputKey === EventInputKeys.INVENTORY) {
+            state.isInventoryOpen = !(state.isInventoryOpen);
+
+            event({
+                type: EventTypes.ENTITY_INVENTORY_DISPLAY,
                 entityId: playerEntityId,
-                targetX: playerPosition._x,
-                targetY: playerPosition._y - 1,
-            })
+            });
         }
-        else if (inputKey === EventInputKeys.LEFT) {
-            updateTile({
-                entityId: playerEntityId,
-                targetX: playerPosition._x - 1,
-                targetY: playerPosition._y,
-            })
-        }
-        else if (inputKey === EventInputKeys.DOWN) {
-            updateTile({
-                entityId: playerEntityId,
-                targetX: playerPosition._x,
-                targetY: playerPosition._y + 1,
-            })
-        }
-        else if (inputKey === EventInputKeys.RIGHT) {
-            updateTile({
-                entityId: playerEntityId,
-                targetX: playerPosition._x + 1,
-                targetY: playerPosition._y,
-            })
-        }
-        else if (inputKey === EventInputKeys.ACT) {
-            const triggeredEntityId = checkTrigger({});
-            if (triggeredEntityId) {
-                onTrigger({ triggeredEntityId });
+        if (!(state.isInventoryOpen)) {
+            if (inputKey === EventInputKeys.UP) {
+                updateTile({
+                    entityId: playerEntityId,
+                    targetX: playerPosition._x,
+                    targetY: playerPosition._y - 1,
+                })
             }
-        }
-        else if (inputKey === EventInputKeys.INVENTORY) { // temp
-            const playerInventory = getComponent({ entityId: playerEntityId, componentId: 'Inventory' });
-            console.log(playerInventory);
+            else if (inputKey === EventInputKeys.LEFT) {
+                updateTile({
+                    entityId: playerEntityId,
+                    targetX: playerPosition._x - 1,
+                    targetY: playerPosition._y,
+                })
+            }
+            else if (inputKey === EventInputKeys.DOWN) {
+                updateTile({
+                    entityId: playerEntityId,
+                    targetX: playerPosition._x,
+                    targetY: playerPosition._y + 1,
+                })
+            }
+            else if (inputKey === EventInputKeys.RIGHT) {
+                updateTile({
+                    entityId: playerEntityId,
+                    targetX: playerPosition._x + 1,
+                    targetY: playerPosition._y,
+                })
+            }
+            else if (inputKey === EventInputKeys.ACT) {
+                const triggeredEntityId = checkTrigger({});
+                if (triggeredEntityId) {
+                    onTrigger({ triggeredEntityId });
+                }
+            }
         }
     } catch (e) {
         console.error(e);
