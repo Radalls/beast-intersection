@@ -5,6 +5,7 @@ import { Resource } from "../../components/resource";
 import { Sprite } from "../../components/sprite";
 import { TileMap } from "../../components/tilemap";
 import { Trigger } from "../../components/trigger";
+import { PLAYER_ENTITY_ID } from "../../entities/entity";
 import { addComponent, getComponent } from "../../entities/entity.manager";
 import { EventTypes } from "../../event";
 
@@ -20,10 +21,13 @@ export const addInventory = ({ entityId, maxSlots = 10 }: {
 
     addComponent({ entityId, component: inventory });
 
-    event({
-        type: EventTypes.ENTITY_INVENTORY_CREATE,
-        entityId,
-    });
+    if (entityId === PLAYER_ENTITY_ID) {
+        event({
+            type: EventTypes.ENTITY_INVENTORY_CREATE,
+            entityId,
+            data: (({ _, slots, ...inventoryData }) => inventoryData)(inventory),
+        });
+    }
 };
 
 export const addPosition = ({ entityId, x = 0, y = 0 }: {
@@ -64,7 +68,7 @@ export const addResource = ({ entityId, isTemporary = false, itemName }: {
                 _name: itemName,
             },
             sprite: {
-                _image: `${itemName.toLowerCase()}.png`,
+                _image: `item_${itemName.toLowerCase()}.png`,
             },
         },
     };
