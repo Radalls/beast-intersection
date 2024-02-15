@@ -1,5 +1,7 @@
+import { event } from "../../../render/event";
 import { Inventory, Item } from "../../components/inventory";
 import { getComponent } from "../../entities/entity.manager";
+import { EventTypes } from "../../event";
 import { findItemRule } from "./inventory.data";
 
 //#region CHECKS
@@ -93,6 +95,12 @@ export const addItemToInventory = ({ entityId, item, itemAmount }: {
                 itemMaxAmount: itemRule.maxAmount,
             });
 
+            event({
+                type: EventTypes.ENTITY_INVENTORY_UPDATE,
+                entityId,
+                data: (({ _, _maxSlots, ...inventoryData }) => inventoryData)(inventory),
+            });
+
             return { success: true };
         }
 
@@ -110,6 +118,12 @@ export const addItemToInventory = ({ entityId, item, itemAmount }: {
             itemAmount: itemAmountRemaining,
         });
     }
+
+    event({
+        type: EventTypes.ENTITY_INVENTORY_UPDATE,
+        entityId,
+        data: (({ _, _maxSlots, ...inventoryData }) => inventoryData)(inventory),
+    });
 
     return { success: false, amountRemaining: itemAmount };
 }
@@ -160,6 +174,13 @@ export const removeItemFromInventory = ({ entityId, itemName, itemAmount }: {
     }
 
     removeSlots({ inventory, slotsToRemove });
+
+    event({
+        type: EventTypes.ENTITY_INVENTORY_UPDATE,
+        entityId,
+        data: (({ _, _maxSlots, ...inventoryData }) => inventoryData)(inventory),
+    });
+
     return true;
 }
 //#endregion
