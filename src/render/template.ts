@@ -11,8 +11,6 @@ const TILE_PIXEL_SIZE = 64;
 
 const INVENTORY_SLOT_SIZE = 64;
 const INVENTORY_SLOTS_PER_ROW = 7;
-const INVENTORY_BG_COLOR = 'rgba(109, 60, 24, 1)';
-const INVENTORY_SLOT_BG_COLOR = 'rgba(242, 186, 106, 1)';
 //#endregion
 
 //#region HELPERS
@@ -68,37 +66,23 @@ export const createInventory = ({ entityId, inventory }: {
         htmlClass: 'inventory',
     });
 
-    entityInventory.style.width = `${INVENTORY_SLOTS_PER_ROW * INVENTORY_SLOT_SIZE + (INVENTORY_SLOTS_PER_ROW - 1) * 2}px`;
-    entityInventory.style.height = `${(Math.ceil(inventory._maxSlots / INVENTORY_SLOTS_PER_ROW)) * INVENTORY_SLOT_SIZE}px`;
-    entityInventory.style.left = '50%';
-    entityInventory.style.transform = 'translateX(-50%)';
-    entityInventory.style.bottom = `${INVENTORY_SLOT_SIZE}px`;
-    entityInventory.style.zIndex = '100';
-    entityInventory.style.padding = '8px';
-    entityInventory.style.backgroundColor = INVENTORY_BG_COLOR;
-    entityInventory.style.justifyContent = 'center';
-    entityInventory.style.flexWrap = 'wrap';
-    entityInventory.style.gap = '2px';
-    entityInventory.style.display = 'none';
+    const inventoryWidth = INVENTORY_SLOTS_PER_ROW * INVENTORY_SLOT_SIZE + (INVENTORY_SLOTS_PER_ROW - 1) * 2;
+    entityInventory.style.width = `${inventoryWidth}px`;
+    const inventoryHeight = (Math.ceil(inventory._maxSlots / INVENTORY_SLOTS_PER_ROW)) * INVENTORY_SLOT_SIZE;
+    entityInventory.style.height = `${inventoryHeight}px`;
 
     for (let i = 0; i < inventory._maxSlots; i++) {
-        const entityInventorySlot = createEntity({
+        createEntity({
             entityId,
             htmlId: `${entityId}-inventory-slot-${i}`,
             htmlClass: 'inventory-slot',
             htmlParent: entityInventory,
             htmlAbsolute: false,
         });
-
-        entityInventorySlot.style.width = `${INVENTORY_SLOT_SIZE}px`;
-        entityInventorySlot.style.height = `${INVENTORY_SLOT_SIZE}px`;
-        entityInventorySlot.style.backgroundColor = INVENTORY_SLOT_BG_COLOR;
     }
 }
 
-export const displayInventory = ({ entityId }: {
-    entityId: string,
-}) => {
+export const displayInventory = ({ entityId }: { entityId: string }) => {
     const entityInventory = getEntity({ entityId: `${entityId}-inventory` });
 
     entityInventory.style.display = (entityInventory.style.display === 'flex') ? 'none' : 'flex';
@@ -112,8 +96,6 @@ export const updateInventory = ({ entityId, inventory }: {
         const entityInventorySlot = getEntity({ entityId: `${entityId}-inventory-slot-${inventory.slots.indexOf(slot)}` });
 
         entityInventorySlot.style.backgroundImage = `url(${getSpritePath(slot.item.sprite._image)})`;
-        entityInventorySlot.style.backgroundSize = 'cover';
-        entityInventorySlot.style.backgroundRepeat = 'no-repeat';
 
         const entityInventorySlotAmount = createEntity({
             entityId,
@@ -123,8 +105,6 @@ export const updateInventory = ({ entityId, inventory }: {
         });
 
         entityInventorySlotAmount.textContent = `x${slot._amount.toString()}`;
-        entityInventorySlotAmount.style.right = '0px';
-        entityInventorySlotAmount.style.bottom = '0px';
     }
 }
 
