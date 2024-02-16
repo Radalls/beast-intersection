@@ -11,8 +11,8 @@ const TILE_PIXEL_SIZE = 64;
 
 const INVENTORY_SLOT_SIZE = 64;
 const INVENTORY_SLOTS_PER_ROW = 7;
-const INVENTORY_BG_COLOR = 'rgba(0, 0, 0, 1)';
-const INVENTORY_SLOT_BG_COLOR = 'rgba(232, 255, 233, 1)';
+const INVENTORY_BG_COLOR = 'rgba(109, 60, 24, 1)';
+const INVENTORY_SLOT_BG_COLOR = 'rgba(242, 186, 106, 1)';
 //#endregion
 
 //#region HELPERS
@@ -114,6 +114,17 @@ export const updateInventory = ({ entityId, inventory }: {
         entityInventorySlot.style.backgroundImage = `url(${getSpritePath(slot.item.sprite._image)})`;
         entityInventorySlot.style.backgroundSize = 'cover';
         entityInventorySlot.style.backgroundRepeat = 'no-repeat';
+
+        const entityInventorySlotAmount = createEntity({
+            entityId,
+            htmlId: `${entityId}-inventory-slot-${inventory.slots.indexOf(slot)}-amount`,
+            htmlClass: 'inventory-slot-amount',
+            htmlParent: entityInventorySlot,
+        });
+
+        entityInventorySlotAmount.textContent = `x${slot._amount.toString()}`;
+        entityInventorySlotAmount.style.right = '0px';
+        entityInventorySlotAmount.style.bottom = '0px';
     }
 }
 
