@@ -1,0 +1,25 @@
+.inventory {
+    background-color: rgba(109, 60, 24, 1);
+    bottom: 64px;
+    display: none;
+    flex-wrap: wrap;
+    gap: 2px;
+    justify-content: center;
+    left: 50%;
+    padding: 8px;
+    transform: translateX(-50%);
+    z-index: 100;
+}
+
+.inventory-slot {
+    width: 64px;
+    height: 64px;
+    background-color: rgba(242, 186, 106, 1);
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.inventory-slot-amount {
+    bottom: 0px;
+    right: 0px;
+}
