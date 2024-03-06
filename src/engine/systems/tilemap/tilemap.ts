@@ -1,14 +1,14 @@
 import { event } from "../../../render/event";
 import { Tile } from "../../components/tilemap";
-import { checkComponent, getComponent } from "../../entities/entity.manager"
+import { checkComponent, getComponent } from "../../services/entity"
 import { EventTypes } from "../../event";
-import { getTileMap } from "../../store";
+import { getStore } from "../../store";
 import { updatePosition } from "../position/position";
 import { setTrigger } from "../trigger/trigger";
 
 //#region HELPERS
 export const findTileByEntityId = ({ entityId }: { entityId: string }) => {
-    const tilemapEntityId = getTileMap();
+    const tilemapEntityId = getStore('tilemapId');
     if (!(tilemapEntityId)) {
         throw {
             message: `Tilemap does not exist`,
@@ -24,7 +24,7 @@ export const findTileByPosition = ({ x, y }: {
     x: number,
     y: number,
 }) => {
-    const tilemapEntityId = getTileMap();
+    const tilemapEntityId = getStore('tilemapId');
     if (!(tilemapEntityId)) {
         throw {
             message: `Tilemap does not exist`,
@@ -39,7 +39,7 @@ export const findTileByPosition = ({ x, y }: {
 
 //#region ACTIONS
 export const generateTiles = ({ tilemapEntityId }: { tilemapEntityId?: string | null }) => {
-    if (!(tilemapEntityId)) tilemapEntityId = getTileMap();
+    if (!(tilemapEntityId)) tilemapEntityId = getStore('tilemapId');
     if (!(tilemapEntityId)) {
         throw {
             message: `Tilemap does not exist`,
@@ -77,7 +77,7 @@ export const setTile = ({ tilemapEntityId, entityId }: {
     tilemapEntityId?: string | null,
     entityId: string,
 }) => {
-    if (!(tilemapEntityId)) tilemapEntityId = getTileMap();
+    if (!(tilemapEntityId)) tilemapEntityId = getStore('tilemapId');
     if (!(tilemapEntityId)) {
         throw {
             message: `Tilemap does not exist`,
@@ -109,7 +109,7 @@ export const updateTile = ({ tilemapEntityId, entityId, targetX, targetY }: {
     targetX: number,
     targetY: number,
 }) => {
-    if (!(tilemapEntityId)) tilemapEntityId = getTileMap();
+    if (!(tilemapEntityId)) tilemapEntityId = getStore('tilemapId');
     if (!(tilemapEntityId)) {
         throw {
             message: `Tilemap does not exist`,
