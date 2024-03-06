@@ -1,12 +1,11 @@
-import { checkEntityId } from './entities/entity.manager';
+import { checkEntityId } from './services/entity';
 
-export const store = {
-    playerId: undefined as string | undefined,
-    tilemapId: undefined as string | undefined,
+const store = {
+    playerId: '',
+    tilemapId: '',
+    activityId: '',
 };
 
-export const setPlayer = (entityId: string) => store.playerId = entityId;
-export const getPlayer = () => store.playerId && checkEntityId(store.playerId);
-
-export const setTileMap = (entityId: string) => store.tilemapId = entityId;
-export const getTileMap = () => store.tilemapId && checkEntityId(store.tilemapId);
+export const setStore = (key: keyof typeof store, value: string) => store[key] = value;
+export const getStore = (key: keyof typeof store) => store[key] && checkEntityId(store[key]);
+export const clearStore = (key: keyof typeof store) => store[key] = '';
