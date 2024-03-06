@@ -3,7 +3,6 @@ module.exports = {
     preset: 'ts-jest/presets/default-esm',
     testEnvironment: 'jsdom',
     testMatch: ['**/*.test.ts'],
-    modulePathIgnorePatterns: ["<rootDir>/src/render"],
     transform: {
         '^.+\\.tsx?$': [
             'ts-jest',
