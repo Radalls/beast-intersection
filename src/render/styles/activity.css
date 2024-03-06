@@ -1,0 +1,41 @@
+.activity-bug {
+    align-items: center;
+    background-color: rgb(241, 21, 65);
+    border: solid 8px rgb(120, 10, 32);
+    border-radius: 8px;
+    color: white;
+    display: flex;
+    gap: 32px;
+    justify-content: center;
+    left: 50%;
+    padding: 16px;
+    height: 128px;
+    text-align: center;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 384px;
+    z-index: 100;
+}
+
+.activity-bug-score {
+    display: flex;
+    flex-direction: column;
+    font-size: 24px;
+}
+
+.activity-bug-symbol {
+    align-items: center;
+    display: flex;
+    font-size: 32px;
+    gap: 32px;
+    justify-content: center;
+}
+
+.activity-bug-symbol-value {
+    font-weight: bold;
+}
+
+.activity-bug-symbol-found {
+    height: 64px;
+    width: 64px;
+}
