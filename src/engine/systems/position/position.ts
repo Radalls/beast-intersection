@@ -1,5 +1,5 @@
 import { event } from "../../../render/event";
-import { getComponent } from "../../entities/entity.manager";
+import { getComponent } from "../../services/entity";
 import { EventTypes } from "../../event";
 
 //#region CHECKS
