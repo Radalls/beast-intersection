@@ -1,13 +1,15 @@
-import { checkComponent, destroyEntity, getComponent } from "../../entities/entity.manager";
-import { getPlayer } from "../../store";
+import { ActivityTypes } from "../../components/resource";
+import { checkComponent, destroyEntity, getComponent } from "../../services/entity";
+import { getStore } from "../../store";
+import { startActivityBug } from "../../services/activity/activity.bug";
 import { addItemToInventory } from "../inventory/inventory";
 import { destroyTrigger } from "../trigger/trigger";
 
-export const useResource = ({ entityId, triggeredEntityId }: {
+export const useResource = ({ entityId, resourceEntityId }: {
     entityId?: string | null,
-    triggeredEntityId: string,
+    resourceEntityId: string,
 }) => {
-    entityId = entityId || getPlayer();
+    entityId = entityId || getStore('playerId');
     if (!(entityId)) {
         throw {
             message: `Entity does not exist`,
@@ -15,7 +17,33 @@ export const useResource = ({ entityId, triggeredEntityId }: {
         }
     }
 
-    const resource = getComponent({ entityId: triggeredEntityId, componentId: 'Resource' });
+    const resource = getComponent({ entityId: resourceEntityId, componentId: 'Resource' });
+
+    if (resource._activityType === ActivityTypes.PICKUP) {
+        getResourceItem({ resourceEntityId });
+
+        if (resource._isTemporary) {
+            destroyResource({ resourceEntityId });
+        }
+    }
+    else if (resource._activityType === ActivityTypes.BUG && resource.activityData) {
+        startActivityBug({ activityId: resourceEntityId });
+    }
+};
+
+export const getResourceItem = ({ entityId, resourceEntityId }: {
+    entityId?: string | null,
+    resourceEntityId: string,
+}) => {
+    entityId = entityId || getStore('playerId');
+    if (!(entityId)) {
+        throw {
+            message: `Entity does not exist`,
+            where: useResource.name,
+        }
+    }
+
+    const resource = getComponent({ entityId: resourceEntityId, componentId: 'Resource' });
 
     addItemToInventory({
         entityId,
@@ -23,11 +51,16 @@ export const useResource = ({ entityId, triggeredEntityId }: {
         itemAmount: 1,
     });
 
-    if (resource._isTemporary) {
-        const resourceTrigger = checkComponent({ entityId: triggeredEntityId, componentId: 'Trigger' });
-        if (resourceTrigger) {
-            destroyTrigger({ entityId: triggeredEntityId });
-        }
-        destroyEntity({ entityId: triggeredEntityId });
+    return resource.item;
+}
+
+export const destroyResource = ({ resourceEntityId }: {
+    resourceEntityId: string,
+}) => {
+    const resourceTrigger = checkComponent({ entityId: resourceEntityId, componentId: 'Trigger' });
+    if (resourceTrigger) {
+        destroyTrigger({ entityId: resourceEntityId });
     }
-};
+
+    destroyEntity({ entityId: resourceEntityId });
+}
