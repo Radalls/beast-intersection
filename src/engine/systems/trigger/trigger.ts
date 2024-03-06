@@ -1,5 +1,5 @@
-import { getComponent } from "../../entities/entity.manager";
-import { getPlayer } from "../../store";
+import { getComponent } from "../../services/entity";
+import { getStore } from "../../store";
 import { findTileByPosition } from "../tilemap/tilemap";
 
 //#region HELPERS
@@ -34,7 +34,7 @@ export const setTrigger = ({ entityId }: { entityId: string }) => {
 }
 
 export const checkTrigger = ({ entityId }: { entityId?: string | null }) => {
-    entityId = entityId || getPlayer();
+    entityId = entityId || getStore('playerId');
     if (!(entityId)) {
         throw {
             message: `Entity does not exist`,
