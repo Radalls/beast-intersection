@@ -3,8 +3,9 @@ import { Position } from "../engine/components/position";
 import { Sprite } from "../engine/components/sprite";
 import { Tile, TileMap } from "../engine/components/tilemap";
 import { EventTypes, onInputKeyDown as engineOnInputKeyDown } from "../engine/event";
-import { createEntity, createSprite, updatePosition, createTileMap, createTileMapTile, destroyEntity, createInventory, displayInventory, updateInventory } from "./template";
+import { createEntity, createSprite, updatePosition, createTileMap, createTileMapTile, destroyEntity, createInventory, displayInventory, updateInventory, startActivityBug, updateActivityBug, endActivityBug } from "./template";
 import { Inventory } from '../engine/components/inventory';
+import { ActivityBugData } from '../engine/components/resource';
 
 export const onInputKeyDown = (e: any) => { engineOnInputKeyDown(e.key); };
 
@@ -47,15 +48,30 @@ export const event = (event: Event) => {
     }
     else if (event.type === EventTypes.TILEMAP_CREATE && event.data) {
         onTileMapCreate({
-            entityId: event.entityId,
+            tilemapEntityId: event.entityId,
             tilemap: event.data as Pick<TileMap, '_height' | '_width'>,
         });
     }
     else if (event.type === EventTypes.TILEMAP_TILE_CREATE && event.data) {
         onTileMapTileCreate({
-            entityId: event.entityId,
+            tilemapEntityId: event.entityId,
             tile: event.data as Pick<Tile, 'position' | 'sprite'>,
         });
+    }
+    else if (event.type === EventTypes.ACTIVITY_BUG_START && event.data) {
+        onActivityBugStart({
+            activityEntityId: event.entityId,
+            activityBugData: event.data as ActivityBugData,
+        });
+    }
+    else if (event.type === EventTypes.ACTIVITY_BUG_UPDATE && event.data) {
+        onActivityBugUpdate({
+            activityEntityId: event.entityId,
+            activityBugData: event.data as ActivityBugData,
+        });
+    }
+    else if (event.type === EventTypes.ACTIVITY_BUG_END) {
+        onActivityBugEnd({ activityEntityId: event.entityId });
     }
     else {
         throw new Error(`Unknown event type: ${event.type}`);
@@ -109,16 +125,34 @@ const onEntitySpriteCreate = ({ entityId, sprite }: {
     createSprite({ entityId, sprite });
 };
 
-const onTileMapCreate = ({ entityId, tilemap }: {
-    entityId: string,
+const onTileMapCreate = ({ tilemapEntityId, tilemap }: {
+    tilemapEntityId: string,
     tilemap: Pick<TileMap, '_height' | '_width'>,
 }) => {
-    createTileMap({ entityId, tilemap });
+    createTileMap({ tilemapEntityId, tilemap });
 };
 
-const onTileMapTileCreate = ({ entityId, tile }: {
-    entityId: string,
+const onTileMapTileCreate = ({ tilemapEntityId, tile }: {
+    tilemapEntityId: string,
     tile: Pick<Tile, 'position' | 'sprite'>,
 }) => {
-    createTileMapTile({ entityId, tile });
+    createTileMapTile({ tilemapEntityId, tile });
+};
+
+const onActivityBugStart = ({ activityEntityId, activityBugData }: {
+    activityEntityId: string,
+    activityBugData: ActivityBugData,
+}) => {
+    startActivityBug({ activityEntityId, activityBugData });
+};
+
+const onActivityBugUpdate = ({ activityEntityId, activityBugData }: {
+    activityEntityId: string,
+    activityBugData: ActivityBugData,
+}) => {
+    updateActivityBug({ activityEntityId, activityBugData });
+}
+
+const onActivityBugEnd = ({ activityEntityId }: { activityEntityId: string }) => {
+    endActivityBug({ activityEntityId });
 };
