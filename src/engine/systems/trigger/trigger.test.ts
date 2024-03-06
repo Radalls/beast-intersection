@@ -1,7 +1,7 @@
 import { Position } from "../../components/position";
 import { TileMap } from "../../components/tilemap";
 import { Trigger } from "../../components/trigger";
-import { addComponent, createEntity } from "../../entities/entity.manager";
+import { addComponent, createEntity } from "../../services/entity";
 import { generateTiles } from "../tilemap/tilemap";
 import { checkTrigger, destroyTrigger, setTrigger } from "./trigger";
 
