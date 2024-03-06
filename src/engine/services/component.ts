@@ -1,13 +1,12 @@
-import { event } from "../../../render/event";
-import { Inventory } from "../../components/inventory";
-import { Position } from "../../components/position";
-import { Resource } from "../../components/resource";
-import { Sprite } from "../../components/sprite";
-import { TileMap } from "../../components/tilemap";
-import { Trigger } from "../../components/trigger";
-import { PLAYER_ENTITY_ID } from "../../entities/entity";
-import { addComponent, getComponent } from "../../entities/entity.manager";
-import { EventTypes } from "../../event";
+import { event } from "../../render/event";
+import { Inventory } from "../components/inventory";
+import { Position } from "../components/position";
+import { Resource, ActivityData, ActivityTypes } from "../components/resource";
+import { Sprite } from "../components/sprite";
+import { TileMap } from "../components/tilemap";
+import { Trigger } from "../components/trigger";
+import { PLAYER_ENTITY_ID, addComponent, getComponent } from "./entity";
+import { EventTypes } from "../event";
 
 export const addInventory = ({ entityId, maxSlots = 10 }: {
     entityId: string,
@@ -55,13 +54,24 @@ export const addPosition = ({ entityId, x = 0, y = 0 }: {
     });
 };
 
-export const addResource = ({ entityId, isTemporary = false, itemName }: {
-    entityId: string,
-    isTemporary?: boolean,
-    itemName: string,
-}) => {
+export const addResource = (
+    {
+        entityId,
+        activityType = ActivityTypes.PICKUP,
+        isTemporary = false,
+        activityData,
+        itemName
+    }: {
+        entityId: string,
+        activityType?: ActivityTypes,
+        isTemporary?: boolean,
+        activityData?: ActivityData,
+        itemName: string,
+    },
+) => {
     const resource: Resource = {
         _: 'Resource',
+        _activityType: activityType,
         _isTemporary: isTemporary,
         item: {
             info: {
@@ -72,6 +82,10 @@ export const addResource = ({ entityId, isTemporary = false, itemName }: {
             },
         },
     };
+
+    if (activityData) {
+        resource.activityData = activityData;
+    }
 
     addComponent({ entityId, component: resource });
 };
