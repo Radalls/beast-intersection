@@ -1,0 +1,9 @@
+.tilemap {
+    left: 64px;
+    top: 64px;
+}
+
+.tile {
+    height: 64px;
+    width: 64px;
+}
