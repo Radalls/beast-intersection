@@ -3,6 +3,7 @@ import { app } from "./main";
 import { Position } from '../engine/components/position';
 import { Tile, TileMap } from "../engine/components/tilemap";
 import { Inventory } from "../engine/components/inventory";
+import { ActivityBugData } from "../engine/components/resource";
 
 //#region CONSTANTS
 const spritePath = new URL('../assets/sprites', import.meta.url).pathname;
@@ -40,7 +41,7 @@ export const createEntity = ({ entityId, htmlId, htmlClass, htmlParent, htmlAbso
     const entity = document.createElement('div');
 
     entity.setAttribute('id', htmlId ?? entityId);
-    entity.setAttribute('class', htmlClass ?? entityId);
+    entity.setAttribute('class', htmlClass ?? entityId.toLowerCase());
 
     entity.style.position = htmlAbsolute ? 'absolute' : 'relative';
 
@@ -131,27 +132,25 @@ export const createSprite = ({ entityId, sprite }: {
     entity.style.height = `${sprite._height * TILE_PIXEL_SIZE}px`;
 };
 
-export const createTileMap = ({ entityId, tilemap }: {
-    entityId: string,
+export const createTileMap = ({ tilemapEntityId, tilemap }: {
+    tilemapEntityId: string,
     tilemap: Pick<TileMap, '_height' | '_width'>,
 }) => {
-    const tilemapEntity = getEntity({ entityId });
+    const tilemapEntity = getEntity({ entityId: tilemapEntityId });
 
-    tilemapEntity.style.left = `${TILE_PIXEL_SIZE}px`;
-    tilemapEntity.style.top = `${TILE_PIXEL_SIZE}px`;
     tilemapEntity.style.width = `${tilemap._width * TILE_PIXEL_SIZE}px`;
     tilemapEntity.style.height = `${tilemap._height * TILE_PIXEL_SIZE}px`;
 };
 
-export const createTileMapTile = ({ entityId, tile }: {
-    entityId: string,
+export const createTileMapTile = ({ tilemapEntityId, tile }: {
+    tilemapEntityId: string,
     tile: Pick<Tile, 'position' | 'sprite'>,
 }) => {
-    const tilemapEntity = getEntity({ entityId });
+    const tilemapEntity = getEntity({ entityId: tilemapEntityId });
 
     const tileEntity = createEntity({
-        entityId,
-        htmlId: `${entityId}-tile-${tile.position._x}-${tile.position._y}`,
+        entityId: tilemapEntityId,
+        htmlId: `${tilemapEntityId}-tile-${tile.position._x}-${tile.position._y}`,
         htmlClass: "tile",
         htmlParent: tilemapEntity,
     });
@@ -159,7 +158,97 @@ export const createTileMapTile = ({ entityId, tile }: {
     tileEntity.style.left = `${tile.position._x * TILE_PIXEL_SIZE}px`;
     tileEntity.style.top = `${tile.position._y * TILE_PIXEL_SIZE}px`;
     tileEntity.style.backgroundImage = `url(${getSpritePath(tile.sprite._image)})`;
-    tileEntity.style.width = `${TILE_PIXEL_SIZE}px`;
-    tileEntity.style.height = `${TILE_PIXEL_SIZE}px`;
+};
+
+export const startActivityBug = ({ activityEntityId, activityBugData }: {
+    activityEntityId: string,
+    activityBugData: ActivityBugData,
+}) => {
+    const activityBugEntity = createEntity({
+        entityId: activityEntityId,
+        htmlId: `${activityEntityId}-activity-bug`,
+        htmlClass: "activity-bug",
+    });
+
+    const activityBugEntityScore = createEntity({
+        entityId: activityEntityId,
+        htmlId: `${activityEntityId}-activity-bug-score`,
+        htmlClass: "activity-bug-score",
+        htmlParent: activityBugEntity,
+        htmlAbsolute: false,
+    });
+
+    createEntity({
+        entityId: activityEntityId,
+        htmlId: `${activityEntityId}-activity-bug-score-hp`,
+        htmlClass: "activity-bug-score",
+        htmlParent: activityBugEntityScore,
+        htmlAbsolute: false,
+    });
+
+    createEntity({
+        entityId: activityEntityId,
+        htmlId: `${activityEntityId}-activity-bug-score-error`,
+        htmlClass: "activity-bug-score",
+        htmlParent: activityBugEntityScore,
+        htmlAbsolute: false,
+    });
+
+    const activityBugEntitySymbol = createEntity({
+        entityId: activityEntityId,
+        htmlId: `${activityEntityId}-activity-bug-symbol`,
+        htmlClass: "activity-bug-symbol",
+        htmlParent: activityBugEntity,
+        htmlAbsolute: false,
+    });
+
+    createEntity({
+        entityId: activityEntityId,
+        htmlId: `${activityEntityId}-activity-bug-symbol-value`,
+        htmlClass: "activity-bug-symbol-value",
+        htmlParent: activityBugEntitySymbol,
+        htmlAbsolute: false,
+    });
+
+    createEntity({
+        entityId: activityEntityId,
+        htmlId: `${activityEntityId}-activity-bug-symbol-found`,
+        htmlClass: "activity-bug-symbol-found",
+        htmlParent: activityBugEntitySymbol,
+        htmlAbsolute: false,
+    });
+
+    updateActivityBug({ activityEntityId, activityBugData });
+};
+
+export const updateActivityBug = ({ activityEntityId, activityBugData }: {
+    activityEntityId: string,
+    activityBugData: ActivityBugData,
+}) => {
+    const activityBugEntityScoreHp = getEntity({ entityId: `${activityEntityId}-activity-bug-score-hp` });
+    activityBugEntityScoreHp.textContent = `HP: ${activityBugData._hp}`;
+
+    const activityBugEntityScoreError = getEntity({ entityId: `${activityEntityId}-activity-bug-score-error` });
+    activityBugEntityScoreError.textContent = `Errors: ${activityBugData._nbErrors}/${activityBugData._maxNbErrors}`;
+
+    const activityBugEntitySymbolValue = getEntity({ entityId: `${activityEntityId}-activity-bug-symbol-value` });
+    activityBugEntitySymbolValue.textContent = `Press: ${activityBugData._symbol ?? ''}`;
+
+    const activityBugEntitySymbolFound = getEntity({ entityId: `${activityEntityId}-activity-bug-symbol-found` });
+    activityBugEntitySymbolFound.style.visibility = activityBugData._symbolFound !== undefined ? 'visible' : 'hidden';
+    if (activityBugData._symbolFound === true) {
+        activityBugEntitySymbolFound.style.backgroundImage = `url(${getSpritePath('activity_bug_symbol_found.png')})`;
+    }
+    else if (activityBugData._symbolFound === false) {
+        activityBugEntitySymbolFound.style.backgroundImage = `url(${getSpritePath('activity_bug_symbol_error.png')})`;
+    }
+};
+
+export const endActivityBug = ({ activityEntityId }: { activityEntityId: string }) => {
+    destroyEntity({ entityId: `${activityEntityId}-activity-bug-score-hp` });
+    destroyEntity({ entityId: `${activityEntityId}-activity-bug-score-error` });
+    destroyEntity({ entityId: `${activityEntityId}-activity-bug-score` });
+    destroyEntity({ entityId: `${activityEntityId}-activity-bug-symbol` });
+    destroyEntity({ entityId: `${activityEntityId}-activity-bug` });
 };
 //#endregion
