@@ -1,5 +1,5 @@
 .inventory {
-    background-color: rgba(109, 60, 24, 1);
+    background-color: rgb(162, 90, 41);
     bottom: 64px;
     display: none;
     flex-wrap: wrap;
@@ -12,11 +12,11 @@
 }
 
 .inventory-slot {
-    width: 64px;
-    height: 64px;
-    background-color: rgba(242, 186, 106, 1);
+    background-color: rgb(241, 210, 131);
     background-repeat: no-repeat;
     background-size: cover;
+    height: 64px;
+    width: 64px;
 }
 
 .inventory-slot-amount {
