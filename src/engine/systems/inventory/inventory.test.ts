@@ -1,5 +1,5 @@
 import { Inventory, Item } from './../../components/inventory';
-import { addComponent, createEntity } from "../../entities/entity.manager";
+import { addComponent, createEntity } from "../../services/entity";
 import { addItemToInventory, removeItemFromInventory } from "./inventory";
 
 jest.mock('../../../render/event.ts', () => ({
