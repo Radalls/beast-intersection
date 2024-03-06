@@ -1,7 +1,7 @@
 import { Position } from "../../components/position";
 import { Sprite } from "../../components/sprite";
 import { TileMap } from "../../components/tilemap";
-import { addComponent, createEntity } from "../../entities/entity.manager";
+import { addComponent, createEntity } from "../../services/entity";
 import { generateTiles, setTile, updateTile } from "./tilemap";
 
 jest.mock('../../../render/event.ts', () => ({
