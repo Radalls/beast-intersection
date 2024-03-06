@@ -3,7 +3,7 @@ type InventoryData = {
 };
 
 type ItemRule = {
-    itemName: 'Leaf' | 'Stick' | 'Rock';
+    itemName: 'Leaf' | 'Stick' | 'Rock' | 'Butterfly';
     maxAmount: number;
 };
 
@@ -22,6 +22,10 @@ export const inventoryData: InventoryData = {
         {
             itemName: 'Rock',
             maxAmount: 2,
+        },
+        {
+            itemName: 'Butterfly',
+            maxAmount: 1,
         }
     ]
 }
