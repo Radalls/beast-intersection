@@ -3,7 +3,7 @@ import { app } from "./main";
 import { Position } from '../engine/components/position';
 import { Tile, TileMap } from "../engine/components/tilemap";
 import { Inventory } from "../engine/components/inventory";
-import { ActivityBugData } from "../engine/components/resource";
+import { ActivityBugData, Resource } from "../engine/components/resource";
 
 //#region CONSTANTS
 const spritePath = new URL('../assets/sprites', import.meta.url).pathname;
@@ -29,6 +29,10 @@ const getEntity = ({ entityId }: { entityId: string }) => {
     }
 
     return entity;
+}
+
+const checkEntity = ({ entityId }: { entityId: string }) => {
+    return document.getElementById(entityId) !== null;
 }
 
 export const createEntity = ({ entityId, htmlId, htmlClass, htmlParent, htmlAbsolute = true }: {
@@ -160,6 +164,25 @@ export const createTileMapTile = ({ tilemapEntityId, tile }: {
     tileEntity.style.backgroundImage = `url(${getSpritePath(tile.sprite._image)})`;
 };
 
+export const winActivity = ({ activityEntityId, activityItem }: {
+    activityEntityId: string,
+    activityItem: Resource['item'],
+}) => {
+    const activityEntityWin = createEntity({
+        entityId: activityEntityId,
+        htmlId: `${activityEntityId}-activity-win`,
+        htmlClass: "activity-win",
+    });
+
+    activityEntityWin.textContent = `You get ${activityItem.info._name}!`;
+}
+
+export const endActivity = ({ activityEntityId }: { activityEntityId: string }) => {
+    if (checkEntity({ entityId: `${activityEntityId}-activity-win` })) {
+        destroyEntity({ entityId: `${activityEntityId}-activity-win` });
+    }
+}
+
 export const startActivityBug = ({ activityEntityId, activityBugData }: {
     activityEntityId: string,
     activityBugData: ActivityBugData,
@@ -232,11 +255,14 @@ export const updateActivityBug = ({ activityEntityId, activityBugData }: {
     activityBugEntityScoreError.textContent = `Errors: ${activityBugData._nbErrors}/${activityBugData._maxNbErrors}`;
 
     const activityBugEntitySymbolValue = getEntity({ entityId: `${activityEntityId}-activity-bug-symbol-value` });
-    activityBugEntitySymbolValue.textContent = `Press: ${activityBugData._symbol ?? ''}`;
+    activityBugEntitySymbolValue.textContent = `Press: ${activityBugData._symbol ?? '...'}`;
 
     const activityBugEntitySymbolFound = getEntity({ entityId: `${activityEntityId}-activity-bug-symbol-found` });
-    activityBugEntitySymbolFound.style.visibility = activityBugData._symbolFound !== undefined ? 'visible' : 'hidden';
-    if (activityBugData._symbolFound === true) {
+    // activityBugEntitySymbolFound.style.visibility = activityBugData._symbolFound !== undefined ? 'visible' : 'hidden';
+    if (activityBugData._symbolFound === undefined) {
+        activityBugEntitySymbolFound.style.backgroundImage = `url(${getSpritePath('activity_bug_symbol_blank.png')})`;
+    }
+    else if (activityBugData._symbolFound === true) {
         activityBugEntitySymbolFound.style.backgroundImage = `url(${getSpritePath('activity_bug_symbol_found.png')})`;
     }
     else if (activityBugData._symbolFound === false) {
