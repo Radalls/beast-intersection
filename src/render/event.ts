@@ -3,9 +3,9 @@ import { Position } from "../engine/components/position";
 import { Sprite } from "../engine/components/sprite";
 import { Tile, TileMap } from "../engine/components/tilemap";
 import { EventTypes, onInputKeyDown as engineOnInputKeyDown } from "../engine/event";
-import { createEntity, createSprite, updatePosition, createTileMap, createTileMapTile, destroyEntity, createInventory, displayInventory, updateInventory, startActivityBug, updateActivityBug, endActivityBug } from "./template";
+import { createEntity, createSprite, updatePosition, createTileMap, createTileMapTile, destroyEntity, createInventory, displayInventory, updateInventory, startActivityBug, updateActivityBug, endActivityBug, winActivity, endActivity } from "./template";
 import { Inventory } from '../engine/components/inventory';
-import { ActivityBugData } from '../engine/components/resource';
+import { ActivityBugData, Resource } from '../engine/components/resource';
 
 export const onInputKeyDown = (e: any) => { engineOnInputKeyDown(e.key); };
 
@@ -57,6 +57,15 @@ export const event = (event: Event) => {
             tilemapEntityId: event.entityId,
             tile: event.data as Pick<Tile, 'position' | 'sprite'>,
         });
+    }
+    else if (event.type === EventTypes.ACTIVITY_WIN && event.data) {
+        onActivityWin({
+            activityEntityId: event.entityId,
+            activityItem: event.data as Resource['item'],
+        });
+    }
+    else if (event.type === EventTypes.ACTIVITY_END) {
+        onActivityEnd({ activityEntityId: event.entityId });
     }
     else if (event.type === EventTypes.ACTIVITY_BUG_START && event.data) {
         onActivityBugStart({
@@ -137,6 +146,17 @@ const onTileMapTileCreate = ({ tilemapEntityId, tile }: {
     tile: Pick<Tile, 'position' | 'sprite'>,
 }) => {
     createTileMapTile({ tilemapEntityId, tile });
+};
+
+const onActivityWin = ({ activityEntityId, activityItem }: {
+    activityEntityId: string,
+    activityItem: Resource['item'],
+}) => {
+    winActivity({ activityEntityId, activityItem });
+}
+
+const onActivityEnd = ({ activityEntityId }: { activityEntityId: string }) => {
+    endActivity({ activityEntityId });
 };
 
 const onActivityBugStart = ({ activityEntityId, activityBugData }: {
