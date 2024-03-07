@@ -1,3 +1,17 @@
+.activity-win {
+    align-items: center;
+    background-color: rgb(241, 210, 131);
+    border: solid 8px rgb(162, 90, 41);
+    border-radius: 8px;
+    bottom: 64px;
+    display: flex;
+    justify-content: center;
+    left: 32px;
+    padding: 8px;
+    text-align: center;
+    z-index: 100;
+}
+
 .activity-bug {
     align-items: center;
     background-color: rgb(241, 21, 65);
