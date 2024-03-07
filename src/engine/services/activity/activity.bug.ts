@@ -1,28 +1,27 @@
 import { event } from "../../../render/event";
 import { ActivityBugData } from "../../components/resource";
-import { setCycle } from "../../cycle";
+import { clearCycle, setCycle } from "../../cycle";
 import { getComponent } from "../entity";
 import { EventInputKeys, EventTypes } from "../../event";
 import { setState } from "../../state";
-import { clearStore, getStore, setStore } from "../../store";
-import { destroyResource, getResourceItem } from "../../systems/resource/resource";
+import { getStore } from "../../store";
+import { endActivity, startActivity, winActivity } from "./activity";
 
 export const startActivityBug = ({ activityId }: { activityId: string }) => {
-    const activityBugData = getComponent({ entityId: activityId, componentId: 'Resource' }).activityData as ActivityBugData;
+    startActivity({ activityId });
 
+    const activityBugData = getComponent({ entityId: activityId, componentId: 'Resource' }).activityData as ActivityBugData;
     activityBugData._hp = activityBugData._maxHp;
     activityBugData._nbErrors = 0;
+
+    setState('isActivityBugRunning', true);
+    setCycle('activityBugTickInterval', activityBugData._symbolInterval);
 
     event({
         type: EventTypes.ACTIVITY_BUG_START,
         entityId: activityId,
         data: activityBugData,
     });
-
-    setState('isActivityRunning', true);
-    setState('isActivityBugRunning', true);
-    setCycle('activityBugTickInterval', activityBugData._symbolInterval);
-    setStore('activityId', activityId);
 };
 
 export const tickActivityBug = ({ activityId }: { activityId?: string | null }) => {
@@ -35,11 +34,9 @@ export const tickActivityBug = ({ activityId }: { activityId?: string | null }) 
     }
 
     const activityBugData = getComponent({ entityId: activityId, componentId: 'Resource' }).activityData as ActivityBugData;
-
     activityBugData._symbol = EventInputKeys[Object.keys(EventInputKeys)[
         Math.floor(Math.random() * Object.keys(EventInputKeys).length)
     ] as keyof typeof EventInputKeys];
-
     activityBugData._symbolFound = undefined;
 
     event({
@@ -62,7 +59,6 @@ export const playActivityBug = ({ activityId, symbol }: {
     }
 
     const activityBugData = getComponent({ entityId: activityId, componentId: 'Resource' }).activityData as ActivityBugData;
-
     if (symbol === activityBugData._symbol && activityBugData._hp > 0) {
         activityBugData._hp -= 1;
         activityBugData._symbolFound = true;
@@ -74,19 +70,22 @@ export const playActivityBug = ({ activityId, symbol }: {
         setState('isActivityBugCooldown', true);
     }
 
+    if (activityBugData._hp <= 0) {
+        endActivityBug({ activityId });
+        winActivity({ activityId });
+        return;
+    }
+    else if (activityBugData._nbErrors >= activityBugData._maxNbErrors) {
+        endActivityBug({ activityId });
+        endActivity({ activityId });
+        return;
+    }
+
     event({
         type: EventTypes.ACTIVITY_BUG_UPDATE,
         entityId: activityId,
         data: activityBugData,
     });
-
-    if (activityBugData._hp <= 0) {
-        getResourceItem({ resourceEntityId: activityId });
-        endActivityBug({ activityId });
-    }
-    else if (activityBugData._nbErrors >= activityBugData._maxNbErrors) {
-        endActivityBug({ activityId });
-    }
 }
 
 export const endActivityBug = ({ activityId }: { activityId?: string | null }) => {
@@ -103,19 +102,13 @@ export const endActivityBug = ({ activityId }: { activityId?: string | null }) =
     activityBugData._symbol = undefined;
     activityBugData._symbolFound = undefined;
 
+    setState('isActivityBugRunning', false);
+    setState('isActivityBugCooldown', false);
+    clearCycle('activityBugTickInterval');
+
     event({
         type: EventTypes.ACTIVITY_BUG_END,
         entityId: activityId,
     });
-
-    setState('isActivityRunning', false);
-    setState('isActivityBugRunning', false);
-    setState('isActivityBugCooldown', false);
-    setCycle('activityBugTickInterval', 0);
-    setCycle('elapsedActivityTime', 0);
-    clearStore('activityId');
-
-    if (activityResource._isTemporary) {
-        destroyResource({ resourceEntityId: activityId });
-    }
 }
+
