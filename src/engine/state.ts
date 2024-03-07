@@ -2,6 +2,7 @@ const state = {
     isGameRunning: false,
     isInventoryOpen: false,
     isActivityRunning: false,
+    isActivityWin: false,
     isActivityBugRunning: false,
     isActivityBugCooldown: false,
 }
