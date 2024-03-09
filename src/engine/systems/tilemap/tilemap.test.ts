@@ -4,7 +4,7 @@ import { TileMap } from "../../components/tilemap";
 import { addComponent, createEntity } from "../../services/entity";
 import { generateTiles, setTile, updateTile } from "./tilemap";
 
-jest.mock('../../../render/event.ts', () => ({
+jest.mock('../../../render/events/event.ts', () => ({
     event: jest.fn(),
 }));
 

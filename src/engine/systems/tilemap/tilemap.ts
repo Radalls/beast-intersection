@@ -1,20 +1,17 @@
-import { event } from "../../../render/event";
+import { event } from "../../../render/events/event";
 import { Tile } from "../../components/tilemap";
 import { checkComponent, getComponent } from "../../services/entity"
 import { EventTypes } from "../../event";
 import { getStore } from "../../store";
 import { updatePosition } from "../position/position";
 import { setTrigger } from "../trigger/trigger";
+import { checkCollider, setCollider } from "../collider/collider";
+import { error } from "../../services/error";
 
 //#region HELPERS
 export const findTileByEntityId = ({ entityId }: { entityId: string }) => {
-    const tilemapEntityId = getStore('tilemapId');
-    if (!(tilemapEntityId)) {
-        throw {
-            message: `Tilemap does not exist`,
-            where: findTileByEntityId.name,
-        }
-    }
+    const tilemapEntityId = getStore('tilemapId')
+        ?? error({ message: `Store tilemapId is undefined`, where: findTileByEntityId.name });
 
     return getComponent({ entityId: tilemapEntityId, componentId: 'TileMap' }).tiles
         .find(tile => tile._entityIds.includes(entityId));
@@ -24,13 +21,8 @@ export const findTileByPosition = ({ x, y }: {
     x: number,
     y: number,
 }) => {
-    const tilemapEntityId = getStore('tilemapId');
-    if (!(tilemapEntityId)) {
-        throw {
-            message: `Tilemap does not exist`,
-            where: findTileByPosition.name,
-        }
-    }
+    const tilemapEntityId = getStore('tilemapId')
+        ?? error({ message: `Store tilemapId is undefined`, where: findTileByPosition.name });
 
     return getComponent({ entityId: tilemapEntityId, componentId: 'TileMap' }).tiles
         .find(tile => tile.position._x === x && tile.position._y === y);
@@ -39,13 +31,8 @@ export const findTileByPosition = ({ x, y }: {
 
 //#region ACTIONS
 export const generateTiles = ({ tilemapEntityId }: { tilemapEntityId?: string | null }) => {
-    if (!(tilemapEntityId)) tilemapEntityId = getStore('tilemapId');
-    if (!(tilemapEntityId)) {
-        throw {
-            message: `Tilemap does not exist`,
-            where: generateTiles.name,
-        }
-    }
+    if (!(tilemapEntityId)) tilemapEntityId = getStore('tilemapId')
+        ?? error({ message: `Store tilemapId is undefined`, where: generateTiles.name });
 
     const tilemap = getComponent({ entityId: tilemapEntityId, componentId: 'TileMap' });
 
@@ -53,13 +40,14 @@ export const generateTiles = ({ tilemapEntityId }: { tilemapEntityId?: string | 
         for (let j = 0; j < tilemap._height; j++) {
             const tile: Tile = {
                 _entityIds: [],
-                _triggerEntityIds: [],
+                _entityColliderIds: [],
+                _entityTriggerIds: [],
                 position: {
                     _x: j,
                     _y: i,
                 },
-                sprite: { // temp
-                    _image: 'tile_grass.png',
+                sprite: {
+                    _image: 'tile_grass.png', // temp
                 },
             }
             tilemap.tiles.push(tile);
@@ -67,7 +55,7 @@ export const generateTiles = ({ tilemapEntityId }: { tilemapEntityId?: string | 
             event({
                 type: EventTypes.TILEMAP_TILE_CREATE,
                 entityId: tilemapEntityId,
-                data: (({ _entityIds, ...tileData }) => tileData)(tile),
+                data: tile,
             });
         }
     }
@@ -77,29 +65,26 @@ export const setTile = ({ tilemapEntityId, entityId }: {
     tilemapEntityId?: string | null,
     entityId: string,
 }) => {
-    if (!(tilemapEntityId)) tilemapEntityId = getStore('tilemapId');
-    if (!(tilemapEntityId)) {
-        throw {
-            message: `Tilemap does not exist`,
-            where: generateTiles.name,
-        }
-    }
+    if (!(tilemapEntityId)) tilemapEntityId = getStore('tilemapId')
+        ?? error({ message: `Store tilemapId is undefined`, where: setTile.name });
 
     const entityPosition = getComponent({ entityId, componentId: 'Position' });
 
     const targetTile = findTileByPosition({
         x: entityPosition._x,
         y: entityPosition._y,
-    });
-    if (!(targetTile)) {
-        throw new Error(`Tile ${entityPosition._x}-${entityPosition._y} not found`);
-    }
+    }) ?? error({ message: `Tile (${entityPosition._x}-${entityPosition._y}) does not exist`, where: setTile.name });
 
     targetTile._entityIds.push(entityId);
 
     const entityTrigger = checkComponent({ entityId, componentId: 'Trigger' });
     if (entityTrigger) {
         setTrigger({ entityId });
+    }
+
+    const entityCollider = checkComponent({ entityId, componentId: 'Collider' });
+    if (entityCollider) {
+        setCollider({ entityId });
     }
 }
 
@@ -109,32 +94,19 @@ export const updateTile = ({ tilemapEntityId, entityId, targetX, targetY }: {
     targetX: number,
     targetY: number,
 }) => {
-    if (!(tilemapEntityId)) tilemapEntityId = getStore('tilemapId');
-    if (!(tilemapEntityId)) {
-        throw {
-            message: `Tilemap does not exist`,
-            where: generateTiles.name,
-        }
-    }
+    if (!(tilemapEntityId)) tilemapEntityId = getStore('tilemapId')
+        ?? error({ message: `Store tilemapId is undefined`, where: updateTile.name });
 
-    const entityTile = findTileByEntityId({ entityId });
-    if (!(entityTile)) {
-        throw {
-            message: `Tile ${entityId} not found`,
-            where: updateTile.name,
-        }
-    }
+    const entityTile = findTileByEntityId({ entityId })
+        ?? error({ message: `Tile for entity ${entityId} not found`, where: updateTile.name });
 
     const targetTile = findTileByPosition({
         x: targetX,
         y: targetY,
-    });
-    if (!(targetTile)) {
-        throw {
-            message: `Tile [${targetX}:${targetY}] not found`,
-            where: updateTile.name,
-        }
-    }
+    }) ?? error({ message: `Tile (${targetX}-${targetY}) does not exist`, where: updateTile.name });
+
+    const isTargetCollider = checkCollider({ x: targetX, y: targetY });
+    if (isTargetCollider) error({ message: `Tile (${targetX}-${targetY}) is not accessible`, where: updateTile.name });
 
     targetTile._entityIds.push(entityId);
     entityTile._entityIds = entityTile._entityIds.filter(id => id !== entityId);
