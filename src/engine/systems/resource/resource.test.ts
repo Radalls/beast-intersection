@@ -3,19 +3,19 @@ import { Resource, ActivityTypes } from "../../components/resource";
 import { addComponent, createEntity, getEntity } from "../../services/entity";
 import { destroyResource, getResourceItem, useResource } from "./resource";
 
-jest.mock('../../../render/event.ts', () => ({
+jest.mock('../../../render/events/event.ts', () => ({
     event: jest.fn(),
 }));
 
 describe('Resource System', () => {
-    const resourceEntityId = createEntity('Resource');
+    const resourceEntityId = createEntity('ResourceWood1');
     const resource: Resource = {
         _: 'Resource',
         _activityType: ActivityTypes.PICKUP,
         _isTemporary: false,
         item: {
-            info: { _name: 'Stick' },
-            sprite: { _image: 'stick.png' },
+            info: { _name: 'Wood1' },
+            sprite: { _image: 'item_wood1.png' },
         }
     };
 
@@ -94,7 +94,7 @@ describe('Resource System', () => {
 
             expect(playerInventory.slots).toHaveLength(1);
             expect(playerInventory.slots[0]._amount).toBe(1);
-            expect(playerInventory.slots[0].item.info._name).toBe('Stick');
+            expect(playerInventory.slots[0].item.info._name).toBe('Wood1');
         });
     });
 
