@@ -1,6 +1,7 @@
-import { event } from "../../../render/event";
+import { event } from "../../../render/events/event";
 import { getComponent } from "../../services/entity";
 import { EventTypes } from "../../event";
+import { error } from "../../services/error";
 
 //#region CHECKS
 const invalidPosition = ({ x, y }: {
@@ -20,29 +21,21 @@ export const updatePosition = ({ entityId, x, y }: {
     x: number,
     y: number,
 }) => {
-    if (invalidPosition({ x, y })) {
-        throw new Error(`Position (${x}-${y}) is invalid`);
-    }
+    if (invalidPosition({ x, y })) error({ message: `Position (${x}-${y}) is invalid`, where: updatePosition.name });
 
     const position = getComponent({ entityId, componentId: 'Position' });
     if (samePosition({
         entityPosition: { x: position._x, y: position._y },
         inputPosition: { x, y },
-    })) {
-        throw new Error(`Position (${x}-${y}) is invalid`);
-    }
+    })) error({ message: `Position (${x}-${y}) is invalid`, where: updatePosition.name });
 
     position._x = x;
     position._y = y;
 
-    const sprite = getComponent({ entityId, componentId: 'Sprite' });
     event({
         type: EventTypes.ENTITY_POSITION_UPDATE,
         entityId,
-        data: {
-            position: (({ _, ...positionData }) => positionData)(position),
-            sprite: (({ _, _image, ...spriteData }) => spriteData)(sprite),
-        },
+        data: position,
     });
 }
 //#endregion
