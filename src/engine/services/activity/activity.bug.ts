@@ -1,18 +1,21 @@
-import { event } from "../../../render/event";
+import { event } from "../../../render/events/event";
 import { ActivityBugData } from "../../components/resource";
 import { clearCycle, setCycle } from "../../cycle";
 import { getComponent } from "../entity";
 import { EventInputKeys, EventTypes } from "../../event";
-import { setState } from "../../state";
-import { getStore } from "../../store";
-import { endActivity, startActivity, winActivity } from "./activity";
+import { getState, setState } from "../../state";
+import { checkActivityId, endActivity, startActivity, winActivity } from "./activity";
 
+//#region SERVICES
 export const startActivityBug = ({ activityId }: { activityId: string }) => {
     startActivity({ activityId });
 
-    const activityBugData = getComponent({ entityId: activityId, componentId: 'Resource' }).activityData as ActivityBugData;
+    const activityResource = getComponent({ entityId: activityId, componentId: 'Resource' });
+    const activityBugData = activityResource.activityData as ActivityBugData;
     activityBugData._hp = activityBugData._maxHp;
     activityBugData._nbErrors = 0;
+    activityBugData._symbol = undefined;
+    activityBugData._symbolFound = undefined;
 
     setState('isActivityBugRunning', true);
     setCycle('activityBugTickInterval', activityBugData._symbolInterval);
@@ -25,19 +28,18 @@ export const startActivityBug = ({ activityId }: { activityId: string }) => {
 };
 
 export const tickActivityBug = ({ activityId }: { activityId?: string | null }) => {
-    activityId = activityId || getStore('activityId');
-    if (!(activityId)) {
-        throw {
-            message: `Resource activity does not exist`,
-            where: tickActivityBug.name,
-        }
-    }
+    activityId = checkActivityId({ activityId });
 
-    const activityBugData = getComponent({ entityId: activityId, componentId: 'Resource' }).activityData as ActivityBugData;
+    const activityResource = getComponent({ entityId: activityId, componentId: 'Resource' });
+    const activityBugData = activityResource.activityData as ActivityBugData;
     activityBugData._symbol = EventInputKeys[Object.keys(EventInputKeys)[
         Math.floor(Math.random() * Object.keys(EventInputKeys).length)
     ] as keyof typeof EventInputKeys];
     activityBugData._symbolFound = undefined;
+
+    if (getState('isActivityBugCooldown')) {
+        setState('isActivityBugCooldown', false);
+    }
 
     event({
         type: EventTypes.ACTIVITY_BUG_UPDATE,
@@ -50,15 +52,10 @@ export const playActivityBug = ({ activityId, symbol }: {
     activityId?: string | null,
     symbol: string,
 }) => {
-    activityId = activityId || getStore('activityId');
-    if (!(activityId)) {
-        throw {
-            message: `Resource activity does not exist`,
-            where: playActivityBug.name,
-        }
-    }
+    activityId = checkActivityId({ activityId });
 
-    const activityBugData = getComponent({ entityId: activityId, componentId: 'Resource' }).activityData as ActivityBugData;
+    const activityResource = getComponent({ entityId: activityId, componentId: 'Resource' });
+    const activityBugData = activityResource.activityData as ActivityBugData;
     if (symbol === activityBugData._symbol && activityBugData._hp > 0) {
         activityBugData._hp -= 1;
         activityBugData._symbolFound = true;
@@ -89,18 +86,7 @@ export const playActivityBug = ({ activityId, symbol }: {
 }
 
 export const endActivityBug = ({ activityId }: { activityId?: string | null }) => {
-    activityId = activityId || getStore('activityId');
-    if (!(activityId)) {
-        throw {
-            message: `Resource activity does not exist`,
-            where: endActivityBug.name,
-        }
-    }
-
-    const activityResource = getComponent({ entityId: activityId, componentId: 'Resource' });
-    const activityBugData = activityResource.activityData as ActivityBugData;
-    activityBugData._symbol = undefined;
-    activityBugData._symbolFound = undefined;
+    activityId = checkActivityId({ activityId });
 
     setState('isActivityBugRunning', false);
     setState('isActivityBugCooldown', false);
@@ -111,4 +97,4 @@ export const endActivityBug = ({ activityId }: { activityId?: string | null }) =
         entityId: activityId,
     });
 }
-
+//#endregion
