@@ -1,7 +1,19 @@
+/* MAIN ACTIVITY */
+.activity {
+    background-color: rgb(245, 245, 245);
+    border: solid 8px rgb(70, 70, 70);
+    border-radius: 8px;
+    left: 50%;
+    padding: 16px;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 100;
+}
+
 .activity-win {
     align-items: center;
-    background-color: rgb(241, 210, 131);
-    border: solid 8px rgb(162, 90, 41);
+    background-color: rgb(245, 245, 245);
+    border: solid 8px rgb(70, 70, 70);
     border-radius: 8px;
     bottom: 64px;
     display: flex;
@@ -12,23 +24,15 @@
     z-index: 100;
 }
 
+/* ACTIVITY BUG */
 .activity-bug {
     align-items: center;
-    background-color: rgb(241, 21, 65);
-    border: solid 8px rgb(120, 10, 32);
-    border-radius: 8px;
-    color: white;
     display: flex;
     gap: 32px;
-    justify-content: center;
-    left: 50%;
-    padding: 16px;
     height: 128px;
+    justify-content: center;
     text-align: center;
-    top: 50%;
-    transform: translate(-50%, -50%);
     width: 384px;
-    z-index: 100;
 }
 
 .activity-bug-score {
@@ -50,6 +54,59 @@
 }
 
 .activity-bug-symbol-found {
+    height: 64px;
+    width: 64px;
+}
+
+/* ACTIVITY FISH */
+.activity-fish {
+    align-items: center;
+    display: flex;
+    gap: 32px;
+    height: 192px;
+    justify-content: center;
+    text-align: center;
+    width: 512px;
+}
+
+.activity-fish-hp-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.activity-fish-hp {
+    display: flex;
+    gap: 8px;
+}
+
+.activity-fish-hp-label {
+    font-size: 24px;
+    width: 128px;
+}
+
+.activity-fish-rod-tension {
+    display: flex;
+    gap: 8px;
+}
+
+.activity-fish-rod-tension-label {
+    font-size: 24px;
+    width: 128px;
+}
+
+.activity-fish-frenzy {
+    align-items: center;
+    display: flex;
+    gap: 8px;
+}
+
+.activity-fish-frenzy-label {
+    font-size: 32px;
+    font-weight: bold;
+}
+
+.activity-fish-frenzy-value {
     height: 64px;
     width: 64px;
 }
