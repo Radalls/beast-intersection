@@ -34,7 +34,9 @@ export const tickActivityFish = ({ activityId }: { activityId?: string | null })
     const activityResource = getComponent({ entityId: activityId, componentId: 'Resource' });
     const activityFishData = activityResource.activityData as ActivityFishData;
     activityFishData._fishHp += Math.floor(activityFishData._rodDamage / 2);
+    activityFishData._fishHp = Math.min(activityFishData._fishHp, activityFishData._fishMaxHp);
     activityFishData._rodTension -= activityFishData._fishDamage * 2;
+    activityFishData._rodTension = Math.max(activityFishData._rodTension, 0);
 
     event({
         type: EventTypes.ACTIVITY_FISH_UPDATE,
