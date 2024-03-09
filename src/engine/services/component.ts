@@ -1,12 +1,13 @@
-import { event } from "../../render/event";
+import { event } from "../../render/events/event";
 import { Inventory } from "../components/inventory";
 import { Position } from "../components/position";
-import { Resource, ActivityData, ActivityTypes } from "../components/resource";
+import { Resource, ActivityTypes, ActivityBugData, ActivityFishData } from "../components/resource";
 import { Sprite } from "../components/sprite";
 import { TileMap } from "../components/tilemap";
 import { Trigger } from "../components/trigger";
-import { PLAYER_ENTITY_ID, addComponent, getComponent } from "./entity";
+import { PLAYER_ENTITY_ID, addComponent } from "./entity";
 import { EventTypes } from "../event";
+import { Collider } from "../components/collider";
 
 export const addInventory = ({ entityId, maxSlots = 10 }: {
     entityId: string,
@@ -22,9 +23,9 @@ export const addInventory = ({ entityId, maxSlots = 10 }: {
 
     if (entityId === PLAYER_ENTITY_ID) {
         event({
-            type: EventTypes.ENTITY_INVENTORY_CREATE,
+            type: EventTypes.INVENTORY_CREATE,
             entityId,
-            data: (({ _, slots, ...inventoryData }) => inventoryData)(inventory),
+            data: inventory,
         });
     }
 };
@@ -42,36 +43,25 @@ export const addPosition = ({ entityId, x = 0, y = 0 }: {
 
     addComponent({ entityId, component: position });
 
-    const sprite = getComponent({ entityId, componentId: 'Sprite' });
-
     event({
         type: EventTypes.ENTITY_POSITION_UPDATE,
         entityId,
-        data: {
-            position: (({ _, ...positionData }) => positionData)(position),
-            sprite: (({ _, _image, ...spriteData }) => spriteData)(sprite),
-        },
+        data: position,
     });
 };
 
-export const addResource = (
-    {
-        entityId,
-        activityType = ActivityTypes.PICKUP,
-        isTemporary = false,
-        activityData,
-        itemName
-    }: {
-        entityId: string,
-        activityType?: ActivityTypes,
-        isTemporary?: boolean,
-        activityData?: ActivityData,
-        itemName: string,
-    },
-) => {
+export const addResourcePickUp = ({
+    entityId,
+    isTemporary = false,
+    itemName
+}: {
+    entityId: string,
+    isTemporary?: boolean,
+    itemName: string,
+}) => {
     const resource: Resource = {
         _: 'Resource',
-        _activityType: activityType,
+        _activityType: ActivityTypes.PICKUP,
         _isTemporary: isTemporary,
         item: {
             info: {
@@ -83,9 +73,96 @@ export const addResource = (
         },
     };
 
-    if (activityData) {
-        resource.activityData = activityData;
-    }
+    addComponent({ entityId, component: resource });
+};
+
+export const addResourceBug = ({
+    entityId,
+    isTemporary = false,
+    maxHp,
+    maxNbErrors,
+    symbolInterval,
+    itemName
+}: {
+    entityId: string,
+    isTemporary?: boolean,
+    maxHp: number,
+    maxNbErrors: number,
+    symbolInterval: number,
+    itemName: string,
+}) => {
+    const activityBugData: ActivityBugData = {
+        _hp: maxHp,
+        _maxHp: maxHp,
+        _maxNbErrors: maxNbErrors,
+        _nbErrors: 0,
+        _symbolInterval: symbolInterval,
+    };
+
+    const resource: Resource = {
+        _: 'Resource',
+        _activityType: ActivityTypes.BUG,
+        _isTemporary: isTemporary,
+        activityData: activityBugData,
+        item: {
+            info: {
+                _name: itemName,
+            },
+            sprite: {
+                _image: `item_${itemName.toLowerCase()}.png`,
+            },
+        },
+    };
+
+    addComponent({ entityId, component: resource });
+};
+
+export const addResourceFish = ({
+    entityId,
+    isTemporary = false,
+    fishDamage,
+    fishMaxHp,
+    frenzyDuration,
+    frenzyInterval,
+    rodDamage,
+    rodMaxTension,
+    itemName
+}: {
+    entityId: string,
+    isTemporary?: boolean,
+    fishDamage: number,
+    fishMaxHp: number,
+    frenzyDuration: number,
+    frenzyInterval: number,
+    rodDamage: number,
+    rodMaxTension: number,
+    itemName: string,
+}) => {
+    const activityFishData: ActivityFishData = {
+        _fishDamage: fishDamage,
+        _fishHp: fishMaxHp,
+        _fishMaxHp: fishMaxHp,
+        _frenzyDuration: frenzyDuration,
+        _frenzyInterval: frenzyInterval,
+        _rodDamage: rodDamage,
+        _rodTension: 0,
+        _rodMaxTension: rodMaxTension,
+    };
+
+    const resource: Resource = {
+        _: 'Resource',
+        _activityType: ActivityTypes.FISH,
+        _isTemporary: isTemporary,
+        activityData: activityFishData,
+        item: {
+            info: {
+                _name: itemName,
+            },
+            sprite: {
+                _image: `item_${itemName.toLowerCase()}.png`,
+            },
+        },
+    };
 
     addComponent({ entityId, component: resource });
 };
@@ -108,7 +185,7 @@ export const addSprite = ({ entityId, height = 1, image, width = 1 }: {
     event({
         type: EventTypes.ENTITY_SPRITE_CREATE,
         entityId,
-        data: (({ _, ...spriteData }) => spriteData)(sprite),
+        data: sprite,
     });
 };
 
@@ -129,7 +206,7 @@ export const addTileMap = ({ entityId, height = 10, width = 10 }: {
     event({
         type: EventTypes.TILEMAP_CREATE,
         entityId,
-        data: (({ _, tiles, ...tilemapData }) => tilemapData)(tilemap),
+        data: tilemap,
     });
 }
 
@@ -147,4 +224,18 @@ export const addTrigger = ({ entityId, priority = 0, points }: {
     };
 
     addComponent({ entityId, component: trigger });
+}
+
+export const addCollider = ({ entityId, points }: {
+    entityId: string,
+    points?: { x: number, y: number }[],
+}) => {
+    const collider: Collider = {
+        _: 'Collider',
+        points: (points)
+            ? points.map(({ x, y }) => ({ _offsetX: x, _offsetY: y }))
+            : [{ _offsetX: 0, _offsetY: 0 }],
+    };
+
+    addComponent({ entityId, component: collider });
 }
