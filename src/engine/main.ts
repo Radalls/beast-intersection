@@ -1,7 +1,6 @@
 import { generateTiles, setTile } from './systems/tilemap/tilemap';
 import { PLAYER_ENTITY_ID, TILEMAP_ENTITY_ID, createEntity } from "./services/entity";
-import { addInventory, addPosition, addResource, addSprite, addTileMap, addTrigger } from "./services/component";
-import { ActivityTypes } from './components/resource';
+import { addCollider, addInventory, addPosition, addResourceBug, addResourceFish, addResourcePickUp, addSprite, addTileMap, addTrigger } from "./services/component";
 import { setState } from './state';
 import { getCycle, runCycle } from './cycle';
 
@@ -22,33 +21,54 @@ export const main = () => {
     addInventory({ entityId: playerEntityId, maxSlots: 20 });
     setTile({ entityId: playerEntityId });
 
-    const stickEntityId = createEntity('ResourceStick');
-    addSprite({ entityId: stickEntityId, image: 'resource_stick.png' });
+    const stickEntityId = createEntity('ResourceWood1');
+    addSprite({ entityId: stickEntityId, image: 'resource_wood1.png' });
     addPosition({ entityId: stickEntityId, x: 3, y: 3 });
-    addResource({
+    addResourcePickUp({
         entityId: stickEntityId,
         isTemporary: true,
-        itemName: 'Stick',
+        itemName: 'Wood1',
     });
     addTrigger({ entityId: stickEntityId });
     setTile({ entityId: stickEntityId });
 
-    const butterflyEntityId = createEntity('ResourceButterfly');
-    addSprite({ entityId: butterflyEntityId, image: 'resource_butterfly.png' });
+    const butterflyEntityId = createEntity('ResourceBug1');
+    addSprite({ entityId: butterflyEntityId, image: 'resource_bug1.png' });
     addPosition({ entityId: butterflyEntityId, x: 4, y: 6 });
-    addResource({
+    addResourceBug({
         entityId: butterflyEntityId,
-        activityType: ActivityTypes.BUG,
         isTemporary: true,
-        activityData: {
-            _hp: 3,
-            _maxHp: 3,
-            _maxNbErrors: 3,
-            _nbErrors: 0,
-            _symbolInterval: 3,
-        },
-        itemName: 'Butterfly',
+        maxHp: 3,
+        maxNbErrors: 3,
+        symbolInterval: 2,
+        itemName: 'Bug1',
     });
     addTrigger({ entityId: butterflyEntityId });
     setTile({ entityId: butterflyEntityId });
+
+    const fishEntityId = createEntity('ResourceFish1');
+    addSprite({ entityId: fishEntityId, image: 'resource_fish1.png' });
+    addPosition({ entityId: fishEntityId, x: 8, y: 2 });
+    addResourceFish({
+        entityId: fishEntityId,
+        isTemporary: true,
+        fishDamage: 3,
+        fishMaxHp: 100,
+        frenzyDuration: 3,
+        frenzyInterval: 9,
+        rodDamage: 2,
+        rodMaxTension: 100,
+        itemName: 'Fish1',
+    });
+    addCollider({ entityId: fishEntityId });
+    addTrigger({
+        entityId: fishEntityId,
+        points: [
+            { x: -1, y: 0 },
+            { x: 0, y: -1 },
+            { x: 1, y: 0 },
+            { x: 0, y: 1 },
+        ],
+    });
+    setTile({ entityId: fishEntityId });
 };
