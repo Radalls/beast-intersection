@@ -3,7 +3,7 @@ type InventoryData = {
 };
 
 type ItemRule = {
-    itemName: 'Leaf' | 'Stick' | 'Rock' | 'Butterfly';
+    itemName: 'Wood1' | 'Bug1' | 'Bug2' | 'Fish1';
     maxAmount: number;
 };
 
@@ -12,19 +12,19 @@ export const findItemRule = (itemName: string) => inventoryData.itemRules.find((
 export const inventoryData: InventoryData = {
     itemRules: [
         {
-            itemName: 'Leaf',
+            itemName: 'Wood1',
             maxAmount: 5,
         },
         {
-            itemName: 'Stick',
-            maxAmount: 3,
+            itemName: 'Bug1',
+            maxAmount: 1,
         },
         {
-            itemName: 'Rock',
-            maxAmount: 2,
+            itemName: 'Bug2',
+            maxAmount: 1,
         },
         {
-            itemName: 'Butterfly',
+            itemName: 'Fish1',
             maxAmount: 1,
         }
     ]
