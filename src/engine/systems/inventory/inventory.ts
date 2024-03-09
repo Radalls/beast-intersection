@@ -1,8 +1,9 @@
-import { event } from "../../../render/event";
+import { event } from "../../../render/events/event";
 import { Inventory, Item } from "../../components/inventory";
 import { getComponent } from "../../services/entity";
 import { EventTypes } from "../../event";
 import { findItemRule } from "./inventory.data";
+import { error } from "../../services/error";
 
 //#region CHECKS
 const invalidItemName = (itemName: string) => !(itemName) || itemName === '';
@@ -50,19 +51,11 @@ export const addItemToInventory = ({ entityId, item, itemAmount }: {
     amountRemaining?: number
 } => {
     if (invalidItemName(item.info._name) || invalidItemAmount(itemAmount) || invalidItemSprite(item.sprite._image)) {
-        throw {
-            message: `Item ${item.info._name} is invalid`,
-            where: addItemToInventory.name,
-        }
+        error({ message: `Item ${item.info._name} is invalid`, where: addItemToInventory.name });
     }
 
-    const itemRule = findItemRule(item.info._name);
-    if (!itemRule) {
-        throw {
-            message: `Item ${item.info._name} does not exist`,
-            where: addItemToInventory.name,
-        }
-    }
+    const itemRule = findItemRule(item.info._name)
+        ?? error({ message: `Item ${item.info._name} does not exist`, where: addItemToInventory.name });
 
     const inventory = getComponent({ entityId, componentId: 'Inventory' });
     const slotsWithItem = findSlotsWithItem({ inventory, itemName: item.info._name });
@@ -96,9 +89,9 @@ export const addItemToInventory = ({ entityId, item, itemAmount }: {
             });
 
             event({
-                type: EventTypes.ENTITY_INVENTORY_UPDATE,
+                type: EventTypes.INVENTORY_UPDATE,
                 entityId,
-                data: (({ _, _maxSlots, ...inventoryData }) => inventoryData)(inventory),
+                data: inventory,
             });
 
             return { success: true };
@@ -120,9 +113,9 @@ export const addItemToInventory = ({ entityId, item, itemAmount }: {
     }
 
     event({
-        type: EventTypes.ENTITY_INVENTORY_UPDATE,
+        type: EventTypes.INVENTORY_UPDATE,
         entityId,
-        data: (({ _, _maxSlots, ...inventoryData }) => inventoryData)(inventory),
+        data: inventory,
     });
 
     return { success: false, amountRemaining: itemAmount };
@@ -141,7 +134,7 @@ export const removeItemFromInventory = ({ entityId, itemName, itemAmount }: {
     itemAmount: number,
 }): boolean => {
     if (invalidItemName(itemName) || invalidItemAmount(itemAmount)) {
-        throw new Error(`Item ${itemName} is invalid`);
+        error({ message: `Item ${itemName} is invalid`, where: addItemToInventory.name });
     }
 
     const inventory = getComponent({ entityId, componentId: 'Inventory' });
@@ -176,9 +169,9 @@ export const removeItemFromInventory = ({ entityId, itemName, itemAmount }: {
     removeSlots({ inventory, slotsToRemove });
 
     event({
-        type: EventTypes.ENTITY_INVENTORY_UPDATE,
+        type: EventTypes.INVENTORY_UPDATE,
         entityId,
-        data: (({ _, _maxSlots, ...inventoryData }) => inventoryData)(inventory),
+        data: inventory,
     });
 
     return true;
