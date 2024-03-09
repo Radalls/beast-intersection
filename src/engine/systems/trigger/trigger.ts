@@ -1,4 +1,5 @@
 import { getComponent } from "../../services/entity";
+import { error } from "../../services/error";
 import { getStore } from "../../store";
 import { findTileByPosition } from "../tilemap/tilemap";
 
@@ -25,41 +26,30 @@ export const setTrigger = ({ entityId }: { entityId: string }) => {
         });
 
         if (pointTile) {
-            pointTile._triggerEntityIds.push(entityId);
-            if (pointTile._triggerEntityIds.length > 1) {
-                pointTile._triggerEntityIds = sortTriggersByPriority({ triggerEntityIds: pointTile._triggerEntityIds });
+            pointTile._entityTriggerIds.push(entityId);
+            if (pointTile._entityTriggerIds.length > 1) {
+                pointTile._entityTriggerIds = sortTriggersByPriority({ triggerEntityIds: pointTile._entityTriggerIds });
             }
         }
     }
 }
 
 export const checkTrigger = ({ entityId }: { entityId?: string | null }) => {
-    entityId = entityId || getStore('playerId');
-    if (!(entityId)) {
-        throw {
-            message: `Entity does not exist`,
-            where: checkTrigger.name,
-        }
-    }
+    if (!(entityId)) entityId = getStore('playerId')
+        ?? error({ message: 'Store playerId is undefined', where: checkTrigger.name });
 
     const entityPosition = getComponent({ entityId, componentId: 'Position' });
 
     const entityTile = findTileByPosition({
         x: entityPosition._x,
         y: entityPosition._y,
-    });
-    if (!(entityTile)) {
-        throw {
-            message: `Tile ${entityId} not found`,
-            where: checkTrigger.name,
-        }
-    }
+    }) ?? error({ message: `Tile (${entityPosition._x}-${entityPosition._y}) does not exist`, where: checkTrigger.name });
 
-    if (entityTile._triggerEntityIds.length === 0) {
+    if (entityTile._entityTriggerIds.length === 0) {
         return null;
     }
 
-    return findPriorityTriggerEntityId({ triggerEntityIds: entityTile._triggerEntityIds });
+    return findPriorityTriggerEntityId({ triggerEntityIds: entityTile._entityTriggerIds });
 }
 
 export const destroyTrigger = ({ entityId }: { entityId: string }) => {
@@ -73,7 +63,7 @@ export const destroyTrigger = ({ entityId }: { entityId: string }) => {
         });
 
         if (pointTile) {
-            pointTile._triggerEntityIds = pointTile._triggerEntityIds.filter((id) => id !== entityId);
+            pointTile._entityTriggerIds = pointTile._entityTriggerIds.filter((id) => id !== entityId);
         }
     }
 };

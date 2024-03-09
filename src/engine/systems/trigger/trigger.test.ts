@@ -5,7 +5,7 @@ import { addComponent, createEntity } from "../../services/entity";
 import { generateTiles } from "../tilemap/tilemap";
 import { checkTrigger, destroyTrigger, setTrigger } from "./trigger";
 
-jest.mock('../../../render/event.ts', () => ({
+jest.mock('../../../render/events/event.ts', () => ({
     event: jest.fn(),
 }));
 
@@ -86,7 +86,7 @@ describe('Trigger System', () => {
             rockTrigger.points = [];
 
             for (const tile of tilemap.tiles) {
-                tile._triggerEntityIds = [];
+                tile._entityTriggerIds = [];
             }
         });
 
@@ -99,8 +99,8 @@ describe('Trigger System', () => {
 
             setTrigger({ entityId: stickEntityId });
 
-            expect(tilemap.tiles[4]._triggerEntityIds.length).toBe(1);
-            expect(tilemap.tiles[4]._triggerEntityIds[0]).toBe(stickEntityId);
+            expect(tilemap.tiles[4]._entityTriggerIds.length).toBe(1);
+            expect(tilemap.tiles[4]._entityTriggerIds[0]).toBe(stickEntityId);
         });
 
         test('Should set trigger points around entity', () => {
@@ -109,11 +109,11 @@ describe('Trigger System', () => {
 
             setTrigger({ entityId: stickEntityId });
 
-            expect(tilemap.tiles[1]._triggerEntityIds.length).toBe(1);
-            expect(tilemap.tiles[1]._triggerEntityIds[0]).toBe(stickEntityId);
+            expect(tilemap.tiles[1]._entityTriggerIds.length).toBe(1);
+            expect(tilemap.tiles[1]._entityTriggerIds[0]).toBe(stickEntityId);
 
-            expect(tilemap.tiles[8]._triggerEntityIds.length).toBe(1);
-            expect(tilemap.tiles[8]._triggerEntityIds[0]).toBe(stickEntityId);
+            expect(tilemap.tiles[8]._entityTriggerIds.length).toBe(1);
+            expect(tilemap.tiles[8]._entityTriggerIds[0]).toBe(stickEntityId);
         });
 
         test('Should not set trigger point if out of bounds', () => {
@@ -123,7 +123,7 @@ describe('Trigger System', () => {
 
             // expect all tiles to have no trigger point assigned
             for (const tile of tilemap.tiles) {
-                expect(tile._triggerEntityIds.length).toBe(0);
+                expect(tile._entityTriggerIds.length).toBe(0);
             }
         });
 
@@ -134,9 +134,9 @@ describe('Trigger System', () => {
             setTrigger({ entityId: stickEntityId });
             setTrigger({ entityId: rockEntityId });
 
-            expect(tilemap.tiles[4]._triggerEntityIds.length).toBe(2);
-            expect(tilemap.tiles[4]._triggerEntityIds[0]).toBe(rockEntityId);
-            expect(tilemap.tiles[4]._triggerEntityIds[1]).toBe(stickEntityId);
+            expect(tilemap.tiles[4]._entityTriggerIds.length).toBe(2);
+            expect(tilemap.tiles[4]._entityTriggerIds[0]).toBe(rockEntityId);
+            expect(tilemap.tiles[4]._entityTriggerIds[1]).toBe(stickEntityId);
         });
     });
 
@@ -198,11 +198,11 @@ describe('Trigger System', () => {
         test('Should destroy trigger points', () => {
             destroyTrigger({ entityId: stickEntityId });
 
-            expect(tilemap.tiles[4]._triggerEntityIds).not.toContain(stickEntityId);
-            expect(tilemap.tiles[5]._triggerEntityIds).toContain(rockEntityId);
+            expect(tilemap.tiles[4]._entityTriggerIds).not.toContain(stickEntityId);
+            expect(tilemap.tiles[5]._entityTriggerIds).toContain(rockEntityId);
 
             destroyTrigger({ entityId: rockEntityId });
-            expect(tilemap.tiles[5]._triggerEntityIds).not.toContain(rockEntityId);
+            expect(tilemap.tiles[5]._entityTriggerIds).not.toContain(rockEntityId);
         });
     });
 });
