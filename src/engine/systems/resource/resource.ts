@@ -1,5 +1,5 @@
 import { ActivityTypes } from "../../components/resource";
-import { checkComponent, destroyEntity, getComponent } from "../../services/entity";
+import { checkComponent, destroyEntity, getComponent } from "../../entities/entity.manager";
 import { getStore } from "../../store";
 import { startActivityBug } from "../../services/activity/activity.bug";
 import { addItemToInventory } from "../inventory/inventory";

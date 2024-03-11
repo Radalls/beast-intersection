@@ -4,7 +4,7 @@ import { EventTypes } from "../../event";
 import { setState } from "../../state";
 import { getStore, clearStore, setStore } from "../../store";
 import { destroyResource, getResourceItem } from "../../systems/resource/resource";
-import { getComponent } from "../entity";
+import { getComponent } from "../../entities/entity.manager";
 import { error } from "../error";
 
 //#region HELPERS

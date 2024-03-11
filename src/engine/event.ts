@@ -1,6 +1,6 @@
 import { Component } from './components/@component';
 import { event } from "../render/events/event";
-import { getComponent, checkComponent } from "./services/entity";
+import { getComponent, checkComponent } from "./entities/entity.manager";
 import { getState, setState } from "./state";
 import { getStore } from "./store";
 import { playActivityBug } from "./services/activity/activity.bug";

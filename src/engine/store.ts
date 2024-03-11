@@ -1,4 +1,4 @@
-import { checkEntityId } from './services/entity';
+import { checkEntityId } from './entities/entity.manager';
 
 const store = {
     playerId: '',

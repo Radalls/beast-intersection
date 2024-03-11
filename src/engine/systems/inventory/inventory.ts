@@ -1,6 +1,6 @@
 import { event } from "../../../render/events/event";
 import { Inventory, Item } from "../../components/inventory";
-import { getComponent } from "../../services/entity";
+import { getComponent } from "../../entities/entity.manager";
 import { EventTypes } from "../../event";
 import { findItemRule } from "./inventory.data";
 import { error } from "../../services/error";

@@ -1,4 +1,4 @@
-import { getComponent } from "../../services/entity";
+import { getComponent } from "../../entities/entity.manager";
 import { error } from "../../services/error";
 import { findTileByPosition } from "../tilemap/tilemap";
 

@@ -1,5 +1,5 @@
 import { event } from "../../../render/events/event";
-import { getComponent } from "../../services/entity";
+import { getComponent } from "../../entities/entity.manager";
 import { EventTypes } from "../../event";
 import { error } from "../../services/error";
 

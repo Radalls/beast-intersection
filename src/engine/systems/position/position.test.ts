@@ -1,5 +1,5 @@
 import { Position } from "../../components/position";
-import { addComponent, createEntity } from "../../services/entity";
+import { addComponent, createEntity } from "../../entities/entity.manager";
 import { updatePosition } from "./position";
 
 jest.mock('../../../render/events/event.ts', () => ({

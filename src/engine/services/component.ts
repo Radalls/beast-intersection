@@ -5,7 +5,7 @@ import { Resource, ActivityTypes, ActivityBugData, ActivityFishData } from "../c
 import { Sprite } from "../components/sprite";
 import { TileMap } from "../components/tilemap";
 import { Trigger } from "../components/trigger";
-import { PLAYER_ENTITY_ID, addComponent } from "./entity";
+import { PLAYER_ENTITY_ID, addComponent } from "../entities/entity.manager";
 import { EventTypes } from "../event";
 import { Collider } from "../components/collider";
 

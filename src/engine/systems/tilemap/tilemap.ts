@@ -1,6 +1,6 @@
 import { event } from "../../../render/events/event";
 import { Tile } from "../../components/tilemap";
-import { checkComponent, getComponent } from "../../services/entity"
+import { checkComponent, getComponent } from "../../entities/entity.manager"
 import { EventTypes } from "../../event";
 import { getStore } from "../../store";
 import { updatePosition } from "../position/position";

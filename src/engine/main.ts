@@ -1,5 +1,5 @@
 import { generateTiles, setTile } from './systems/tilemap/tilemap';
-import { PLAYER_ENTITY_ID, TILEMAP_ENTITY_ID, createEntity } from "./services/entity";
+import { PLAYER_ENTITY_ID, TILEMAP_ENTITY_ID, createEntity } from "./entities/entity.manager";
 import { addCollider, addInventory, addPosition, addResourceBug, addResourceFish, addResourcePickUp, addSprite, addTileMap, addTrigger } from "./services/component";
 import { setState } from './state';
 import { getCycle, runCycle } from './cycle';
@@ -71,4 +71,19 @@ export const main = () => {
         ],
     });
     setTile({ entityId: fishEntityId });
+
+    const npcEntityId = createEntity('Npc');
+    addSprite({ entityId: npcEntityId, height: 2, image: 'npc.png' });
+    addPosition({ entityId: npcEntityId, x: 1, y: 9 });
+    addCollider({ entityId: npcEntityId });
+    addTrigger({
+        entityId: npcEntityId,
+        points: [
+            { x: -1, y: 0 },
+            { x: 0, y: -1 },
+            { x: 1, y: 0 },
+            { x: 0, y: 1 },
+        ],
+    });
+    setTile({ entityId: npcEntityId });
 };

@@ -1,7 +1,7 @@
 import { event } from "../../../render/events/event";
 import { ActivityBugData } from "../../components/resource";
 import { clearCycle, setCycle } from "../../cycle";
-import { getComponent } from "../entity";
+import { getComponent } from "../../entities/entity.manager";
 import { EventInputKeys, EventTypes } from "../../event";
 import { getState, setState } from "../../state";
 import { checkActivityId, endActivity, startActivity, winActivity } from "./activity";

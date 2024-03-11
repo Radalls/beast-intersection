@@ -3,7 +3,7 @@ import { ActivityFishData } from "../../components/resource";
 import { clearCycle, setCycle } from "../../cycle";
 import { EventInputKeys, EventTypes } from "../../event";
 import { setState } from "../../state";
-import { getComponent } from "../entity";
+import { getComponent } from "../../entities/entity.manager";
 import { checkActivityId, endActivity, startActivity, winActivity } from "./activity"
 
 //#region SERVICES

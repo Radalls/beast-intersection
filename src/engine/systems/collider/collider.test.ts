@@ -1,7 +1,7 @@
 import { Collider } from "../../components/collider";
 import { Position } from "../../components/position";
 import { TileMap } from "../../components/tilemap";
-import { addComponent, createEntity } from "../../services/entity";
+import { addComponent, createEntity } from "../../entities/entity.manager";
 import { generateTiles } from "../tilemap/tilemap";
 import { checkCollider, destroyCollider, setCollider } from "./collider";
 

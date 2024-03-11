@@ -1,6 +1,6 @@
 import { Inventory } from "../../components/inventory";
 import { Resource, ActivityTypes } from "../../components/resource";
-import { addComponent, createEntity, getEntity } from "../../services/entity";
+import { addComponent, createEntity, getEntity } from "../../entities/entity.manager";
 import { destroyResource, getResourceItem, useResource } from "./resource";
 
 jest.mock('../../../render/events/event.ts', () => ({
