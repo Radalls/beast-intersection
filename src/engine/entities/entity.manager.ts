@@ -56,7 +56,7 @@ export const addComponent = <T extends keyof Component>({ entityId, component }:
     const entity = getEntity(entityId)
         ?? error({ message: `Entity ${entityId} does not exist`, where: addComponent.name });
 
-    // @ts-ignore - Component[T] is not assignable to type 'undefined'
+    // @ts-expect-error - Component[T] is not assignable to type 'undefined'
     entity[component._] = component;
 };
 
