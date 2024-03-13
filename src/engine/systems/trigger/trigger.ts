@@ -14,7 +14,7 @@ const sortTriggersByPriority = ({ triggerEntityIds }: { triggerEntityIds: string
 const findPriorityTriggerEntityId = ({ triggerEntityIds }: { triggerEntityIds: string[] }) => triggerEntityIds[0];
 //#endregion
 
-//#region ACTIONS
+//#region SYSTEMS
 export const setTrigger = ({ entityId }: { entityId: string }) => {
     const entityPosition = getComponent({ entityId, componentId: 'Position' });
     const entityTrigger = getComponent({ entityId, componentId: 'Trigger' });

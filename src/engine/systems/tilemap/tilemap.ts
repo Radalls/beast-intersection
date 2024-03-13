@@ -29,7 +29,7 @@ export const findTileByPosition = ({ x, y }: {
 }
 //#endregion
 
-//#region ACTIONS
+//#region SYSTEMS
 export const generateTiles = ({ tilemapEntityId }: { tilemapEntityId?: string | null }) => {
     if (!(tilemapEntityId)) tilemapEntityId = getStore('tilemapId')
         ?? error({ message: `Store tilemapId is undefined`, where: generateTiles.name });

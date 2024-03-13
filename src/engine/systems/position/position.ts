@@ -15,7 +15,7 @@ const samePosition = ({ entityPosition, inputPosition }: {
 }) => entityPosition.x === inputPosition.x && entityPosition.y === inputPosition.y
 //#endregion
 
-//#region ACTIONS
+//#region SYSTEMS
 export const updatePosition = ({ entityId, x, y }: {
     entityId: string,
     x: number,

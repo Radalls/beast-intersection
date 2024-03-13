@@ -8,6 +8,7 @@ import { destroyCollider } from "../collider/collider";
 import { startActivityFish } from "../../services/activity/activity.fish";
 import { error } from "../../services/error";
 
+//#region SYSTEMS
 export const useResource = ({ entityId, resourceEntityId }: {
     entityId?: string | null,
     resourceEntityId: string,
@@ -63,3 +64,4 @@ export const destroyResource = ({ resourceEntityId }: {
 
     destroyEntity({ entityId: resourceEntityId });
 }
+//#endregion
