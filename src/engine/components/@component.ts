@@ -1,4 +1,5 @@
 import { Collider } from "./collider";
+import { Dialog } from "./dialog";
 import { Inventory } from "./inventory";
 import { Position } from "./position";
 import { Resource } from "./resource";
@@ -8,6 +9,7 @@ import { Trigger } from "./trigger";
 
 export type Component = {
     'Collider': Collider;
+    'Dialog': Dialog;
     'Inventory': Inventory;
     'Position': Position;
     'Resource': Resource;
