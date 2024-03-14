@@ -11,18 +11,21 @@ import { onTileMapCreate, onTileMapTileCreate } from './event.tilemap';
 import { error } from '../../engine/services/error';
 import { Component } from '../../engine/components/@component';
 import { Inventory } from '../../engine/components/inventory';
+import { Dialog } from '../../engine/components/dialog';
+import { onDialogStart, onDialogNext, onDialogEnd } from './event.dialog';
 
 export const onInputKeyDown = (e: any) => { engineOnInputKeyDown(e.key); };
 
 //#region HELPERS
-const checkInventoryData = (data: any): data is Inventory => data
 const checkPositionData = (data: any): data is Position => data
+const checkSpriteData = (data: any): data is Sprite => data
+const checkInventoryData = (data: any): data is Inventory => data
+const checkTileMapData = (data: any): data is TileMap => data
+const checkTileData = (data: any): data is Tile => data
 const checkResourceData = (data: any): data is Resource => data
 const checkActivityBugData = (data: any): data is ActivityBugData => data
 const checkActivityFishData = (data: any): data is ActivityFishData => data
-const checkSpriteData = (data: any): data is Sprite => data
-const checkTileMapData = (data: any): data is TileMap => data
-const checkTileData = (data: any): data is Tile => data
+const checkDialogData = (data: any): data is Dialog => data
 //#endregion
 
 //#region EVENTS
@@ -118,6 +121,22 @@ export const event = <T extends keyof Component>(event: Event<T>) => {
         }
         else if (event.type === EventTypes.ACTIVITY_FISH_END) {
             onActivityFishEnd({ activityEntityId: event.entityId });
+        }
+        /* Dialog */
+        else if (event.type === EventTypes.DIALOG_START && checkDialogData(event.data)) {
+            onDialogStart({
+                entityId: event.entityId,
+                dialog: event.data,
+            });
+        }
+        else if (event.type === EventTypes.DIALOG_UPDATE && checkDialogData(event.data)) {
+            onDialogNext({
+                entityId: event.entityId,
+                dialog: event.data,
+            });
+        }
+        else if (event.type === EventTypes.DIALOG_END) {
+            onDialogEnd({ entityId: event.entityId });
         }
         else error({ message: `Unknown Event type: ${event.type}`, where: 'event' });
     }
