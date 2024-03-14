@@ -11,6 +11,7 @@ import { playActivityFish } from "./services/activity/activity.fish";
 import { error } from "./services/error";
 import { ActivityBugData, ActivityFishData } from './components/resource';
 import { Tile } from './components/tilemap';
+import { nextDialog, selectDialogOption, startDialog } from './systems/dialog/dialog';
 
 export type Event<K extends keyof Component = keyof Component> = {
     type: EventTypes,
@@ -18,7 +19,7 @@ export type Event<K extends keyof Component = keyof Component> = {
     data?: EventData<K>,
 };
 
-export type EventData<K extends keyof Component = keyof Component> = Component[K] | Tile | ActivityBugData | ActivityFishData
+export type EventData<K extends keyof Component = keyof Component> = Component[K] | Tile | ActivityBugData | ActivityFishData;
 
 export enum EventInputKeys {
     UP = 'z',
@@ -52,6 +53,10 @@ export enum EventTypes {
     ACTIVITY_FISH_START = 'ACTIVITY_FISH_START',
     ACTIVITY_FISH_UPDATE = 'ACTIVITY_FISH_UPDATE',
     ACTIVITY_FISH_END = 'ACTIVITY_FISH_END',
+    /* Dialog */
+    DIALOG_START = 'DIALOG_START',
+    DIALOG_UPDATE = 'DIALOG_UPDATE',
+    DIALOG_END = 'DIALOG_END',
 }
 
 export const onInputKeyDown = (inputKey: EventInputKeys) => {
@@ -61,9 +66,11 @@ export const onInputKeyDown = (inputKey: EventInputKeys) => {
     const playerPosition = getComponent({ entityId: playerEntityId, componentId: 'Position' });
 
     try {
-        if (!(getState('isGameRunning'))) return;
-        if (getState('isInputCooldown')) return;
-        if (getState('isActivityBugCooldown')) return;
+        if (
+            !(getState('isGameRunning')) ||
+            getState('isInputCooldown') ||
+            getState('isActivityBugCooldown')
+        ) return;
 
         setState('isInputCooldown', true);
 
@@ -76,12 +83,29 @@ export const onInputKeyDown = (inputKey: EventInputKeys) => {
                 onActivityFishInput({ inputKey });
                 return;
             }
+            else return;
+        }
+        else if (getState('isPlayerDialogOpen')) {
+            const dialogEntityId = getStore('dialogId')
+                ?? error({ message: 'Store dialogId is undefined', where: onInputKeyDown.name });
 
-            return;
+            if (inputKey === EventInputKeys.UP) {
+                selectDialogOption({ entityId: dialogEntityId, offset: -1 });
+                return;
+            }
+            else if (inputKey === EventInputKeys.DOWN) {
+                selectDialogOption({ entityId: dialogEntityId, offset: 1 });
+                return;
+            }
+            else if (inputKey === EventInputKeys.ACT) {
+                nextDialog({ entityId: dialogEntityId });
+                return;
+            }
+            else return;
         }
         else {
             if (inputKey === EventInputKeys.INVENTORY) {
-                setState('isInventoryOpen', !(getState('isInventoryOpen')));
+                setState('isPlayerInventoryOpen', !(getState('isPlayerInventoryOpen')));
 
                 event({
                     type: EventTypes.INVENTORY_DISPLAY,
@@ -90,52 +114,59 @@ export const onInputKeyDown = (inputKey: EventInputKeys) => {
 
                 return;
             }
-            else if (!(getState('isInventoryOpen'))) {
-                if (inputKey === EventInputKeys.UP) {
-                    updateTile({
-                        entityId: playerEntityId,
-                        targetX: playerPosition._x,
-                        targetY: playerPosition._y - 1,
-                    });
+            else if (inputKey === EventInputKeys.UP) {
+                if (getState('isPlayerInventoryOpen')) return; // temp
 
-                    return;
-                }
-                else if (inputKey === EventInputKeys.LEFT) {
-                    updateTile({
-                        entityId: playerEntityId,
-                        targetX: playerPosition._x - 1,
-                        targetY: playerPosition._y,
-                    });
+                updateTile({
+                    entityId: playerEntityId,
+                    targetX: playerPosition._x,
+                    targetY: playerPosition._y - 1,
+                });
 
-                    return;
-                }
-                else if (inputKey === EventInputKeys.DOWN) {
-                    updateTile({
-                        entityId: playerEntityId,
-                        targetX: playerPosition._x,
-                        targetY: playerPosition._y + 1,
-                    });
+                return;
+            }
+            else if (inputKey === EventInputKeys.LEFT) {
+                if (getState('isPlayerInventoryOpen')) return; // temp
 
-                    return;
-                }
-                else if (inputKey === EventInputKeys.RIGHT) {
-                    updateTile({
-                        entityId: playerEntityId,
-                        targetX: playerPosition._x + 1,
-                        targetY: playerPosition._y,
-                    });
+                updateTile({
+                    entityId: playerEntityId,
+                    targetX: playerPosition._x - 1,
+                    targetY: playerPosition._y,
+                });
 
-                    return;
-                }
-                else if (inputKey === EventInputKeys.ACT) {
-                    const triggeredEntityId = checkTrigger({});
-                    if (triggeredEntityId) {
-                        onTrigger({ triggeredEntityId });
-                        return;
-                    }
+                return;
+            }
+            else if (inputKey === EventInputKeys.DOWN) {
+                if (getState('isPlayerInventoryOpen')) return; // temp
 
-                    return;
+                updateTile({
+                    entityId: playerEntityId,
+                    targetX: playerPosition._x,
+                    targetY: playerPosition._y + 1,
+                });
+
+                return;
+            }
+            else if (inputKey === EventInputKeys.RIGHT) {
+                if (getState('isPlayerInventoryOpen')) return; // temp
+
+                updateTile({
+                    entityId: playerEntityId,
+                    targetX: playerPosition._x + 1,
+                    targetY: playerPosition._y,
+                });
+
+                return;
+            }
+            else if (inputKey === EventInputKeys.ACT) {
+                if (getState('isPlayerInventoryOpen')) return; // temp
+
+                const triggeredEntityId = checkTrigger({});
+                if (triggeredEntityId) {
+                    onTrigger({ triggeredEntityId });
                 }
+
+                return;
             }
         }
     }
@@ -154,6 +185,11 @@ const onTrigger = ({ entityId, triggeredEntityId }: {
     const resource = checkComponent({ entityId: triggeredEntityId, componentId: 'Resource' });
     if (resource) {
         useResource({ resourceEntityId: triggeredEntityId });
+    }
+
+    const dialog = checkComponent({ entityId: triggeredEntityId, componentId: 'Dialog' });
+    if (dialog) {
+        startDialog({ entityId: triggeredEntityId });
     }
 };
 
