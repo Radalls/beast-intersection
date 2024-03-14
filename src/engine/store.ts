@@ -4,6 +4,7 @@ const store = {
     playerId: '',
     tilemapId: '',
     activityId: '',
+    dialogId: '',
 };
 
 export const setStore = (key: keyof typeof store, value: string) => store[key] = value;
