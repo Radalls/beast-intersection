@@ -8,6 +8,7 @@ import { Trigger } from "../components/trigger";
 import { PLAYER_ENTITY_ID, addComponent } from "../entities/entity.manager";
 import { EventTypes } from "../event";
 import { Collider } from "../components/collider";
+import { Dialog } from "../components/dialog";
 
 export const addInventory = ({ entityId, maxSlots = 10 }: {
     entityId: string,
@@ -238,4 +239,15 @@ export const addCollider = ({ entityId, points }: {
     };
 
     addComponent({ entityId, component: collider });
+}
+
+export const addDialog = ({ entityId }: {
+    entityId: string,
+}) => {
+    const dialog: Dialog = {
+        _: 'Dialog',
+        texts: [],
+    };
+
+    addComponent({ entityId, component: dialog });
 }
