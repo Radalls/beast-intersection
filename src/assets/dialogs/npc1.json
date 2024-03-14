@@ -1,0 +1,17 @@
+[
+    { "_id": 1, "_value": "J'ai mal dormi... 😴", "_next": 2, "_options": [] },
+    { "_id": 2, "_value": "Pourtant on dit que dormir au sol, c'est bon pour le dos 🥱", "_next": 3, "_options": [] },
+    { "_id": 3, "_value": "J'ai vraiment besoin d'un café... 😵", "_next": 4, "_options": [] },
+    { "_id": 4, "_value": "J'en ai rêvé cette nuit tu sais ? 🤩", "_next": 5, "_options": [] },
+    { "_id": 5, "_value": "Tu préfères le café ou le thé ?", "_next": null, "_options": [6, 7, 8] },
+    { "_id": 6, "_value": "Le thé ! C'est zen...", "_next": 9, "_options": [] },
+    { "_id": 7, "_value": "Le café pour se réveiller !", "_next": 10, "_options": [] },
+    { "_id": 8, "_value": "Aucun des deux...", "_next": 11, "_options": [] },
+    { "_id": 9, "_value": "Beurk ! C'est du pisse mémé 🤢", "_next": 12, "_options": [] },
+    { "_id": 10, "_value": "Moi aussi... tu me passes un café ? ☕", "_next": 12, "_options": [] },
+    { "_id": 11, "_value": "Ah ? Tu es le genre de personne à n'aimer que l'eau... 😒", "_next": 12, "_options": [] },
+    { "_id": 12, "_value": "J'ai mal au dos... 😖", "_next": null, "_options": [13, 14] },
+    { "_id": 13, "_value": "Tu veux de la pommade ?", "_next": 15, "_options": [] },
+    { "_id": 14, "_value": "C'est normal, t'es vieux (*drops mic*)", "_next": null, "_options": [] },
+    { "_id": 15, "_value": "Une pomme ? Non merci j'ai déjà pris mon petit déjeuner 👴", "_next": null, "_options": [] }
+]
