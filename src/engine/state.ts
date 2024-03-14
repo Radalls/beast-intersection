@@ -1,7 +1,8 @@
 const state = {
     isGameRunning: false,
     isInputCooldown: false,
-    isInventoryOpen: false,
+    isPlayerInventoryOpen: false,
+    isPlayerDialogOpen: false,
     isActivityRunning: false,
     isActivityWin: false,
     isActivityBugRunning: false,
