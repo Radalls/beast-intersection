@@ -1,5 +1,5 @@
 import { createEntity, PLAYER_ENTITY_ID, TILEMAP_ENTITY_ID } from "../entities/entity.manager";
-import { loadDialog } from "../systems/dialog/dialog";
+import { loadDialog } from "../systems/dialog/dialog.data";
 import { generateTiles, setTile } from "../systems/tilemap/tilemap";
 import { addSprite, addPosition, addInventory, addTileMap, addResourcePickUp, addTrigger, addResourceBug, addCollider, addResourceFish, addDialog } from "./component";
 
