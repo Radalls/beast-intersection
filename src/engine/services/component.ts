@@ -9,8 +9,10 @@ import { PLAYER_ENTITY_ID, addComponent } from "../entities/entity.manager";
 import { EventTypes } from "../event";
 import { Collider } from "../components/collider";
 import { Dialog } from "../components/dialog";
+import { loadDialog } from "../systems/dialog/dialog.data";
+import { generateTiles } from "../systems/tilemap/tilemap";
 
-export const addInventory = ({ entityId, maxSlots = 10 }: {
+export const addInventory = ({ entityId, maxSlots = 20 }: {
     entityId: string,
     maxSlots?: number,
 }) => {
@@ -209,6 +211,8 @@ export const addTileMap = ({ entityId, height = 10, width = 10 }: {
         entityId,
         data: tilemap,
     });
+
+    generateTiles({});
 }
 
 export const addTrigger = ({ entityId, priority = 0, points }: {
@@ -250,4 +254,5 @@ export const addDialog = ({ entityId }: {
     };
 
     addComponent({ entityId, component: dialog });
+    loadDialog({ entityId });
 }
