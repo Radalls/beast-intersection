@@ -1,5 +1,5 @@
 import { Inventory } from "../../engine/components/inventory";
-import { createEntity, getEntity, getSpritePath } from "./template";
+import { checkEntity, createEntity, getEntity, getSpritePath } from "./template";
 
 //#region CONSTANTS
 const INVENTORY_SLOT_SIZE = 64;
@@ -45,15 +45,16 @@ export const updateInventory = ({ entityId, inventory }: {
 }) => {
     for (const slot of inventory.slots) {
         const entityInventorySlot = getEntity({ entityId: `${entityId}-inventory-slot-${inventory.slots.indexOf(slot)}` });
-
         entityInventorySlot.style.backgroundImage = `url(${getSpritePath(slot.item.sprite._image)})`;
 
-        const entityInventorySlotAmount = createEntity({
-            entityId,
-            htmlId: `${entityId}-inventory-slot-${inventory.slots.indexOf(slot)}-amount`,
-            htmlClass: 'inventory-slot-amount',
-            htmlParent: entityInventorySlot,
-        });
+        const entityInventorySlotAmount = checkEntity({ entityId: `${entityId}-inventory-slot-${inventory.slots.indexOf(slot)}-amount` })
+            ? getEntity({ entityId: `${entityId}-inventory-slot-${inventory.slots.indexOf(slot)}-amount` })
+            : createEntity({
+                entityId,
+                htmlId: `${entityId}-inventory-slot-${inventory.slots.indexOf(slot)}-amount`,
+                htmlClass: 'inventory-slot-amount',
+                htmlParent: entityInventorySlot,
+            });
 
         entityInventorySlotAmount.textContent = `x${slot._amount.toString()}`;
     }
