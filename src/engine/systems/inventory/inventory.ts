@@ -64,6 +64,13 @@ export const addItemToInventory = ({ entityId, item, itemAmount }: {
             if (slot._amount < slot._maxAmount) {
                 if (slot._amount + itemAmount <= slot._maxAmount) {
                     slot._amount += itemAmount;
+
+                    event({
+                        type: EventTypes.INVENTORY_UPDATE,
+                        entityId,
+                        data: inventory,
+                    });
+
                     return { success: true };
                 }
 
