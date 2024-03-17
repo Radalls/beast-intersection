@@ -42,6 +42,10 @@ export const getResourceItem = ({ entityId, resourceEntityId }: {
 
     const resource = getComponent({ entityId: resourceEntityId, componentId: 'Resource' });
 
+    if (!(resource.item)) {
+        throw error({ message: `Resource ${resourceEntityId} does not have an item`, where: getResourceItem.name });
+    }
+
     addItemToInventory({
         entityId,
         item: resource.item,
