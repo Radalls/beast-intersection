@@ -27,7 +27,7 @@ export const winActivity = ({ activityEntityId, resource }: {
         htmlClass: "activity-win",
     });
 
-    activityEntityWin.textContent = `You get ${resource.item.info._name}!`;
+    activityEntityWin.textContent = `You get ${resource.item?.info._name}!`;
 }
 
 export const endActivity = ({ activityEntityId }: { activityEntityId: string }) => {
