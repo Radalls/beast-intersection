@@ -185,11 +185,13 @@ const onTrigger = ({ entityId, triggeredEntityId }: {
     const resource = checkComponent({ entityId: triggeredEntityId, componentId: 'Resource' });
     if (resource) {
         useResource({ resourceEntityId: triggeredEntityId });
+        return;
     }
 
     const dialog = checkComponent({ entityId: triggeredEntityId, componentId: 'Dialog' });
     if (dialog) {
         startDialog({ entityId: triggeredEntityId });
+        return;
     }
 };
 
