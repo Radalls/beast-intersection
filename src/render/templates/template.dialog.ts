@@ -74,8 +74,6 @@ const destroyDialogOptions = ({ entityId }: { entityId: string }) => {
 
 export const endDialog = ({ entityId }: { entityId: string }) => {
     destroyDialogOptions({ entityId });
-    destroyEntity({ entityId: `${entityId}-dialog-text-options` });
-    destroyEntity({ entityId: `${entityId}-dialog-text` });
     destroyEntity({ entityId: `${entityId}-dialog` });
 }
 //#endregion
