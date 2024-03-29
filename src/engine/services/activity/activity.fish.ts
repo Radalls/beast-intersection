@@ -1,7 +1,7 @@
 import { event } from "../../../render/events/event";
 import { ActivityFishData } from "../../components/resource";
 import { clearCycle, setCycle } from "../../cycle";
-import { EventInputKeys, EventTypes } from "../../event";
+import { EventInputActionKeys, EventTypes } from "../../event";
 import { setState } from "../../state";
 import { getComponent } from "../../entities/entity.manager";
 import { checkActivityId, endActivity, startActivity, winActivity } from "./activity"
@@ -67,7 +67,7 @@ export const playActivityFish = ({ activityId, symbol }: {
 }) => {
     activityId = checkActivityId({ activityId });
 
-    if (symbol !== EventInputKeys.ACT) return;
+    if (symbol !== EventInputActionKeys.ACT) return;
 
     const activityResource = getComponent({ entityId: activityId, componentId: 'Resource' });
     const activityFishData = activityResource.activityData as ActivityFishData;
