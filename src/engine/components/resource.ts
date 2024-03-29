@@ -5,16 +5,17 @@ export type Resource = {
     _activityType: ActivityTypes,
     _isTemporary: boolean,
     activityData?: ActivityData,
-    item: Item,
+    item?: Item,
 };
 
 export enum ActivityTypes {
     PICKUP = 'PICKUP',
     BUG = 'BUG',
     FISH = 'FISH',
+    CRAFT = 'CRAFT',
 }
 
-export type ActivityData = ActivityBugData | ActivityFishData;
+export type ActivityData = ActivityBugData | ActivityFishData | ActivityCraftData;
 
 export type ActivityBugData = {
     _hp: number,
@@ -36,4 +37,12 @@ export type ActivityFishData = {
     _rodDamage: number,
     _rodTension: number,
     _rodMaxTension: number,
+}
+
+export type ActivityCraftData = {
+    _currentRecipeIndex?: number,
+    _nbErrors: number,
+    _maxNbErrors: number,
+    _currentRecipeId?: number,
+    _hitCount?: number,
 }
