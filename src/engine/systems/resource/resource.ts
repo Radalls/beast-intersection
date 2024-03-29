@@ -7,6 +7,7 @@ import { destroyTrigger } from "../trigger/trigger";
 import { destroyCollider } from "../collider/collider";
 import { startActivityFish } from "../../services/activity/activity.fish";
 import { error } from "../../services/error";
+import { startActivityCraft } from "../../services/activity/activity.craft";
 
 //#region SYSTEMS
 export const useResource = ({ entityId, resourceEntityId }: {
@@ -30,6 +31,9 @@ export const useResource = ({ entityId, resourceEntityId }: {
     }
     else if (resource._activityType === ActivityTypes.FISH && resource.activityData) {
         startActivityFish({ activityId: resourceEntityId });
+    }
+    else if (resource._activityType === ActivityTypes.CRAFT && resource.activityData) {
+        startActivityCraft({ activityId: resourceEntityId });
     }
 };
 
