@@ -110,3 +110,54 @@
     height: 64px;
     width: 64px;
 }
+
+/* ACTIVITY CRAFT */
+.activity-craft {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    padding: 16px;
+    text-align: center;
+}
+
+.activity-craft-recipes {
+    align-items: center;
+    display: flex;
+    height: 512px;
+    flex-direction: column;
+    gap: 16px;
+    height: 100%;
+    width: 512px;
+}
+
+.activity-craft-recipe {
+    align-items: center;
+    border: solid 4px rgb(70, 70, 70);
+    display: flex;
+    gap: 32px;
+    padding: 8px;
+    width: 100%;
+}
+
+.activity-craft-recipe-icon {
+    height: 64px;
+    width: 64px;
+}
+
+.activity-craft-recipe-ingredients {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.activity-craft-recipe-ingredient {
+    align-items: center;
+    display: flex;
+    gap: 4px;
+}
+
+.activity-craft-recipe-ingredient-icon {
+    background-size: contain;
+    height: 32px;
+    width: 32px;
+}
