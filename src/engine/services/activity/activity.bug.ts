@@ -2,7 +2,7 @@ import { event } from "../../../render/events/event";
 import { ActivityBugData } from "../../components/resource";
 import { clearCycle, setCycle } from "../../cycle";
 import { getComponent } from "../../entities/entity.manager";
-import { EventInputKeys, EventTypes } from "../../event";
+import { EventInputActionKeys, EventTypes } from "../../event";
 import { getState, setState } from "../../state";
 import { checkActivityId, endActivity, startActivity, winActivity } from "./activity";
 
@@ -32,9 +32,9 @@ export const tickActivityBug = ({ activityId }: { activityId?: string | null }) 
 
     const activityResource = getComponent({ entityId: activityId, componentId: 'Resource' });
     const activityBugData = activityResource.activityData as ActivityBugData;
-    activityBugData._symbol = EventInputKeys[Object.keys(EventInputKeys)[
-        Math.floor(Math.random() * Object.keys(EventInputKeys).length)
-    ] as keyof typeof EventInputKeys];
+    activityBugData._symbol = EventInputActionKeys[Object.keys(EventInputActionKeys)[
+        Math.floor(Math.random() * Object.keys(EventInputActionKeys).length)
+    ] as keyof typeof EventInputActionKeys];
     activityBugData._symbolFound = undefined;
 
     if (getState('isActivityBugCooldown')) {
