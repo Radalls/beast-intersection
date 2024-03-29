@@ -1,5 +1,6 @@
-import { Resource, ActivityBugData, ActivityFishData } from "../../engine/components/resource";
+import { Resource, ActivityBugData, ActivityFishData, ActivityCraftData } from "../../engine/components/resource";
 import { checkEntity, createEntity, destroyEntity, getEntity, getSpritePath } from "./template";
+import itemRecipes from '../../assets/items/item_recipes.json';
 
 //#region CONSTANTS
 //#endregion
@@ -130,10 +131,6 @@ export const updateActivityBug = ({ activityEntityId, activityBugData }: {
 };
 
 export const endActivityBug = ({ activityEntityId }: { activityEntityId: string }) => {
-    destroyEntity({ entityId: `${activityEntityId}-activity-bug-score-hp` });
-    destroyEntity({ entityId: `${activityEntityId}-activity-bug-score-error` });
-    destroyEntity({ entityId: `${activityEntityId}-activity-bug-score` });
-    destroyEntity({ entityId: `${activityEntityId}-activity-bug-symbol` });
     destroyEntity({ entityId: `${activityEntityId}-activity-bug` });
 };
 //#endregion
@@ -256,17 +253,180 @@ export const updateActivityFish = ({ activityEntityId, activityFishData }: {
 };
 
 export const endActivityFish = ({ activityEntityId }: { activityEntityId: string }) => {
-    destroyEntity({ entityId: `${activityEntityId}-activity-fish-frenzy-value` });
-    destroyEntity({ entityId: `${activityEntityId}-activity-fish-frenzy-label` });
-    destroyEntity({ entityId: `${activityEntityId}-activity-fish-frenzy` });
-    destroyEntity({ entityId: `${activityEntityId}-activity-fish-rod-tension-value` });
-    destroyEntity({ entityId: `${activityEntityId}-activity-fish-rod-tension-label` });
-    destroyEntity({ entityId: `${activityEntityId}-activity-fish-rod-tension` });
-    destroyEntity({ entityId: `${activityEntityId}-activity-fish-hp-value` });
-    destroyEntity({ entityId: `${activityEntityId}-activity-fish-hp-label` });
-    destroyEntity({ entityId: `${activityEntityId}-activity-fish-hp` });
-    destroyEntity({ entityId: `${activityEntityId}-activity-fish-hp-bars` });
     destroyEntity({ entityId: `${activityEntityId}-activity-fish` });
+};
+//#endregion
+
+//#region ACTIVITY CRAFT
+export const startActivityCraft = ({ activityEntityId }: { activityEntityId: string }) => {
+    const activityEntity = getEntity({ entityId: `${activityEntityId}-activity` });
+
+    createEntity({
+        entityId: activityEntityId,
+        htmlId: `${activityEntityId}-activity-craft`,
+        htmlClass: "activity-craft",
+        htmlParent: activityEntity,
+        htmlAbsolute: false,
+    });
+}
+
+export const startSelectActivityCraft = ({ activityEntityId, activityCraftData }: {
+    activityEntityId: string,
+    activityCraftData: ActivityCraftData,
+}) => {
+    const activityCraftEntity = getEntity({ entityId: `${activityEntityId}-activity-craft` });
+
+    const activityCraftRecipesEntity = createEntity({
+        entityId: activityEntityId,
+        htmlId: `${activityEntityId}-activity-craft-recipes`,
+        htmlClass: "activity-craft-recipes",
+        htmlParent: activityCraftEntity,
+        htmlAbsolute: false,
+    });
+
+    for (let i = 0; i < itemRecipes.length; i++) {
+        const activityCraftRecipeEntity = createEntity({
+            entityId: activityEntityId,
+            htmlId: `${activityEntityId}-activity-craft-recipe-${i}`,
+            htmlClass: "activity-craft-recipe",
+            htmlParent: activityCraftRecipesEntity,
+            htmlAbsolute: false,
+        });
+
+        const activityCraftRecipeIconEntity = createEntity({
+            entityId: activityEntityId,
+            htmlId: `${activityEntityId}-activity-craft-recipe-${i}-icon`,
+            htmlClass: "activity-craft-recipe-icon",
+            htmlParent: activityCraftRecipeEntity,
+            htmlAbsolute: false,
+        });
+        activityCraftRecipeIconEntity.style.backgroundImage = `url(${getSpritePath(`item_${itemRecipes[i].name.toLowerCase()}.png`)})`;
+
+        const activityCraftRecipeNameEntity = createEntity({
+            entityId: activityEntityId,
+            htmlId: `${activityEntityId}-activity-craft-recipe-${i}-name`,
+            htmlClass: "activity-craft-recipe-name",
+            htmlParent: activityCraftRecipeEntity,
+            htmlAbsolute: false,
+        });
+        activityCraftRecipeNameEntity.textContent = itemRecipes[i].name;
+
+        const activityCraftRecipeIngredientsEntity = createEntity({
+            entityId: activityEntityId,
+            htmlId: `${activityEntityId}-activity-craft-recipe-${i}-ingredients`,
+            htmlClass: "activity-craft-recipe-ingredients",
+            htmlParent: activityCraftRecipeEntity,
+            htmlAbsolute: false,
+        });
+
+        for (let j = 0; j < itemRecipes[i].ingredients.length; j++) {
+            const activityCraftRecipeIngredientEntity = createEntity({
+                entityId: activityEntityId,
+                htmlId: `${activityEntityId}-activity-craft-recipe-${i}-ingredient-${j}`,
+                htmlClass: "activity-craft-recipe-ingredient",
+                htmlParent: activityCraftRecipeIngredientsEntity,
+                htmlAbsolute: false,
+            });
+
+            const activityCraftRecipeIngredientIconEntity = createEntity({
+                entityId: activityEntityId,
+                htmlId: `${activityEntityId}-activity-craft-recipe-${i}-ingredient-${j}-icon`,
+                htmlClass: "activity-craft-recipe-ingredient-icon",
+                htmlParent: activityCraftRecipeIngredientEntity,
+                htmlAbsolute: false,
+            });
+            activityCraftRecipeIngredientIconEntity.style.backgroundImage = `url(${getSpritePath(`item_${itemRecipes[i].ingredients[j].name.toLowerCase()}.png`)})`;
+
+            const activityCraftRecipeIngredientNameEntity = createEntity({
+                entityId: activityEntityId,
+                htmlId: `${activityEntityId}-activity-craft-recipe-${i}-ingredient-${j}-name`,
+                htmlClass: "activity-craft-recipe-ingredient-name",
+                htmlParent: activityCraftRecipeIngredientEntity,
+                htmlAbsolute: false,
+            });
+            activityCraftRecipeIngredientNameEntity.textContent = itemRecipes[i].ingredients[j].name;
+
+            const activityCraftRecipeIngredientAmountEntity = createEntity({
+                entityId: activityEntityId,
+                htmlId: `${activityEntityId}-activity-craft-recipe-${i}-ingredient-${j}-amount`,
+                htmlClass: "activity-craft-recipe-ingredient-amount",
+                htmlParent: activityCraftRecipeIngredientEntity,
+                htmlAbsolute: false,
+            });
+            activityCraftRecipeIngredientAmountEntity.textContent = `x${itemRecipes[i].ingredients[j].amount}`;
+        }
+    }
+
+    updateSelectActivityCraft({ activityEntityId, activityCraftData });
+};
+
+export const updateSelectActivityCraft = ({ activityEntityId, activityCraftData }: {
+    activityEntityId: string,
+    activityCraftData: ActivityCraftData,
+}) => {
+    const activityCraftRecipesEntity = getEntity({ entityId: `${activityEntityId}-activity-craft-recipes` });
+
+    for (let i = 0; i < activityCraftRecipesEntity.children.length; i++) {
+        const activityCraftRecipeEntity = getEntity({ entityId: `${activityEntityId}-activity-craft-recipe-${i}` });
+        activityCraftRecipeEntity.style.border = 'solid 4px rgb(70, 70, 70)';
+    }
+
+    const selectedActivityCraftRecipeEntity = getEntity({ entityId: `${activityEntityId}-activity-craft-recipe-${activityCraftData._currentRecipeIndex}` });
+    selectedActivityCraftRecipeEntity.style.border = 'solid 4px red';
+};
+
+export const endSelectActivityCraft = ({ activityEntityId }: { activityEntityId: string }) => {
+    destroyEntity({ entityId: `${activityEntityId}-activity-craft-recipes` });
+};
+
+export const startPlayActivityCraft = ({ activityEntityId, activityCraftData }: {
+    activityEntityId: string,
+    activityCraftData: ActivityCraftData,
+}) => {
+    const activityCraftEntity = getEntity({ entityId: `${activityEntityId}-activity-craft` });
+
+    const activityCraftProgressEntity = createEntity({
+        entityId: activityEntityId,
+        htmlId: `${activityEntityId}-activity-craft-progress`,
+        htmlClass: "activity-craft-progress",
+        htmlParent: activityCraftEntity,
+        htmlAbsolute: false,
+    });
+
+    const activityCraftProgressLabelEntity = createEntity({
+        entityId: activityEntityId,
+        htmlId: `${activityEntityId}-activity-craft-progress-label`,
+        htmlClass: "activity-craft-progress-label",
+        htmlParent: activityCraftProgressEntity,
+        htmlAbsolute: false,
+    });
+    activityCraftProgressLabelEntity.textContent = "Craft: ";
+
+    createEntity({
+        entityId: activityEntityId,
+        htmlId: `${activityEntityId}-activity-craft-progress-value`,
+        htmlClass: "activity-craft-progress-value",
+        htmlParent: activityCraftProgressEntity,
+        htmlAbsolute: false,
+    });
+
+    updatePlayActivityCraft({ activityEntityId, activityCraftData });
+};
+
+export const updatePlayActivityCraft = ({ activityEntityId, activityCraftData }: {
+    activityEntityId: string,
+    activityCraftData: ActivityCraftData,
+}) => {
+    const activityCraftProgressValueEntity = getEntity({ entityId: `${activityEntityId}-activity-craft-progress-value` });
+    activityCraftProgressValueEntity.innerHTML = `<progress value="${activityCraftData._hitCount}" max="${10}"></progress>`;
+};
+
+export const endPlayActivityCraft = ({ activityEntityId }: { activityEntityId: string }) => {
+    destroyEntity({ entityId: `${activityEntityId}-activity-craft-progress` });
+};
+
+export const endActivityCraft = ({ activityEntityId }: { activityEntityId: string }) => {
+    destroyEntity({ entityId: `${activityEntityId}-activity-craft` });
 };
 //#endregion
 //#endregion
