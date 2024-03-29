@@ -1,5 +1,5 @@
 import { Inventory } from "../../engine/components/inventory";
-import { checkEntity, createEntity, getEntity, getSpritePath } from "./template";
+import { checkEntity, createEntity, destroyEntity, getEntity, getSpritePath } from "./template";
 
 //#region CONSTANTS
 const INVENTORY_SLOT_SIZE = 64;
@@ -43,6 +43,8 @@ export const updateInventory = ({ entityId, inventory }: {
     entityId: string,
     inventory: Pick<Inventory, 'slots'>,
 }) => {
+    clearInventory({ entityId });
+
     for (const slot of inventory.slots) {
         const entityInventorySlot = getEntity({ entityId: `${entityId}-inventory-slot-${inventory.slots.indexOf(slot)}` });
         entityInventorySlot.style.backgroundImage = `url(${getSpritePath(slot.item.sprite._image)})`;
@@ -57,6 +59,19 @@ export const updateInventory = ({ entityId, inventory }: {
             });
 
         entityInventorySlotAmount.textContent = `x${slot._amount.toString()}`;
+    }
+}
+
+const clearInventory = ({ entityId }: { entityId: string }) => {
+    const entityInventory = getEntity({ entityId: `${entityId}-inventory` });
+
+    for (let i = 0; i < entityInventory.children.length; i++) {
+        const inventorySlotEntity = getEntity({ entityId: `${entityId}-inventory-slot-${i}` });
+        inventorySlotEntity.style.backgroundImage = '';
+
+        if (checkEntity({ entityId: `${entityId}-inventory-slot-${i}-amount` })) {
+            destroyEntity({ entityId: `${entityId}-inventory-slot-${i}-amount` });
+        }
     }
 }
 //#endregion
