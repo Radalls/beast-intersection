@@ -5,7 +5,17 @@ export const loadDialog = async ({ entityId }: { entityId: string }) => {
 
     try {
         const { default: dialogData } = await import(`../../../assets/dialogs/${entityId.toLowerCase()}.json`);
-        entityDialog.texts = dialogData;
+
+        entityDialog.texts = dialogData.map((dialogText: any) => {
+            const { id, value, next, options } = dialogText;
+
+            return {
+                _id: id,
+                _value: value,
+                _next: next,
+                _options: options,
+            }
+        });
     } catch (e) {
         console.error(e);
     }
