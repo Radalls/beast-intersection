@@ -51,6 +51,10 @@ export const createEntity = ({ entityId, htmlId, htmlClass, htmlParent, htmlAbso
 export const destroyEntity = ({ entityId }: { entityId: string }) => {
     const entity = getEntity({ entityId });
 
+    while (entity.firstChild) {
+        entity.removeChild(entity.firstChild);
+    }
+
     entity.remove();
 };
 
