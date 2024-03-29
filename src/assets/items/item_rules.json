@@ -1,0 +1,10 @@
+[
+    { "id": 1, "name": "Wood1", "maxAmount": 5 },
+    { "id": 2, "name": "Wood2", "maxAmount": 2 },
+    { "id": 3, "name": "Rock1", "maxAmount": 5 },
+    { "id": 4, "name": "Rock2", "maxAmount": 2 },
+    { "id": 5, "name": "Campfire", "maxAmount": 1 },
+    { "id": 6, "name": "Bug1", "maxAmount": 1 },
+    { "id": 7, "name": "Bug2", "maxAmount": 1 },
+    { "id": 8, "name": "Fish1", "maxAmount": 1 }
+]
