@@ -9,6 +9,9 @@ const state = {
     isActivityBugCooldown: false,
     isActivityFishRunning: false,
     isActivityFishFrenzy: false,
+    isActivityCraftRunning: false,
+    isActivityCraftSelecting: false,
+    isActivityCraftPlaying: false,
 }
 
 export const setState = (key: keyof typeof state, value: boolean) => state[key] = value;
