@@ -1,6 +1,6 @@
 import { setState } from './state';
 import { getCycle, runCycle } from './cycle';
-import { createEntityNpc, createEntityPlayer, createEntityResourceBug, createEntityResourceFish, createEntityResourcePickUp, createEntityTileMap } from './services/entity';
+import { createEntityNpc, createEntityPlayer, createEntityResourceBug, createEntityResourceCraft, createEntityResourceFish, createEntityResourcePickUp, createEntityTileMap } from './services/entity';
 
 export const main = () => {
     setState('isGameRunning', true);
@@ -12,13 +12,11 @@ export const main = () => {
     createEntityTileMap();
     createEntityPlayer({ spritePath: 'player.png' });
 
-    createEntityResourcePickUp({
-        entityId: 'ResourceWood1',
-        spritePath: 'resource_wood1.png',
-        positionX: 1,
-        positionY: 1,
-        resourceIsTemporary: true,
-        resoureceItemName: 'Wood1',
+    createEntityNpc({
+        entityId: 'Npc1',
+        spritePath: 'npc.png',
+        positionX: 8,
+        positionY: 3,
     });
 
     createEntityResourceBug({
@@ -48,10 +46,56 @@ export const main = () => {
         resoureceItemName: 'Fish1',
     });
 
-    createEntityNpc({
-        entityId: 'Npc1',
-        spritePath: 'npc.png',
+    createEntityResourcePickUp({
+        entityId: 'ResourceWood1a',
+        spritePath: 'resource_wood1.png',
+        positionX: 1,
+        positionY: 1,
+        resourceIsTemporary: true,
+        resoureceItemName: 'Wood1',
+    });
+
+    createEntityResourcePickUp({
+        entityId: 'ResourceWood1b',
+        spritePath: 'resource_wood1.png',
+        positionX: 2,
+        positionY: 1,
+        resourceIsTemporary: true,
+        resoureceItemName: 'Wood1',
+    });
+
+    createEntityResourcePickUp({
+        entityId: 'ResourceWood1c',
+        spritePath: 'resource_wood1.png',
+        positionX: 3,
+        positionY: 1,
+        resourceIsTemporary: true,
+        resoureceItemName: 'Wood1',
+    });
+
+    createEntityResourcePickUp({
+        entityId: 'ResourceRock1a',
+        spritePath: 'resource_rock1.png',
+        positionX: 5,
+        positionY: 1,
+        resourceIsTemporary: true,
+        resoureceItemName: 'Rock1',
+    });
+
+    createEntityResourcePickUp({
+        entityId: 'ResourceRock1b',
+        spritePath: 'resource_rock1.png',
+        positionX: 6,
+        positionY: 1,
+        resourceIsTemporary: true,
+        resoureceItemName: 'Rock1',
+    });
+
+    createEntityResourceCraft({
+        entityId: 'ResourceCraft',
+        spritePath: 'resource_craft.png',
         positionX: 8,
         positionY: 1,
+        resourceMaxNbErrors: 3,
     });
 };
