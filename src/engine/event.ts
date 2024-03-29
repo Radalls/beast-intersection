@@ -9,9 +9,10 @@ import { updateTile } from "./systems/tilemap/tilemap";
 import { checkTrigger } from "./systems/trigger/trigger";
 import { playActivityFish } from "./services/activity/activity.fish";
 import { error } from "./services/error";
-import { ActivityBugData, ActivityFishData } from './components/resource';
+import { ActivityData } from './components/resource';
 import { Tile } from './components/tilemap';
 import { nextDialog, selectDialogOption, startDialog } from './systems/dialog/dialog';
+import { confirmActivityCraftRecipe, endActivityCraft, playActivityCraft, selectActivityCraftRecipe } from './services/activity/activity.craft';
 
 export type Event<K extends keyof Component = keyof Component> = {
     type: EventTypes,
@@ -19,15 +20,19 @@ export type Event<K extends keyof Component = keyof Component> = {
     data?: EventData<K>,
 };
 
-export type EventData<K extends keyof Component = keyof Component> = Component[K] | Tile | ActivityBugData | ActivityFishData;
+export type EventData<K extends keyof Component = keyof Component> = Component[K] | Tile | ActivityData;
 
-export enum EventInputKeys {
+export enum EventInputActionKeys {
+    ACT = 'e',
+    INVENTORY = 'i',
+    BACK = 'Escape',
+}
+
+export enum EventInputMoveKeys {
     UP = 'z',
     LEFT = 'q',
     DOWN = 's',
     RIGHT = 'd',
-    ACT = 'e',
-    INVENTORY = 'i',
 }
 
 export enum EventTypes {
@@ -53,13 +58,21 @@ export enum EventTypes {
     ACTIVITY_FISH_START = 'ACTIVITY_FISH_START',
     ACTIVITY_FISH_UPDATE = 'ACTIVITY_FISH_UPDATE',
     ACTIVITY_FISH_END = 'ACTIVITY_FISH_END',
+    ACTIVITY_CRAFT_START = 'ACTIVITY_CRAFT_START',
+    ACTIVITY_CRAFT_SELECT_START = 'ACTIVITY_CRAFT_SELECT_START',
+    ACTIVITY_CRAFT_SELECT_UPDATE = 'ACTIVITY_CRAFT_SELECT_UPDATE',
+    ACTIVITY_CRAFT_SELECT_END = 'ACTIVITY_CRAFT_SELECT_END',
+    ACTIVITY_CRAFT_PLAY_START = 'ACTIVITY_CRAFT_PLAY_START',
+    ACTIVITY_CRAFT_PLAY_UPDATE = 'ACTIVITY_CRAFT_PLAY_UPDATE',
+    ACTIVITY_CRAFT_PLAY_END = 'ACTIVITY_CRAFT_PLAY_END',
+    ACTIVITY_CRAFT_END = 'ACTIVITY_CRAFT_END',
     /* Dialog */
     DIALOG_START = 'DIALOG_START',
     DIALOG_UPDATE = 'DIALOG_UPDATE',
     DIALOG_END = 'DIALOG_END',
 }
 
-export const onInputKeyDown = (inputKey: EventInputKeys) => {
+export const onInputKeyDown = (inputKey: EventInputActionKeys | EventInputMoveKeys) => {
     const playerEntityId = getStore('playerId')
         ?? error({ message: 'Store playerId is undefined', where: onInputKeyDown.name });
 
@@ -74,38 +87,9 @@ export const onInputKeyDown = (inputKey: EventInputKeys) => {
 
         setState('isInputCooldown', true);
 
-        if (getState('isActivityRunning')) {
-            if (getState('isActivityBugRunning')) {
-                onActivityBugInput({ inputKey });
-                return;
-            }
-            else if (getState('isActivityFishRunning')) {
-                onActivityFishInput({ inputKey });
-                return;
-            }
-            else return;
-        }
-        else if (getState('isPlayerDialogOpen')) {
-            const dialogEntityId = getStore('dialogId')
-                ?? error({ message: 'Store dialogId is undefined', where: onInputKeyDown.name });
-
-            if (inputKey === EventInputKeys.UP) {
-                selectDialogOption({ entityId: dialogEntityId, offset: -1 });
-                return;
-            }
-            else if (inputKey === EventInputKeys.DOWN) {
-                selectDialogOption({ entityId: dialogEntityId, offset: 1 });
-                return;
-            }
-            else if (inputKey === EventInputKeys.ACT) {
-                nextDialog({ entityId: dialogEntityId });
-                return;
-            }
-            else return;
-        }
-        else {
-            if (inputKey === EventInputKeys.INVENTORY) {
-                setState('isPlayerInventoryOpen', !(getState('isPlayerInventoryOpen')));
+        if (getState('isPlayerInventoryOpen')) {
+            if (inputKey === EventInputActionKeys.INVENTORY || inputKey === EventInputActionKeys.BACK) {
+                setState('isPlayerInventoryOpen', false);
 
                 event({
                     type: EventTypes.INVENTORY_DISPLAY,
@@ -114,9 +98,53 @@ export const onInputKeyDown = (inputKey: EventInputKeys) => {
 
                 return;
             }
-            else if (inputKey === EventInputKeys.UP) {
-                if (getState('isPlayerInventoryOpen')) return; // temp
+            else return;
+        }
+        else if (getState('isActivityRunning')) {
+            if (getState('isActivityBugRunning')) {
+                onActivityBugInput({ inputKey });
+                return;
+            }
+            else if (getState('isActivityFishRunning')) {
+                onActivityFishInput({ inputKey });
+                return;
+            }
+            else if (getState('isActivityCraftRunning')) {
+                onActivityCraftInput({ inputKey });
+                return;
+            }
+            else return;
+        }
+        else if (getState('isPlayerDialogOpen')) {
+            const dialogEntityId = getStore('dialogId')
+                ?? error({ message: 'Store dialogId is undefined', where: onInputKeyDown.name });
 
+            if (inputKey === EventInputMoveKeys.UP) {
+                selectDialogOption({ entityId: dialogEntityId, offset: -1 });
+                return;
+            }
+            else if (inputKey === EventInputMoveKeys.DOWN) {
+                selectDialogOption({ entityId: dialogEntityId, offset: 1 });
+                return;
+            }
+            else if (inputKey === EventInputActionKeys.ACT) {
+                nextDialog({ entityId: dialogEntityId });
+                return;
+            }
+            else return;
+        }
+        else {
+            if (inputKey === EventInputActionKeys.INVENTORY) {
+                setState('isPlayerInventoryOpen', true);
+
+                event({
+                    type: EventTypes.INVENTORY_DISPLAY,
+                    entityId: playerEntityId,
+                });
+
+                return;
+            }
+            else if (inputKey === EventInputMoveKeys.UP) {
                 updateTile({
                     entityId: playerEntityId,
                     targetX: playerPosition._x,
@@ -125,9 +153,7 @@ export const onInputKeyDown = (inputKey: EventInputKeys) => {
 
                 return;
             }
-            else if (inputKey === EventInputKeys.LEFT) {
-                if (getState('isPlayerInventoryOpen')) return; // temp
-
+            else if (inputKey === EventInputMoveKeys.LEFT) {
                 updateTile({
                     entityId: playerEntityId,
                     targetX: playerPosition._x - 1,
@@ -136,9 +162,7 @@ export const onInputKeyDown = (inputKey: EventInputKeys) => {
 
                 return;
             }
-            else if (inputKey === EventInputKeys.DOWN) {
-                if (getState('isPlayerInventoryOpen')) return; // temp
-
+            else if (inputKey === EventInputMoveKeys.DOWN) {
                 updateTile({
                     entityId: playerEntityId,
                     targetX: playerPosition._x,
@@ -147,9 +171,7 @@ export const onInputKeyDown = (inputKey: EventInputKeys) => {
 
                 return;
             }
-            else if (inputKey === EventInputKeys.RIGHT) {
-                if (getState('isPlayerInventoryOpen')) return; // temp
-
+            else if (inputKey === EventInputMoveKeys.RIGHT) {
                 updateTile({
                     entityId: playerEntityId,
                     targetX: playerPosition._x + 1,
@@ -158,9 +180,7 @@ export const onInputKeyDown = (inputKey: EventInputKeys) => {
 
                 return;
             }
-            else if (inputKey === EventInputKeys.ACT) {
-                if (getState('isPlayerInventoryOpen')) return; // temp
-
+            else if (inputKey === EventInputActionKeys.ACT) {
                 const triggeredEntityId = checkTrigger({});
                 if (triggeredEntityId) {
                     onTrigger({ triggeredEntityId });
@@ -195,16 +215,39 @@ const onTrigger = ({ entityId, triggeredEntityId }: {
     }
 };
 
-const onActivityBugInput = ({ inputKey }: { inputKey: EventInputKeys }) => {
+const onActivityBugInput = ({ inputKey }: { inputKey: EventInputActionKeys | EventInputMoveKeys }) => {
     const activityBugEntityId = getStore('activityId')
         ?? error({ message: 'Store activityId is undefined ', where: onActivityBugInput.name });
 
     playActivityBug({ activityId: activityBugEntityId, symbol: inputKey });
 };
 
-const onActivityFishInput = ({ inputKey }: { inputKey: EventInputKeys }) => {
+const onActivityFishInput = ({ inputKey }: { inputKey: EventInputActionKeys | EventInputMoveKeys }) => {
     const activityFishEntityId = getStore('activityId')
         ?? error({ message: 'Store activityId is undefined ', where: onActivityFishInput.name });
 
     playActivityFish({ activityId: activityFishEntityId, symbol: inputKey });
+};
+
+const onActivityCraftInput = ({ inputKey }: { inputKey: EventInputActionKeys | EventInputMoveKeys }) => {
+    const activityCraftEntityId = getStore('activityId')
+        ?? error({ message: 'Store activityId is undefined ', where: onActivityCraftInput.name });
+
+    if (getState('isActivityCraftSelecting')) {
+        if (inputKey === EventInputActionKeys.ACT) {
+            confirmActivityCraftRecipe({ activityId: activityCraftEntityId });
+        }
+        else if (inputKey === EventInputMoveKeys.UP) {
+            selectActivityCraftRecipe({ activityId: activityCraftEntityId, offset: -1 });
+        }
+        else if (inputKey === EventInputMoveKeys.DOWN) {
+            selectActivityCraftRecipe({ activityId: activityCraftEntityId, offset: 1 });
+        }
+        else if (inputKey === EventInputActionKeys.BACK) {
+            endActivityCraft({ activityId: activityCraftEntityId });
+        }
+    }
+    else if (getState('isActivityCraftPlaying')) {
+        playActivityCraft({ activityId: activityCraftEntityId, symbol: inputKey });
+    }
 };
