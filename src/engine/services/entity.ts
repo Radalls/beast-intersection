@@ -1,6 +1,6 @@
 import { createEntity, PLAYER_ENTITY_ID, TILEMAP_ENTITY_ID } from "../entities/entity.manager";
 import { setTile } from "../systems/tilemap/tilemap";
-import { addSprite, addPosition, addInventory, addTileMap, addResourcePickUp, addTrigger, addResourceBug, addCollider, addResourceFish, addDialog } from "./component";
+import { addSprite, addPosition, addInventory, addTileMap, addResourcePickUp, addTrigger, addResourceBug, addCollider, addResourceFish, addDialog, addResourceCraft } from "./component";
 
 export const createEntityPlayer = ({
     spriteHeight = 2,
@@ -190,4 +190,40 @@ export const createEntityNpc = ({
         ],
     });
     setTile({ entityId: npcEntityId });
+};
+
+export const createEntityResourceCraft = ({
+    entityId,
+    spriteHeight = 1,
+    spriteWidth = 1,
+    spritePath,
+    positionX,
+    positionY,
+    resourceIsTemporary = false,
+    resourceMaxNbErrors,
+}: {
+    entityId: string,
+    spriteHeight?: number,
+    spriteWidth?: number,
+    spritePath: string,
+    positionX: number,
+    positionY: number,
+    resourceIsTemporary?: boolean,
+    resourceMaxNbErrors: number,
+}) => {
+    createEntity(entityId);
+    addSprite({ entityId, height: spriteHeight, width: spriteWidth, image: spritePath });
+    addPosition({ entityId, x: positionX, y: positionY });
+    addResourceCraft({ entityId, isTemporary: resourceIsTemporary, maxNbErrors: resourceMaxNbErrors });
+    addCollider({ entityId });
+    addTrigger({
+        entityId,
+        points: [
+            { x: -1, y: 0 },
+            { x: 0, y: -1 },
+            { x: 1, y: 0 },
+            { x: 0, y: 1 },
+        ],
+    });
+    setTile({ entityId });
 };
