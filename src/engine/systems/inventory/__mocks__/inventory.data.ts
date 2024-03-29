@@ -1,7 +1,8 @@
 // maxAmount is always 2
 export const findItemRule = (itemName: string) => {
     return {
-        itemName,
+        id: 1,
+        name: itemName,
         maxAmount: 2,
     };
 };
