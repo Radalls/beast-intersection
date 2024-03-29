@@ -1,7 +1,7 @@
 import { event } from "../../render/events/event";
 import { Inventory } from "../components/inventory";
 import { Position } from "../components/position";
-import { Resource, ActivityTypes, ActivityBugData, ActivityFishData } from "../components/resource";
+import { Resource, ActivityTypes, ActivityBugData, ActivityFishData, ActivityCraftData } from "../components/resource";
 import { Sprite } from "../components/sprite";
 import { TileMap } from "../components/tilemap";
 import { Trigger } from "../components/trigger";
@@ -11,6 +11,48 @@ import { Collider } from "../components/collider";
 import { Dialog } from "../components/dialog";
 import { loadDialog } from "../systems/dialog/dialog.data";
 import { generateTiles } from "../systems/tilemap/tilemap";
+
+export const addPosition = ({ entityId, x = 0, y = 0 }: {
+    entityId: string,
+    x?: number,
+    y?: number,
+}) => {
+    const position: Position = {
+        _: 'Position',
+        _x: x,
+        _y: y,
+    };
+
+    addComponent({ entityId, component: position });
+
+    event({
+        type: EventTypes.ENTITY_POSITION_UPDATE,
+        entityId,
+        data: position,
+    });
+};
+
+export const addSprite = ({ entityId, height = 1, image, width = 1 }: {
+    entityId: string,
+    height?: number,
+    image: string,
+    width?: number,
+}) => {
+    const sprite: Sprite = {
+        _: 'Sprite',
+        _height: height,
+        _image: image,
+        _width: width,
+    };
+
+    addComponent({ entityId, component: sprite });
+
+    event({
+        type: EventTypes.ENTITY_SPRITE_CREATE,
+        entityId,
+        data: sprite,
+    });
+};
 
 export const addInventory = ({ entityId, maxSlots = 20 }: {
     entityId: string,
@@ -33,25 +75,58 @@ export const addInventory = ({ entityId, maxSlots = 20 }: {
     }
 };
 
-export const addPosition = ({ entityId, x = 0, y = 0 }: {
+export const addTileMap = ({ entityId, height = 10, width = 10 }: {
     entityId: string,
-    x?: number,
-    y?: number,
+    height?: number,
+    width?: number,
 }) => {
-    const position: Position = {
-        _: 'Position',
-        _x: x,
-        _y: y,
+    const tilemap: TileMap = {
+        _: 'TileMap',
+        _height: height,
+        _width: width,
+        tiles: [],
     };
 
-    addComponent({ entityId, component: position });
+    addComponent({ entityId, component: tilemap });
 
     event({
-        type: EventTypes.ENTITY_POSITION_UPDATE,
+        type: EventTypes.TILEMAP_CREATE,
         entityId,
-        data: position,
+        data: tilemap,
     });
-};
+
+    generateTiles({});
+}
+
+export const addTrigger = ({ entityId, priority = 0, points }: {
+    entityId: string,
+    priority?: number,
+    points?: { x: number, y: number }[],
+}) => {
+    const trigger: Trigger = {
+        _: 'Trigger',
+        _priority: priority,
+        points: (points)
+            ? points.map(({ x, y }) => ({ _offsetX: x, _offsetY: y }))
+            : [{ _offsetX: 0, _offsetY: 0 }],
+    };
+
+    addComponent({ entityId, component: trigger });
+}
+
+export const addCollider = ({ entityId, points }: {
+    entityId: string,
+    points?: { x: number, y: number }[],
+}) => {
+    const collider: Collider = {
+        _: 'Collider',
+        points: (points)
+            ? points.map(({ x, y }) => ({ _offsetX: x, _offsetY: y }))
+            : [{ _offsetX: 0, _offsetY: 0 }],
+    };
+
+    addComponent({ entityId, component: collider });
+}
 
 export const addResourcePickUp = ({
     entityId,
@@ -170,79 +245,29 @@ export const addResourceFish = ({
     addComponent({ entityId, component: resource });
 };
 
-export const addSprite = ({ entityId, height = 1, image, width = 1 }: {
+export const addResourceCraft = ({
+    entityId,
+    isTemporary = false,
+    maxNbErrors,
+}: {
     entityId: string,
-    height?: number,
-    image: string,
-    width?: number,
+    isTemporary?: boolean,
+    maxNbErrors: number,
 }) => {
-    const sprite: Sprite = {
-        _: 'Sprite',
-        _height: height,
-        _image: image,
-        _width: width,
+    const activityCraftData: ActivityCraftData = {
+        _maxNbErrors: maxNbErrors,
+        _nbErrors: 0,
+    }
+
+    const resource: Resource = {
+        _: 'Resource',
+        _activityType: ActivityTypes.CRAFT,
+        _isTemporary: isTemporary,
+        activityData: activityCraftData,
+        item: undefined,
     };
 
-    addComponent({ entityId, component: sprite });
-
-    event({
-        type: EventTypes.ENTITY_SPRITE_CREATE,
-        entityId,
-        data: sprite,
-    });
-};
-
-export const addTileMap = ({ entityId, height = 10, width = 10 }: {
-    entityId: string,
-    height?: number,
-    width?: number,
-}) => {
-    const tilemap: TileMap = {
-        _: 'TileMap',
-        _height: height,
-        _width: width,
-        tiles: [],
-    };
-
-    addComponent({ entityId, component: tilemap });
-
-    event({
-        type: EventTypes.TILEMAP_CREATE,
-        entityId,
-        data: tilemap,
-    });
-
-    generateTiles({});
-}
-
-export const addTrigger = ({ entityId, priority = 0, points }: {
-    entityId: string,
-    priority?: number,
-    points?: { x: number, y: number }[],
-}) => {
-    const trigger: Trigger = {
-        _: 'Trigger',
-        _priority: priority,
-        points: (points)
-            ? points.map(({ x, y }) => ({ _offsetX: x, _offsetY: y }))
-            : [{ _offsetX: 0, _offsetY: 0 }],
-    };
-
-    addComponent({ entityId, component: trigger });
-}
-
-export const addCollider = ({ entityId, points }: {
-    entityId: string,
-    points?: { x: number, y: number }[],
-}) => {
-    const collider: Collider = {
-        _: 'Collider',
-        points: (points)
-            ? points.map(({ x, y }) => ({ _offsetX: x, _offsetY: y }))
-            : [{ _offsetX: 0, _offsetY: 0 }],
-    };
-
-    addComponent({ entityId, component: collider });
+    addComponent({ entityId, component: resource });
 }
 
 export const addDialog = ({ entityId }: {
