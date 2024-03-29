@@ -1,31 +1,31 @@
-import { Event } from '../../engine/event';
+import { Component } from '../../engine/components/@component';
+import { Dialog } from '../../engine/components/dialog';
+import { Inventory } from '../../engine/components/inventory';
 import { Position } from "../../engine/components/position";
+import { ActivityBugData, ActivityCraftData, ActivityFishData, Resource } from '../../engine/components/resource';
 import { Sprite } from "../../engine/components/sprite";
-import { Tile, TileMap } from "../../engine/components/tilemap";
-import { EventTypes, onInputKeyDown as engineOnInputKeyDown } from "../../engine/event";
-import { ActivityBugData, ActivityFishData, Resource } from '../../engine/components/resource';
-import { createEntity, destroyEntity, updatePosition, createSprite } from '../templates/template';
-import { onActivityStart, onActivityWin, onActivityEnd, onActivityBugStart, onActivityBugUpdate, onActivityBugEnd, onActivityFishStart, onActivityFishUpdate, onActivityFishEnd } from './event.activity';
+import { Tile, TileMap } from '../../engine/components/tilemap';
+import { Event, EventTypes, onInputKeyDown as engineOnInputKeyDown } from '../../engine/event';
+import { error } from '../../engine/services/error';
+import { createEntity, createSprite, destroyEntity, updatePosition } from '../templates/template';
+import { onActivityBugEnd, onActivityBugStart, onActivityBugUpdate, onActivityCraftEnd, onActivityCraftPlayEnd, onActivityCraftPlayStart, onActivityCraftPlayUpdate, onActivityCraftSelectEnd, onActivityCraftSelectStart, onActivityCraftSelectUpdate, onActivityCraftStart, onActivityEnd, onActivityFishEnd, onActivityFishStart, onActivityFishUpdate, onActivityStart, onActivityWin } from './event.activity';
+import { onDialogEnd, onDialogNext, onDialogStart } from './event.dialog';
 import { onEntityInventoryCreate, onEntityInventoryDisplay, onEntityInventoryUpdate } from './event.inventory';
 import { onTileMapCreate, onTileMapTileCreate } from './event.tilemap';
-import { error } from '../../engine/services/error';
-import { Component } from '../../engine/components/@component';
-import { Inventory } from '../../engine/components/inventory';
-import { Dialog } from '../../engine/components/dialog';
-import { onDialogStart, onDialogNext, onDialogEnd } from './event.dialog';
 
-export const onInputKeyDown = (e: any) => { engineOnInputKeyDown(e.key); };
+export const onInputKeyDown = (e: any) => engineOnInputKeyDown(e.key);
 
 //#region HELPERS
-const checkPositionData = (data: any): data is Position => data
-const checkSpriteData = (data: any): data is Sprite => data
-const checkInventoryData = (data: any): data is Inventory => data
-const checkTileMapData = (data: any): data is TileMap => data
-const checkTileData = (data: any): data is Tile => data
-const checkResourceData = (data: any): data is Resource => data
-const checkActivityBugData = (data: any): data is ActivityBugData => data
-const checkActivityFishData = (data: any): data is ActivityFishData => data
-const checkDialogData = (data: any): data is Dialog => data
+export const checkPositionData = (data: any): data is Position => data
+export const checkSpriteData = (data: any): data is Sprite => data
+export const checkInventoryData = (data: any): data is Inventory => data
+export const checkTileMapData = (data: any): data is TileMap => data
+export const checkTileData = (data: any): data is Tile => data
+export const checkResourceData = (data: any): data is Resource => data
+export const checkActivityBugData = (data: any): data is ActivityBugData => data
+export const checkActivityFishData = (data: any): data is ActivityFishData => data
+export const checkActivityCraftData = (data: any): data is ActivityCraftData => data
+export const checkDialogData = (data: any): data is Dialog => data
 //#endregion
 
 //#region EVENTS
@@ -121,6 +121,42 @@ export const event = <T extends keyof Component>(event: Event<T>) => {
         }
         else if (event.type === EventTypes.ACTIVITY_FISH_END) {
             onActivityFishEnd({ activityEntityId: event.entityId });
+        }
+        else if (event.type === EventTypes.ACTIVITY_CRAFT_START) {
+            onActivityCraftStart({ activityEntityId: event.entityId });
+        }
+        else if (event.type === EventTypes.ACTIVITY_CRAFT_SELECT_START && checkActivityCraftData(event.data)) {
+            onActivityCraftSelectStart({
+                activityEntityId: event.entityId,
+                activityCraftData: event.data,
+            });
+        }
+        else if (event.type === EventTypes.ACTIVITY_CRAFT_SELECT_UPDATE && checkActivityCraftData(event.data)) {
+            onActivityCraftSelectUpdate({
+                activityEntityId: event.entityId,
+                activityCraftData: event.data,
+            });
+        }
+        else if (event.type === EventTypes.ACTIVITY_CRAFT_SELECT_END) {
+            onActivityCraftSelectEnd({ activityEntityId: event.entityId });
+        }
+        else if (event.type === EventTypes.ACTIVITY_CRAFT_PLAY_START && checkActivityCraftData(event.data)) {
+            onActivityCraftPlayStart({
+                activityEntityId: event.entityId,
+                activityCraftData: event.data,
+            });
+        }
+        else if (event.type === EventTypes.ACTIVITY_CRAFT_PLAY_UPDATE && checkActivityCraftData(event.data)) {
+            onActivityCraftPlayUpdate({
+                activityEntityId: event.entityId,
+                activityCraftData: event.data,
+            });
+        }
+        else if (event.type === EventTypes.ACTIVITY_CRAFT_PLAY_END) {
+            onActivityCraftPlayEnd({ activityEntityId: event.entityId });
+        }
+        else if (event.type === EventTypes.ACTIVITY_CRAFT_END) {
+            onActivityCraftEnd({ activityEntityId: event.entityId });
         }
         /* Dialog */
         else if (event.type === EventTypes.DIALOG_START && checkDialogData(event.data)) {
