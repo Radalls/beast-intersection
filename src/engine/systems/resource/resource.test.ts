@@ -1,7 +1,8 @@
-import { Inventory } from "../../components/inventory";
-import { Resource, ActivityTypes } from "../../components/resource";
-import { addComponent, createEntity, getEntity } from "../../entities/entity.manager";
-import { destroyResource, getResourceItem, useResource } from "./resource";
+import { Inventory } from '../../components/inventory';
+import { Resource, ActivityTypes } from '../../components/resource';
+import { addComponent, createEntity, getEntity } from '../../entities/entity.manager';
+
+import { destroyResource, getResourceItem, useResource } from './resource';
 
 jest.mock('../../../render/events/event.ts', () => ({
     event: jest.fn(),
@@ -16,7 +17,7 @@ describe('Resource System', () => {
         item: {
             info: { _name: 'Wood1' },
             sprite: { _image: 'item_wood1' },
-        }
+        },
     };
 
     const playerEntityId = createEntity({ entityName: 'Player' });
@@ -27,15 +28,8 @@ describe('Resource System', () => {
     };
 
     beforeAll(() => {
-        addComponent({
-            entityId: resourceEntityId,
-            component: resource,
-        });
-
-        addComponent({
-            entityId: playerEntityId,
-            component: playerInventory,
-        });
+        addComponent({ component: resource, entityId: resourceEntityId });
+        addComponent({ component: playerInventory, entityId: playerEntityId });
     });
 
     describe(useResource.name, () => {
@@ -47,8 +41,8 @@ describe('Resource System', () => {
             const temporaryResourceEntityId = createEntity({ entityName: 'TemporaryResource' });
 
             addComponent({
-                entityId: temporaryResourceEntityId,
                 component: { ...resource, _isTemporary: true },
+                entityId: temporaryResourceEntityId,
             });
 
             useResource({
@@ -64,8 +58,8 @@ describe('Resource System', () => {
             const bugResourceEntityId = createEntity({ entityName: 'ResourceBug' });
 
             addComponent({
-                entityId: bugResourceEntityId,
                 component: { ...resource, _activityType: ActivityTypes.BUG },
+                entityId: bugResourceEntityId,
             });
 
             useResource({
