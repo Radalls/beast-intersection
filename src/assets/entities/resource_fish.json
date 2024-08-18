@@ -2,10 +2,12 @@
     {
         "type": "ResourceFish",
         "name": "Fish1",
-        "isTemporary": true,
-        "damage": 3,
-        "maxHp": 100,
-        "frenzyDuration": 3,
-        "frenzyInterval": 9
+        "data": {
+            "isTemporary": true,
+            "damage": 3,
+            "maxHp": 100,
+            "frenzyDuration": 3,
+            "frenzyInterval": 9
+        }
     }
 ]
