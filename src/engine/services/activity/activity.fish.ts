@@ -1,16 +1,17 @@
-import { event } from "../../../render/events/event";
-import { ActivityFishData } from "../../components/resource";
-import { clearCycle, setCycle } from "../../cycle";
-import { EventInputActionKeys, EventTypes } from "../../event";
-import { setState } from "../../state";
-import { getComponent } from "../../entities/entity.manager";
-import { checkActivityId, endActivity, startActivity, winActivity } from "./activity"
+import { event } from '../../../render/events/event';
+import { ActivityFishData } from '../../components/resource';
+import { clearCycle, setCycle } from '../../cycle';
+import { getComponent } from '../../entities/entity.manager';
+import { EventInputActionKeys, EventTypes } from '../../event';
+import { setState } from '../../state';
+
+import { checkActivityId, endActivity, startActivity, winActivity } from './activity';
 
 //#region SERVICES
 export const startActivityFish = ({ activityId }: { activityId: string }) => {
     startActivity({ activityId });
 
-    const activityResource = getComponent({ entityId: activityId, componentId: 'Resource' });
+    const activityResource = getComponent({ componentId: 'Resource', entityId: activityId });
     const activityFishData = activityResource.activityData as ActivityFishData;
     activityFishData._fishHp = activityFishData._fishMaxHp;
     activityFishData._rodTension = 0;
@@ -22,16 +23,16 @@ export const startActivityFish = ({ activityId }: { activityId: string }) => {
     setCycle('activityFishTickIntervalFrenzyOn', activityFishData._frenzyDuration);
 
     event({
-        type: EventTypes.ACTIVITY_FISH_START,
-        entityId: activityId,
         data: activityFishData,
+        entityId: activityId,
+        type: EventTypes.ACTIVITY_FISH_START,
     });
-}
+};
 
 export const tickActivityFish = ({ activityId }: { activityId?: string | null }) => {
     activityId = checkActivityId({ activityId });
 
-    const activityResource = getComponent({ entityId: activityId, componentId: 'Resource' });
+    const activityResource = getComponent({ componentId: 'Resource', entityId: activityId });
     const activityFishData = activityResource.activityData as ActivityFishData;
     activityFishData._fishHp += Math.floor(activityFishData._rodDamage / 2);
     activityFishData._fishHp = Math.min(activityFishData._fishHp, activityFishData._fishMaxHp);
@@ -39,25 +40,25 @@ export const tickActivityFish = ({ activityId }: { activityId?: string | null })
     activityFishData._rodTension = Math.max(activityFishData._rodTension, 0);
 
     event({
-        type: EventTypes.ACTIVITY_FISH_UPDATE,
-        entityId: activityId,
         data: activityFishData,
+        entityId: activityId,
+        type: EventTypes.ACTIVITY_FISH_UPDATE,
     });
 };
 
 export const tickActivityFishFrenzy = ({ activityId }: { activityId?: string | null }) => {
     activityId = checkActivityId({ activityId });
 
-    const activityResource = getComponent({ entityId: activityId, componentId: 'Resource' });
+    const activityResource = getComponent({ componentId: 'Resource', entityId: activityId });
     const activityFishData = activityResource.activityData as ActivityFishData;
     activityFishData._isFrenzy = !(activityFishData._isFrenzy);
 
     setState('isActivityFishFrenzy', activityFishData._isFrenzy);
 
     event({
-        type: EventTypes.ACTIVITY_FISH_UPDATE,
-        entityId: activityId,
         data: activityFishData,
+        entityId: activityId,
+        type: EventTypes.ACTIVITY_FISH_UPDATE,
     });
 };
 
@@ -69,7 +70,7 @@ export const playActivityFish = ({ activityId, symbol }: {
 
     if (symbol !== EventInputActionKeys.ACT) return;
 
-    const activityResource = getComponent({ entityId: activityId, componentId: 'Resource' });
+    const activityResource = getComponent({ componentId: 'Resource', entityId: activityId });
     const activityFishData = activityResource.activityData as ActivityFishData;
     if (activityFishData._isFrenzy) {
         activityFishData._rodTension += activityFishData._fishDamage * 3;
@@ -92,11 +93,11 @@ export const playActivityFish = ({ activityId, symbol }: {
     }
 
     event({
-        type: EventTypes.ACTIVITY_FISH_UPDATE,
-        entityId: activityId,
         data: activityFishData,
+        entityId: activityId,
+        type: EventTypes.ACTIVITY_FISH_UPDATE,
     });
-}
+};
 
 export const endActivityFish = ({ activityId }: { activityId?: string | null }) => {
     activityId = checkActivityId({ activityId });
@@ -107,8 +108,8 @@ export const endActivityFish = ({ activityId }: { activityId?: string | null }) 
     clearCycle('activityFishTickIntervalFrenzyOff');
 
     event({
-        type: EventTypes.ACTIVITY_FISH_END,
         entityId: activityId,
+        type: EventTypes.ACTIVITY_FISH_END,
     });
-}
+};
 //#endregion
