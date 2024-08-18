@@ -1,15 +1,15 @@
-import { event } from "../../render/events/event";
-import { Inventory } from "../components/inventory";
-import { Position } from "../components/position";
-import { Resource, ActivityTypes, ActivityBugData, ActivityFishData, ActivityCraftData } from "../components/resource";
-import { Sprite } from "../components/sprite";
-import { TileMap } from "../components/tilemap";
-import { Trigger } from "../components/trigger";
-import { PLAYER_ENTITY_NAME, addComponent } from "../entities/entity.manager";
-import { EventTypes } from "../event";
-import { Collider } from "../components/collider";
-import { Dialog } from "../components/dialog";
-import { loadDialogData } from "../systems/dialog/dialog.data";
+import { event } from '../../render/events/event';
+import { Collider } from '../components/collider';
+import { Dialog } from '../components/dialog';
+import { Inventory } from '../components/inventory';
+import { Position } from '../components/position';
+import { Resource, ActivityTypes, ActivityBugData, ActivityFishData, ActivityCraftData } from '../components/resource';
+import { Sprite } from '../components/sprite';
+import { TileMap } from '../components/tilemap';
+import { Trigger } from '../components/trigger';
+import { PLAYER_ENTITY_NAME, addComponent } from '../entities/entity.manager';
+import { EventTypes } from '../event';
+import { loadDialogData } from '../systems/dialog/dialog.data';
 
 export const addPosition = ({ entityId, x = 0, y = 0 }: {
     entityId: string,
@@ -22,12 +22,12 @@ export const addPosition = ({ entityId, x = 0, y = 0 }: {
         _y: y,
     };
 
-    addComponent({ entityId, component: position });
+    addComponent({ component: position, entityId });
 
     event({
-        type: EventTypes.ENTITY_POSITION_UPDATE,
-        entityId,
         data: position,
+        entityId,
+        type: EventTypes.ENTITY_POSITION_UPDATE,
     });
 };
 
@@ -44,12 +44,12 @@ export const addSprite = ({ entityId, height = 1, image, width = 1 }: {
         _width: width,
     };
 
-    addComponent({ entityId, component: sprite });
+    addComponent({ component: sprite, entityId });
 
     event({
-        type: EventTypes.ENTITY_SPRITE_CREATE,
-        entityId,
         data: sprite,
+        entityId,
+        type: EventTypes.ENTITY_SPRITE_CREATE,
     });
 };
 
@@ -63,13 +63,13 @@ export const addInventory = ({ entityId, maxSlots = 20 }: {
         slots: [],
     };
 
-    addComponent({ entityId, component: inventory });
+    addComponent({ component: inventory, entityId });
 
     if (entityId.split('-')[0] === PLAYER_ENTITY_NAME) {
         event({
-            type: EventTypes.INVENTORY_CREATE,
-            entityId,
             data: inventory,
+            entityId,
+            type: EventTypes.INVENTORY_CREATE,
         });
     }
 };
@@ -84,13 +84,13 @@ export const addTileMap = ({ entityId }: {
         tiles: [],
     };
 
-    addComponent({ entityId, component: tileMap });
-}
+    addComponent({ component: tileMap, entityId });
+};
 
 export const addTrigger = ({ entityId, priority = 0, points }: {
     entityId: string,
-    priority?: number,
     points?: { x: number, y: number }[],
+    priority?: number
 }) => {
     const trigger: Trigger = {
         _: 'Trigger',
@@ -100,8 +100,8 @@ export const addTrigger = ({ entityId, priority = 0, points }: {
             : [{ _offsetX: 0, _offsetY: 0 }],
     };
 
-    addComponent({ entityId, component: trigger });
-}
+    addComponent({ component: trigger, entityId });
+};
 
 export const addCollider = ({ entityId, points }: {
     entityId: string,
@@ -114,13 +114,13 @@ export const addCollider = ({ entityId, points }: {
             : [{ _offsetX: 0, _offsetY: 0 }],
     };
 
-    addComponent({ entityId, component: collider });
-}
+    addComponent({ component: collider, entityId });
+};
 
 export const addResourceItem = ({
     entityId,
     isTemporary = false,
-    itemName
+    itemName,
 }: {
     entityId: string,
     isTemporary?: boolean,
@@ -140,7 +140,7 @@ export const addResourceItem = ({
         },
     };
 
-    addComponent({ entityId, component: resource });
+    addComponent({ component: resource, entityId });
 };
 
 export const addResourceBug = ({
@@ -149,14 +149,14 @@ export const addResourceBug = ({
     maxHp,
     maxNbErrors,
     symbolInterval,
-    itemName
+    itemName,
 }: {
     entityId: string,
     isTemporary?: boolean,
+    itemName: string,
     maxHp: number,
     maxNbErrors: number,
-    symbolInterval: number,
-    itemName: string,
+    symbolInterval: number
 }) => {
     const activityBugData: ActivityBugData = {
         _hp: maxHp,
@@ -181,7 +181,7 @@ export const addResourceBug = ({
         },
     };
 
-    addComponent({ entityId, component: resource });
+    addComponent({ component: resource, entityId });
 };
 
 export const addResourceFish = ({
@@ -193,17 +193,17 @@ export const addResourceFish = ({
     frenzyInterval,
     rodDamage,
     rodMaxTension,
-    itemName
+    itemName,
 }: {
     entityId: string,
-    isTemporary?: boolean,
     fishDamage: number,
     fishMaxHp: number,
     frenzyDuration: number,
     frenzyInterval: number,
-    rodDamage: number,
-    rodMaxTension: number,
+    isTemporary?: boolean,
     itemName: string,
+    rodDamage: number,
+    rodMaxTension: number
 }) => {
     const activityFishData: ActivityFishData = {
         _fishDamage: fishDamage,
@@ -212,8 +212,8 @@ export const addResourceFish = ({
         _frenzyDuration: frenzyDuration,
         _frenzyInterval: frenzyInterval,
         _rodDamage: rodDamage,
-        _rodTension: 0,
         _rodMaxTension: rodMaxTension,
+        _rodTension: 0,
     };
 
     const resource: Resource = {
@@ -231,7 +231,7 @@ export const addResourceFish = ({
         },
     };
 
-    addComponent({ entityId, component: resource });
+    addComponent({ component: resource, entityId });
 };
 
 export const addResourceCraft = ({
@@ -246,7 +246,7 @@ export const addResourceCraft = ({
     const activityCraftData: ActivityCraftData = {
         _maxNbErrors: maxNbErrors,
         _nbErrors: 0,
-    }
+    };
 
     const resource: Resource = {
         _: 'Resource',
@@ -256,8 +256,8 @@ export const addResourceCraft = ({
         item: undefined,
     };
 
-    addComponent({ entityId, component: resource });
-}
+    addComponent({ component: resource, entityId });
+};
 
 export const addDialog = ({ entityId }: {
     entityId: string,
@@ -267,6 +267,6 @@ export const addDialog = ({ entityId }: {
         texts: [],
     };
 
-    addComponent({ entityId, component: dialog });
+    addComponent({ component: dialog, entityId });
     loadDialogData({ entityId });
-}
+};
