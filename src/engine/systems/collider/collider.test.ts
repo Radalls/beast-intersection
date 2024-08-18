@@ -1,9 +1,10 @@
-import { Collider } from "../../components/collider";
-import { Position } from "../../components/position";
-import { TileMap } from "../../components/tilemap";
-import { addComponent, createEntity } from "../../entities/entity.manager";
-import { generateTileMap } from "../tilemap/tilemap";
-import { checkCollider, destroyCollider, setCollider } from "./collider";
+import { Collider } from '../../components/collider';
+import { Position } from '../../components/position';
+import { TileMap } from '../../components/tilemap';
+import { addComponent, createEntity } from '../../entities/entity.manager';
+import { generateTileMap } from '../tilemap/tilemap';
+
+import { checkCollider, destroyCollider, setCollider } from './collider';
 
 jest.mock('../tilemap/tilemap.data.ts');
 jest.mock('../../../render/events/event.ts', () => ({
@@ -38,25 +39,13 @@ describe('Trigger System', () => {
     };
 
     beforeAll(async () => {
-        addComponent({
-            entityId: tilemapEntityId,
-            component: tileMap,
-        });
-        await generateTileMap({ tilemapEntityId, tileMapPath: 'mock-map' });
+        addComponent({ component: tileMap, entityId: tilemapEntityId });
+        await generateTileMap({ tileMapPath: 'mock-map', tilemapEntityId });
 
-        addComponent({
-            entityId: playerEntityId,
-            component: playerPosition,
-        });
+        addComponent({ component: playerPosition, entityId: playerEntityId });
 
-        addComponent({
-            entityId: fishEntityId,
-            component: fishPosition,
-        });
-        addComponent({
-            entityId: fishEntityId,
-            component: fishCollider,
-        });
+        addComponent({ component: fishPosition, entityId: fishEntityId });
+        addComponent({ component: fishCollider, entityId: fishEntityId });
     });
 
     describe(setCollider.name, () => {
