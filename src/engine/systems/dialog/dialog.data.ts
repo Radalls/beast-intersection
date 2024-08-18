@@ -1,12 +1,22 @@
 import { getComponent } from "../../entities/entity.manager";
 
-export const loadDialog = async ({ entityId }: { entityId: string }) => {
+//#region TYPES
+export type DialogTextData = {
+    id: number,
+    value: string,
+    next: number | null,
+    options: number[],
+};
+//#endregion
+
+//#region DATA
+export const loadDialogData = async ({ entityId }: { entityId: string }) => {
     const entityDialog = getComponent({ entityId, componentId: 'Dialog' });
 
     try {
-        const { default: dialogData } = await import(`../../../assets/dialogs/${entityId.toLowerCase()}.json`);
+        const { default: dialogData } = await import(`../../../assets/dialogs/${entityId.split('-')[0].toLowerCase()}.json`);
 
-        entityDialog.texts = dialogData.map((dialogText: any) => {
+        entityDialog.texts = dialogData.map((dialogText: DialogTextData) => {
             const { id, value, next, options } = dialogText;
 
             return {
@@ -20,3 +30,4 @@ export const loadDialog = async ({ entityId }: { entityId: string }) => {
         console.error(e);
     }
 };
+//#endregion
