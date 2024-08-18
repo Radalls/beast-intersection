@@ -7,7 +7,7 @@ jest.mock('../../../render/events/event.ts', () => ({
 }));
 
 describe('Position System', () => {
-    const entityId = createEntity('Entity');
+    const entityId = createEntity({ entityName: 'Entity' });
     const position: Position = {
         _: 'Position',
         _x: 0,
@@ -24,7 +24,7 @@ describe('Position System', () => {
             component: {
                 _: 'Sprite',
                 _height: 1,
-                _image: 'sprite.png',
+                _image: 'sprite',
                 _width: 1,
             },
         });
