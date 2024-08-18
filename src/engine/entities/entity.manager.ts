@@ -4,17 +4,20 @@ import { EventTypes } from "../event";
 import { setStore } from "../store";
 import { Entity } from "./entity";
 import { error } from "../services/error";
+import { v4 as uuidv4 } from 'uuid';
 
 export const entities: Record<string, Entity> = {};
 
 //#region CONSTANTS
-export const TILEMAP_ENTITY_ID = 'TileMap';
-export const PLAYER_ENTITY_ID = 'Player';
+export const TILEMAP_ENTITY_NAME = 'TileMap';
+export const PLAYER_ENTITY_NAME = 'Player';
 //#endregion
 
 //#region HELPERS
 export const getEntity = (entityId: string) => entities[entityId] ? entities[entityId] : null;
 export const checkEntityId = (entityId: string) => entities[entityId] ? entityId : null;
+
+export const generateEntityId = (entityId: string) => `${entityId}-${uuidv4()}`
 
 export const checkComponent = <T extends keyof Component>({ entityId, componentId }: {
     entityId: string,
@@ -28,16 +31,18 @@ export const checkComponent = <T extends keyof Component>({ entityId, componentI
 //#endregion
 
 //#region SERVICES
-export const createEntity = (entityId: string) => {
+export const createEntity = ({ entityName }: { entityName: string }) => {
+    const entityId = generateEntityId(entityName);
+
     const existingEntity = getEntity(entityId);
     if (existingEntity) error({ message: `Entity ${entityId} already exists`, where: createEntity.name });
 
     entities[entityId] = {} as Entity;
 
-    if (entityId === PLAYER_ENTITY_ID) {
+    if (entityName === PLAYER_ENTITY_NAME) {
         setStore('playerId', entityId);
     }
-    if (entityId === TILEMAP_ENTITY_ID) {
+    if (entityName === TILEMAP_ENTITY_NAME) {
         setStore('tilemapId', entityId);
     }
 
