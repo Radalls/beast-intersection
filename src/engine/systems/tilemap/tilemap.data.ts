@@ -1,36 +1,36 @@
 //#region TYPES
 export type TileMapData = {
+    entities: {
+        name: string,
+        type: string,
+        x: number,
+        y: number,
+    }[],
+    height: number,
     id: number,
     name: string,
-    width: number,
-    height: number,
     tiles: {
+        solid?: boolean,
         sprite: string,
         x: number,
-        y: number,
-        solid?: boolean,
+        y: number
     }[],
-    entities: {
-        type: string,
-        name: string,
-        x: number,
-        y: number,
-    }[],
+    width: number
 };
 
 export type EntityData = {
-    type: string,
-    name: string,
     data?: any,
+    name: string,
+    type: string
 };
 
 export enum EntityDataTypes {
-    PLAYER = 'Player',
     NPC = 'Npc',
-    RESOURCE_ITEM = 'ResourceItem',
+    PLAYER = 'Player',
     RESOURCE_BUG = 'ResourceBug',
-    RESOURCE_FISH = 'ResourceFish',
     RESOURCE_CRAFT = 'ResourceCraft',
+    RESOURCE_FISH = 'ResourceFish',
+    RESOURCE_ITEM = 'ResourceItem'
 }
 //#endregion
 
@@ -46,11 +46,13 @@ export const loadTileMapData = async ({ tileMapPath }: { tileMapPath: string }) 
 };
 
 export const loadTileMapEntityData = async ({ entityType, entityName }: {
-    entityType: string,
-    entityName: string
+    entityName: string,
+    entityType: string
 }) => {
     try {
-        const { default: entityTypeData } = await import(`../../../assets/entities/${entityType.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase()}.json`);
+        const { default: entityTypeData } = await import(
+            `../../../assets/entities/${entityType.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase()}.json`,
+        );
         const entityData = entityTypeData.find((e: any) => e.name === entityName);
 
         return entityData as EntityData;

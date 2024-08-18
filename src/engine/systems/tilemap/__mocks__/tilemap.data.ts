@@ -1,37 +1,37 @@
-import tileMapData from "./mock-map.json";
+import tileMapData from './mock-map.json';
 
 //#region TYPES
 export type TileMapData = {
+    entities: {
+        name: string,
+        type: string,
+        x: number,
+        y: number
+    }[],
+    height: number,
     id: number,
     name: string,
-    width: number,
-    height: number,
     tiles: {
         sprite: string,
         x: number,
         y: number
     }[],
-    entities: {
-        type: string,
-        name: string,
-        x: number,
-        y: number
-    }[],
+    width: number
 };
 
 export type EntityData = {
-    type: string,
-    name: string,
     data?: any,
+    name: string,
+    type: string
 };
 
 export enum EntityDataTypes {
-    PLAYER = 'Player',
     NPC = 'Npc',
-    RESOURCE_ITEM = 'ResourceItem',
+    PLAYER = 'Player',
     RESOURCE_BUG = 'ResourceBug',
-    RESOURCE_FISH = 'ResourceFish',
     RESOURCE_CRAFT = 'ResourceCraft',
+    RESOURCE_FISH = 'ResourceFish',
+    RESOURCE_ITEM = 'ResourceItem'
 }
 //#endregion
 
@@ -40,9 +40,9 @@ export const loadTileMapData = async () => tileMapData as TileMapData;
 
 export const loadTileMapEntityData = async () => {
     const mockEntityData: EntityData = {
-        type: 'Player',
         name: 'Player',
-    }
+        type: 'Player',
+    };
 
     return mockEntityData;
 };

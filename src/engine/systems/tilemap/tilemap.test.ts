@@ -1,8 +1,9 @@
-import { Position } from "../../components/position";
-import { Sprite } from "../../components/sprite";
-import { TileMap } from "../../components/tilemap";
-import { addComponent, createEntity } from "../../entities/entity.manager";
-import { generateTileMap, setTile, updateTile } from "./tilemap";
+import { Position } from '../../components/position';
+import { Sprite } from '../../components/sprite';
+import { TileMap } from '../../components/tilemap';
+import { addComponent, createEntity } from '../../entities/entity.manager';
+
+import { generateTileMap, setTile, updateTile } from './tilemap';
 
 jest.mock('./tilemap.data.ts');
 jest.mock('../../../render/events/event.ts', () => ({
@@ -34,19 +35,9 @@ describe('TileMap System', () => {
     const playerStartTileId = 4;
 
     beforeAll(() => {
-        addComponent({
-            entityId: tilemapEntityId,
-            component: tileMap,
-        });
-
-        addComponent({
-            entityId: playerEntityId,
-            component: playerPosition,
-        });
-        addComponent({
-            entityId: playerEntityId,
-            component: playerSprite,
-        });
+        addComponent({ component: tileMap, entityId: tilemapEntityId });
+        addComponent({ component: playerPosition, entityId: playerEntityId });
+        addComponent({ component: playerSprite, entityId: playerEntityId });
     });
 
     describe(generateTileMap.name, () => {
@@ -59,7 +50,7 @@ describe('TileMap System', () => {
         });
 
         test('Should generate tiles', async () => {
-            await generateTileMap({ tilemapEntityId, tileMapPath: 'mock-map' });
+            await generateTileMap({ tileMapPath: 'mock-map', tilemapEntityId });
 
             expect(tileMap._height).toBe(3);
             expect(tileMap._width).toBe(3);
@@ -77,7 +68,7 @@ describe('TileMap System', () => {
 
     describe(setTile.name, () => {
         beforeAll(async () => {
-            await generateTileMap({ tilemapEntityId, tileMapPath: 'mock-map' });
+            await generateTileMap({ tileMapPath: 'mock-map', tilemapEntityId });
         });
 
         beforeEach(() => {
@@ -94,15 +85,15 @@ describe('TileMap System', () => {
             playerPosition._x = -5;
 
             expect(() => setTile({
-                tilemapEntityId,
                 entityId: playerEntityId,
+                tilemapEntityId,
             })).toThrow();
         });
 
         test('Should set entity in tile', () => {
             setTile({
-                tilemapEntityId,
                 entityId: playerEntityId,
+                tilemapEntityId,
             });
 
             expect(tileMap.tiles[playerStartTileId]._entityIds).toContain(playerEntityId);
@@ -111,7 +102,7 @@ describe('TileMap System', () => {
 
     describe(updateTile.name, () => {
         beforeAll(async () => {
-            await generateTileMap({ tilemapEntityId, tileMapPath: 'mock-map' });
+            await generateTileMap({ tileMapPath: 'mock-map', tilemapEntityId });
         });
 
         beforeEach(() => {
@@ -127,17 +118,17 @@ describe('TileMap System', () => {
 
         test('Should throw if parameters are invalid', () => {
             expect(() => updateTile({
-                tilemapEntityId,
                 entityId: playerEntityId,
                 targetX: -5,
                 targetY: 0,
+                tilemapEntityId,
             })).toThrow();
 
             expect(() => updateTile({
-                tilemapEntityId,
                 entityId: playerEntityId,
                 targetX: 0,
                 targetY: -5,
+                tilemapEntityId,
             })).toThrow();
         });
 
@@ -145,10 +136,10 @@ describe('TileMap System', () => {
             tileMap.tiles[1]._solid = true;
 
             expect(() => updateTile({
-                tilemapEntityId,
                 entityId: playerEntityId,
                 targetX: 1,
                 targetY: 0,
+                tilemapEntityId,
             })).toThrow();
 
             tileMap.tiles[1]._solid = false;
@@ -158,10 +149,10 @@ describe('TileMap System', () => {
             tileMap.tiles[1]._entityColliderIds = ['mockColliderId'];
 
             expect(() => updateTile({
-                tilemapEntityId,
                 entityId: playerEntityId,
                 targetX: 1,
                 targetY: 0,
+                tilemapEntityId,
             })).toThrow();
 
             tileMap.tiles[1]._entityColliderIds = [];
@@ -169,10 +160,10 @@ describe('TileMap System', () => {
 
         test('Should update tile', () => {
             updateTile({
-                tilemapEntityId,
                 entityId: playerEntityId,
                 targetX: playerPosition._x + 1,
                 targetY: playerPosition._y,
+                tilemapEntityId,
             });
 
             expect(tileMap.tiles[5]._entityIds).toContain(playerEntityId);
