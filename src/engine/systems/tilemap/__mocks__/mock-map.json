@@ -1,0 +1,22 @@
+{
+    "id": 0,
+    "name": "map0",
+    "height": 3,
+    "width": 3,
+    "tiles": [
+        { "sprite": "grass", "x": 0, "y": 0 },
+        { "sprite": "grass", "x": 1, "y": 0 },
+        { "sprite": "grass", "x": 2, "y": 0 },
+
+        { "sprite": "grass", "x": 0, "y": 1 },
+        { "sprite": "grass", "x": 1, "y": 1 },
+        { "sprite": "grass", "x": 2, "y": 1 },
+
+        { "sprite": "grass", "x": 0, "y": 2 },
+        { "sprite": "grass", "x": 1, "y": 2 },
+        { "sprite": "grass", "x": 2, "y": 2 }
+    ],
+    "entities": [
+        { "type": "Player", "name": "Player", "x": 1, "y": 1 }
+    ]
+}
