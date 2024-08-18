@@ -1,11 +1,11 @@
-import { event } from "../../../render/events/event";
-import { setCycle } from "../../cycle";
-import { EventTypes } from "../../event";
-import { setState } from "../../state";
-import { getStore, clearStore, setStore } from "../../store";
-import { destroyResource, getResourceItem } from "../../systems/resource/resource";
-import { getComponent } from "../../entities/entity.manager";
-import { error } from "../error";
+import { event } from '../../../render/events/event';
+import { setCycle } from '../../cycle';
+import { getComponent } from '../../entities/entity.manager';
+import { EventTypes } from '../../event';
+import { setState } from '../../state';
+import { getStore, clearStore, setStore } from '../../store';
+import { destroyResource, getResourceItem } from '../../systems/resource/resource';
+import { error } from '../error';
 
 //#region HELPERS
 export const checkActivityId = ({ activityId }: { activityId: string | null | undefined }) => {
@@ -13,7 +13,7 @@ export const checkActivityId = ({ activityId }: { activityId: string | null | un
         ?? error({ message: 'Store activityId is undefined', where: checkActivityId.name });
 
     return activityId;
-}
+};
 //#endregion
 
 //#region SERVICES
@@ -23,25 +23,25 @@ export const startActivity = ({ activityId }: { activityId: string }) => {
     setStore('activityId', activityId);
 
     event({
-        type: EventTypes.ACTIVITY_START,
         entityId: activityId,
+        type: EventTypes.ACTIVITY_START,
     });
-}
+};
 
 export const winActivity = ({ activityId }: { activityId?: string | null }) => {
     activityId = checkActivityId({ activityId });
 
-    const activityResource = getComponent({ entityId: activityId, componentId: 'Resource' });
+    const activityResource = getComponent({ componentId: 'Resource', entityId: activityId });
     getResourceItem({ resourceEntityId: activityId });
 
     setState('isActivityWin', true);
 
     event({
-        type: EventTypes.ACTIVITY_WIN,
-        entityId: activityId,
         data: activityResource,
+        entityId: activityId,
+        type: EventTypes.ACTIVITY_WIN,
     });
-}
+};
 
 export const endActivity = ({ activityId }: { activityId?: string | null }) => {
     activityId = checkActivityId({ activityId });
@@ -51,13 +51,13 @@ export const endActivity = ({ activityId }: { activityId?: string | null }) => {
     clearStore('activityId');
 
     event({
-        type: EventTypes.ACTIVITY_END,
         entityId: activityId,
+        type: EventTypes.ACTIVITY_END,
     });
 
-    const activityResource = getComponent({ entityId: activityId, componentId: 'Resource' });
+    const activityResource = getComponent({ componentId: 'Resource', entityId: activityId });
     if (activityResource._isTemporary) {
         destroyResource({ resourceEntityId: activityId });
     }
-}
+};
 //#endregion
