@@ -5,12 +5,11 @@ import { Resource, ActivityTypes, ActivityBugData, ActivityFishData, ActivityCra
 import { Sprite } from "../components/sprite";
 import { TileMap } from "../components/tilemap";
 import { Trigger } from "../components/trigger";
-import { PLAYER_ENTITY_ID, addComponent } from "../entities/entity.manager";
+import { PLAYER_ENTITY_NAME, addComponent } from "../entities/entity.manager";
 import { EventTypes } from "../event";
 import { Collider } from "../components/collider";
 import { Dialog } from "../components/dialog";
-import { loadDialog } from "../systems/dialog/dialog.data";
-import { generateTiles } from "../systems/tilemap/tilemap";
+import { loadDialogData } from "../systems/dialog/dialog.data";
 
 export const addPosition = ({ entityId, x = 0, y = 0 }: {
     entityId: string,
@@ -66,7 +65,7 @@ export const addInventory = ({ entityId, maxSlots = 20 }: {
 
     addComponent({ entityId, component: inventory });
 
-    if (entityId === PLAYER_ENTITY_ID) {
+    if (entityId.split('-')[0] === PLAYER_ENTITY_NAME) {
         event({
             type: EventTypes.INVENTORY_CREATE,
             entityId,
@@ -75,27 +74,17 @@ export const addInventory = ({ entityId, maxSlots = 20 }: {
     }
 };
 
-export const addTileMap = ({ entityId, height = 10, width = 10 }: {
+export const addTileMap = ({ entityId }: {
     entityId: string,
-    height?: number,
-    width?: number,
 }) => {
-    const tilemap: TileMap = {
+    const tileMap: TileMap = {
         _: 'TileMap',
-        _height: height,
-        _width: width,
+        _height: 0,
+        _width: 0,
         tiles: [],
     };
 
-    addComponent({ entityId, component: tilemap });
-
-    event({
-        type: EventTypes.TILEMAP_CREATE,
-        entityId,
-        data: tilemap,
-    });
-
-    generateTiles({});
+    addComponent({ entityId, component: tileMap });
 }
 
 export const addTrigger = ({ entityId, priority = 0, points }: {
@@ -128,7 +117,7 @@ export const addCollider = ({ entityId, points }: {
     addComponent({ entityId, component: collider });
 }
 
-export const addResourcePickUp = ({
+export const addResourceItem = ({
     entityId,
     isTemporary = false,
     itemName
@@ -139,14 +128,14 @@ export const addResourcePickUp = ({
 }) => {
     const resource: Resource = {
         _: 'Resource',
-        _activityType: ActivityTypes.PICKUP,
+        _activityType: ActivityTypes.ITEM,
         _isTemporary: isTemporary,
         item: {
             info: {
                 _name: itemName,
             },
             sprite: {
-                _image: `item_${itemName.toLowerCase()}.png`,
+                _image: `item_${itemName.toLowerCase()}`,
             },
         },
     };
@@ -187,7 +176,7 @@ export const addResourceBug = ({
                 _name: itemName,
             },
             sprite: {
-                _image: `item_${itemName.toLowerCase()}.png`,
+                _image: `item_${itemName.toLowerCase()}`,
             },
         },
     };
@@ -237,7 +226,7 @@ export const addResourceFish = ({
                 _name: itemName,
             },
             sprite: {
-                _image: `item_${itemName.toLowerCase()}.png`,
+                _image: `item_${itemName.toLowerCase()}`,
             },
         },
     };
@@ -279,5 +268,5 @@ export const addDialog = ({ entityId }: {
     };
 
     addComponent({ entityId, component: dialog });
-    loadDialog({ entityId });
+    loadDialogData({ entityId });
 }
