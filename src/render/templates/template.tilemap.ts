@@ -13,6 +13,8 @@ export const createTileMap = ({ tilemapEntityId, tilemap }: {
 
     tilemapEntity.style.width = `${tilemap._width * TILE_PIXEL_SIZE}px`;
     tilemapEntity.style.height = `${tilemap._height * TILE_PIXEL_SIZE}px`;
+    tilemapEntity.style.top = `${TILE_PIXEL_SIZE}px`;
+    tilemapEntity.style.left = `${TILE_PIXEL_SIZE}px`;
 };
 
 export const createTileMapTile = ({ tilemapEntityId, tile }: {
