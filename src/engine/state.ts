@@ -1,18 +1,18 @@
 const state = {
-    isGameRunning: false,
-    isInputCooldown: false,
-    isPlayerInventoryOpen: false,
-    isPlayerDialogOpen: false,
-    isActivityRunning: false,
-    isActivityWin: false,
-    isActivityBugRunning: false,
     isActivityBugCooldown: false,
-    isActivityFishRunning: false,
-    isActivityFishFrenzy: false,
+    isActivityBugRunning: false,
+    isActivityCraftPlaying: false,
     isActivityCraftRunning: false,
     isActivityCraftSelecting: false,
-    isActivityCraftPlaying: false,
-}
+    isActivityFishFrenzy: false,
+    isActivityFishRunning: false,
+    isActivityRunning: false,
+    isActivityWin: false,
+    isGameRunning: false,
+    isInputCooldown: false,
+    isPlayerDialogOpen: false,
+    isPlayerInventoryOpen: false,
+};
 
 export const setState = (key: keyof typeof state, value: boolean) => state[key] = value;
 export const getState = (key: keyof typeof state) => state[key];
