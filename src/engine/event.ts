@@ -1,41 +1,69 @@
+import { event } from '../render/events/event';
+
 import { Component } from './components/@component';
-import { event } from "../render/events/event";
-import { getComponent, checkComponent } from "./entities/entity.manager";
-import { getState, setState } from "./state";
-import { getStore } from "./store";
-import { playActivityBug } from "./services/activity/activity.bug";
-import { useResource } from "./systems/resource/resource";
-import { updateTile } from "./systems/tilemap/tilemap";
-import { checkTrigger } from "./systems/trigger/trigger";
-import { playActivityFish } from "./services/activity/activity.fish";
-import { error } from "./services/error";
 import { ActivityData } from './components/resource';
 import { Tile } from './components/tilemap';
+import { getComponent, checkComponent } from './entities/entity.manager';
+import { playActivityBug } from './services/activity/activity.bug';
+import {
+    confirmActivityCraftRecipe,
+    endActivityCraft,
+    playActivityCraft,
+    selectActivityCraftRecipe,
+} from './services/activity/activity.craft';
+import { playActivityFish } from './services/activity/activity.fish';
+import { error } from './services/error';
+import { getState, setState } from './state';
+import { getStore } from './store';
 import { nextDialog, selectDialogOption, startDialog } from './systems/dialog/dialog';
-import { confirmActivityCraftRecipe, endActivityCraft, playActivityCraft, selectActivityCraftRecipe } from './services/activity/activity.craft';
+import { useResource } from './systems/resource/resource';
+import { updateTile } from './systems/tilemap/tilemap';
+import { checkTrigger } from './systems/trigger/trigger';
 
 export type Event<K extends keyof Component = keyof Component> = {
-    type: EventTypes,
-    entityId: string,
     data?: EventData<K>,
+    entityId: string,
+    type: EventTypes
 };
 
 export type EventData<K extends keyof Component = keyof Component> = Component[K] | Tile | ActivityData;
 
 export enum EventInputActionKeys {
     ACT = 'e',
-    INVENTORY = 'i',
     BACK = 'Escape',
+    INVENTORY = 'i'
 }
 
 export enum EventInputMoveKeys {
-    UP = 'z',
-    LEFT = 'q',
     DOWN = 's',
+    LEFT = 'q',
     RIGHT = 'd',
+    UP = 'z'
 }
 
 export enum EventTypes {
+    /* Activity */
+    ACTIVITY_BUG_END = 'ACTIVITY_BUG_END',
+    ACTIVITY_BUG_START = 'ACTIVITY_BUG_START',
+    ACTIVITY_BUG_UPDATE = 'ACTIVITY_BUG_UPDATE',
+    ACTIVITY_CRAFT_END = 'ACTIVITY_CRAFT_END',
+    ACTIVITY_CRAFT_PLAY_END = 'ACTIVITY_CRAFT_PLAY_END',
+    ACTIVITY_CRAFT_PLAY_START = 'ACTIVITY_CRAFT_PLAY_START',
+    ACTIVITY_CRAFT_PLAY_UPDATE = 'ACTIVITY_CRAFT_PLAY_UPDATE',
+    ACTIVITY_CRAFT_SELECT_END = 'ACTIVITY_CRAFT_SELECT_END',
+    ACTIVITY_CRAFT_SELECT_START = 'ACTIVITY_CRAFT_SELECT_START',
+    ACTIVITY_CRAFT_SELECT_UPDATE = 'ACTIVITY_CRAFT_SELECT_UPDATE',
+    ACTIVITY_CRAFT_START = 'ACTIVITY_CRAFT_START',
+    ACTIVITY_END = 'ACTIVITY_END',
+    ACTIVITY_FISH_END = 'ACTIVITY_FISH_END',
+    ACTIVITY_FISH_START = 'ACTIVITY_FISH_START',
+    ACTIVITY_FISH_UPDATE = 'ACTIVITY_FISH_UPDATE',
+    ACTIVITY_START = 'ACTIVITY_START',
+    ACTIVITY_WIN = 'ACTIVITY_WIN',
+    /* Dialog */
+    DIALOG_END = 'DIALOG_END',
+    DIALOG_START = 'DIALOG_START',
+    DIALOG_UPDATE = 'DIALOG_UPDATE',
     /* Entity */
     ENTITY_CREATE = 'ENTITY_CREATE',
     ENTITY_DESTROY = 'ENTITY_DESTROY',
@@ -48,35 +76,13 @@ export enum EventTypes {
     /* Tilemap */
     TILEMAP_CREATE = 'TILEMAP_CREATE',
     TILEMAP_TILE_CREATE = 'TILEMAP_TILE_CREATE',
-    /* Activity */
-    ACTIVITY_START = 'ACTIVITY_START',
-    ACTIVITY_WIN = 'ACTIVITY_WIN',
-    ACTIVITY_END = 'ACTIVITY_END',
-    ACTIVITY_BUG_START = 'ACTIVITY_BUG_START',
-    ACTIVITY_BUG_UPDATE = 'ACTIVITY_BUG_UPDATE',
-    ACTIVITY_BUG_END = 'ACTIVITY_BUG_END',
-    ACTIVITY_FISH_START = 'ACTIVITY_FISH_START',
-    ACTIVITY_FISH_UPDATE = 'ACTIVITY_FISH_UPDATE',
-    ACTIVITY_FISH_END = 'ACTIVITY_FISH_END',
-    ACTIVITY_CRAFT_START = 'ACTIVITY_CRAFT_START',
-    ACTIVITY_CRAFT_SELECT_START = 'ACTIVITY_CRAFT_SELECT_START',
-    ACTIVITY_CRAFT_SELECT_UPDATE = 'ACTIVITY_CRAFT_SELECT_UPDATE',
-    ACTIVITY_CRAFT_SELECT_END = 'ACTIVITY_CRAFT_SELECT_END',
-    ACTIVITY_CRAFT_PLAY_START = 'ACTIVITY_CRAFT_PLAY_START',
-    ACTIVITY_CRAFT_PLAY_UPDATE = 'ACTIVITY_CRAFT_PLAY_UPDATE',
-    ACTIVITY_CRAFT_PLAY_END = 'ACTIVITY_CRAFT_PLAY_END',
-    ACTIVITY_CRAFT_END = 'ACTIVITY_CRAFT_END',
-    /* Dialog */
-    DIALOG_START = 'DIALOG_START',
-    DIALOG_UPDATE = 'DIALOG_UPDATE',
-    DIALOG_END = 'DIALOG_END',
 }
 
 export const onInputKeyDown = (inputKey: EventInputActionKeys | EventInputMoveKeys) => {
     const playerEntityId = getStore('playerId')
         ?? error({ message: 'Store playerId is undefined', where: onInputKeyDown.name });
 
-    const playerPosition = getComponent({ entityId: playerEntityId, componentId: 'Position' });
+    const playerPosition = getComponent({ componentId: 'Position', entityId: playerEntityId });
 
     try {
         if (
@@ -92,8 +98,8 @@ export const onInputKeyDown = (inputKey: EventInputActionKeys | EventInputMoveKe
                 setState('isPlayerInventoryOpen', false);
 
                 event({
-                    type: EventTypes.INVENTORY_DISPLAY,
                     entityId: playerEntityId,
+                    type: EventTypes.INVENTORY_DISPLAY,
                 });
 
                 return;
@@ -138,8 +144,8 @@ export const onInputKeyDown = (inputKey: EventInputActionKeys | EventInputMoveKe
                 setState('isPlayerInventoryOpen', true);
 
                 event({
-                    type: EventTypes.INVENTORY_DISPLAY,
                     entityId: playerEntityId,
+                    type: EventTypes.INVENTORY_DISPLAY,
                 });
 
                 return;
@@ -202,13 +208,13 @@ const onTrigger = ({ entityId, triggeredEntityId }: {
     if (!(entityId)) entityId = getStore('playerId')
         ?? error({ message: 'Store playerId is undefined ', where: onTrigger.name });
 
-    const resource = checkComponent({ entityId: triggeredEntityId, componentId: 'Resource' });
+    const resource = checkComponent({ componentId: 'Resource', entityId: triggeredEntityId });
     if (resource) {
         useResource({ resourceEntityId: triggeredEntityId });
         return;
     }
 
-    const dialog = checkComponent({ entityId: triggeredEntityId, componentId: 'Dialog' });
+    const dialog = checkComponent({ componentId: 'Dialog', entityId: triggeredEntityId });
     if (dialog) {
         startDialog({ entityId: triggeredEntityId });
         return;
