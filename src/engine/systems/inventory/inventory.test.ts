@@ -10,7 +10,7 @@ jest.mock('../../../render/events/event.ts', () => ({
 jest.mock('./inventory.data');
 
 describe('Inventory system', () => {
-    const entityId = createEntity('Entity');
+    const entityId = createEntity({ entityName: 'Entity' });
     const inventory: Inventory = {
         _: 'Inventory',
         _maxSlots: 2,
@@ -18,11 +18,11 @@ describe('Inventory system', () => {
     };
     const item1: Item = {
         info: { _name: 'item1' },
-        sprite: { _image: 'item1.png' },
+        sprite: { _image: 'item1' },
     };
     const item2: Item = {
         info: { _name: 'item2' },
-        sprite: { _image: 'item2.png' },
+        sprite: { _image: 'item2' },
     };
 
     beforeAll(() => {
@@ -46,7 +46,7 @@ describe('Inventory system', () => {
                 entityId,
                 item: {
                     info: { _name: '' },
-                    sprite: { _image: 'item.png' },
+                    sprite: { _image: 'item' },
                 },
                 itemAmount: 1,
             })).toThrow();
