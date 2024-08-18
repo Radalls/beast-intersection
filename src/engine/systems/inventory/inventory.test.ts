@@ -1,6 +1,7 @@
+import { addComponent, createEntity } from '../../entities/entity.manager';
+
 import { Inventory, Item } from './../../components/inventory';
-import { addComponent, createEntity } from "../../entities/entity.manager";
-import { addItemToInventory, removeItemFromInventory } from "./inventory";
+import { addItemToInventory, removeItemFromInventory } from './inventory';
 
 jest.mock('../../../render/events/event.ts', () => ({
     event: jest.fn(),
@@ -26,10 +27,7 @@ describe('Inventory system', () => {
     };
 
     beforeAll(() => {
-        addComponent({
-            entityId,
-            component: inventory,
-        });
+        addComponent({ component: inventory, entityId });
     });
 
     beforeEach(() => {
@@ -122,7 +120,10 @@ describe('Inventory system', () => {
 
             const result = addItemToInventory({ entityId, item: item1, itemAmount: 1 });
 
-            expect(result).toEqual({ success: false, amountRemaining: 1 });
+            expect(result).toEqual({
+                amountRemaining: 1,
+                success: false,
+            });
         });
 
         test('Should not add remaining item if no slots available', () => {
@@ -136,7 +137,10 @@ describe('Inventory system', () => {
 
             const result = addItemToInventory({ entityId, item: item1, itemAmount: 3 });
 
-            expect(result).toEqual({ success: false, amountRemaining: 1 });
+            expect(result).toEqual({
+                amountRemaining: 1,
+                success: false,
+            });
             expect(inventory.slots.length).toBe(2);
             expect(inventory.slots[1]._amount).toBe(2);
         });
@@ -150,14 +154,14 @@ describe('Inventory system', () => {
         test('Should throw if parameters are invalid', () => {
             expect(() => removeItemFromInventory({
                 entityId,
-                itemName: '',
                 itemAmount: 1,
+                itemName: '',
             })).toThrow();
 
             expect(() => removeItemFromInventory({
                 entityId,
-                itemName: 'item1',
                 itemAmount: -5,
+                itemName: 'item1',
             })).toThrow();
         });
 
@@ -170,7 +174,11 @@ describe('Inventory system', () => {
                 },
             ];
 
-            const result = removeItemFromInventory({ entityId, itemName: 'item1', itemAmount: 1 });
+            const result = removeItemFromInventory({
+                entityId,
+                itemAmount: 1,
+                itemName: 'item1',
+            });
 
             expect(result).toBe(true);
             expect(inventory.slots.length).toBe(1);
@@ -186,7 +194,11 @@ describe('Inventory system', () => {
                 },
             ];
 
-            const result = removeItemFromInventory({ entityId, itemName: 'item1', itemAmount: 1 });
+            const result = removeItemFromInventory({
+                entityId,
+                itemAmount: 1,
+                itemName: 'item1',
+            });
 
             expect(result).toBe(true);
             expect(inventory.slots.length).toBe(0);
@@ -206,7 +218,11 @@ describe('Inventory system', () => {
                 },
             ];
 
-            const result = removeItemFromInventory({ entityId, itemName: 'item1', itemAmount: 3 });
+            const result = removeItemFromInventory({
+                entityId,
+                itemAmount: 3,
+                itemName: 'item1',
+            });
 
             expect(result).toBe(true);
             expect(inventory.slots.length).toBe(1);
@@ -222,7 +238,11 @@ describe('Inventory system', () => {
                 },
             ];
 
-            const result = removeItemFromInventory({ entityId, itemName: 'item2', itemAmount: 1 });
+            const result = removeItemFromInventory({
+                entityId,
+                itemAmount: 1,
+                itemName: 'item2',
+            });
 
             expect(result).toBe(false);
             expect(inventory.slots.length).toBe(1);
@@ -243,7 +263,11 @@ describe('Inventory system', () => {
                 },
             ];
 
-            const result = removeItemFromInventory({ entityId, itemName: 'item1', itemAmount: 5 });
+            const result = removeItemFromInventory({
+                entityId,
+                itemAmount: 5,
+                itemName: 'item1',
+            });
 
             expect(result).toBe(false);
             expect(inventory.slots.length).toBe(2);

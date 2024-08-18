@@ -1,9 +1,10 @@
-import { event } from "../../../render/events/event";
-import { Inventory, Item } from "../../components/inventory";
-import { getComponent } from "../../entities/entity.manager";
-import { EventTypes } from "../../event";
-import { findItemRule } from "./inventory.data";
-import { error } from "../../services/error";
+import { event } from '../../../render/events/event';
+import { Inventory, Item } from '../../components/inventory';
+import { getComponent } from '../../entities/entity.manager';
+import { EventTypes } from '../../event';
+import { error } from '../../services/error';
+
+import { findItemRule } from './inventory.data';
 
 //#region CHECKS
 const invalidItemName = (itemName: string) => !(itemName) || itemName === '';
@@ -47,8 +48,8 @@ export const addItemToInventory = ({ entityId, item, itemAmount }: {
     item: Item,
     itemAmount: number,
 }): {
-    success: boolean,
-    amountRemaining?: number
+    amountRemaining?: number,
+    success: boolean
 } => {
     if (invalidItemName(item.info._name) || invalidItemAmount(itemAmount) || invalidItemSprite(item.sprite._image)) {
         error({ message: `Item ${item.info._name} is invalid`, where: addItemToInventory.name });
@@ -57,7 +58,7 @@ export const addItemToInventory = ({ entityId, item, itemAmount }: {
     const itemRule = findItemRule(item.info._name)
         ?? error({ message: `Item ${item.info._name} does not exist`, where: addItemToInventory.name });
 
-    const inventory = getComponent({ entityId, componentId: 'Inventory' });
+    const inventory = getComponent({ componentId: 'Inventory', entityId });
     const slotsWithItem = findSlotsWithItem({ inventory, itemName: item.info._name });
     if (slotsWithItem.length > 0) {
         for (const slot of slotsWithItem) {
@@ -66,9 +67,9 @@ export const addItemToInventory = ({ entityId, item, itemAmount }: {
                     slot._amount += itemAmount;
 
                     event({
-                        type: EventTypes.INVENTORY_UPDATE,
-                        entityId,
                         data: inventory,
+                        entityId,
+                        type: EventTypes.INVENTORY_UPDATE,
                     });
 
                     return { success: true };
@@ -96,9 +97,9 @@ export const addItemToInventory = ({ entityId, item, itemAmount }: {
             });
 
             event({
-                type: EventTypes.INVENTORY_UPDATE,
-                entityId,
                 data: inventory,
+                entityId,
+                type: EventTypes.INVENTORY_UPDATE,
             });
 
             return { success: true };
@@ -120,13 +121,13 @@ export const addItemToInventory = ({ entityId, item, itemAmount }: {
     }
 
     event({
-        type: EventTypes.INVENTORY_UPDATE,
-        entityId,
         data: inventory,
+        entityId,
+        type: EventTypes.INVENTORY_UPDATE,
     });
 
-    return { success: false, amountRemaining: itemAmount };
-}
+    return { amountRemaining: itemAmount, success: false };
+};
 
 /**
  * Removes an item from an inventory.
@@ -137,14 +138,14 @@ export const addItemToInventory = ({ entityId, item, itemAmount }: {
  */
 export const removeItemFromInventory = ({ entityId, itemName, itemAmount }: {
     entityId: string,
-    itemName: string,
     itemAmount: number,
+    itemName: string
 }): boolean => {
     if (invalidItemName(itemName) || invalidItemAmount(itemAmount)) {
         error({ message: `Item ${itemName} is invalid`, where: addItemToInventory.name });
     }
 
-    const inventory = getComponent({ entityId, componentId: 'Inventory' });
+    const inventory = getComponent({ componentId: 'Inventory', entityId });
     const slotsWithItem = findSlotsWithItem({ inventory, itemName });
     if (slotsWithItem.length === 0) {
         return false;
@@ -176,11 +177,11 @@ export const removeItemFromInventory = ({ entityId, itemName, itemAmount }: {
     removeSlots({ inventory, slotsToRemove });
 
     event({
-        type: EventTypes.INVENTORY_UPDATE,
-        entityId,
         data: inventory,
+        entityId,
+        type: EventTypes.INVENTORY_UPDATE,
     });
 
     return true;
-}
+};
 //#endregion

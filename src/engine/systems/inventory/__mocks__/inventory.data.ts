@@ -2,7 +2,7 @@
 export const findItemRule = (itemName: string) => {
     return {
         id: 1,
-        name: itemName,
         maxAmount: 2,
+        name: itemName,
     };
 };
