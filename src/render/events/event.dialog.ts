@@ -1,22 +1,22 @@
-import { Dialog } from "../../engine/components/dialog";
-import { startDialog, updateDialog, endDialog } from "../templates/template.dialog";
+import { Dialog } from '../../engine/components/dialog';
+import { startDialog, updateDialog, endDialog } from '../templates/template.dialog';
 
 //#region EVENTS
 export const onDialogStart = ({ entityId, dialog }: {
-    entityId: string,
     dialog: Dialog,
+    entityId: string
 }) => {
-    startDialog({ entityId, dialog });
-}
+    startDialog({ dialog, entityId });
+};
 
 export const onDialogNext = ({ entityId, dialog }: {
-    entityId: string,
     dialog: Dialog,
+    entityId: string
 }) => {
-    updateDialog({ entityId, dialog });
-}
+    updateDialog({ dialog, entityId });
+};
 
 export const onDialogEnd = ({ entityId }: { entityId: string }) => {
     endDialog({ entityId });
-}
+};
 //#endregion

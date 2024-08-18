@@ -1,8 +1,28 @@
-import { ActivityBugData, ActivityCraftData, ActivityFishData, Resource } from "../../engine/components/resource";
-import { startActivity, winActivity, endActivity, startActivityBug, updateActivityBug, endActivityBug, endActivityFish, startActivityFish, updateActivityFish, startActivityCraft, startSelectActivityCraft, updateSelectActivityCraft, endSelectActivityCraft, startPlayActivityCraft, updatePlayActivityCraft, endPlayActivityCraft, endActivityCraft } from "../templates/template.activity";
+import { ActivityBugData, ActivityCraftData, ActivityFishData, Resource } from '../../engine/components/resource';
+import {
+    endActivity,
+    endActivityBug,
+    endActivityCraft,
+    endActivityFish,
+    endPlayActivityCraft,
+    endSelectActivityCraft,
+    startActivity,
+    startActivityBug,
+    startActivityCraft,
+    startActivityFish,
+    startPlayActivityCraft,
+    startSelectActivityCraft,
+    updateActivityBug,
+    updateActivityFish,
+    updatePlayActivityCraft,
+    updateSelectActivityCraft,
+    winActivity,
+} from '../templates/template.activity';
 
 //#region MAIN ACTIVITY
-export const onActivityStart = ({ activityEntityId }: { activityEntityId: string }) => startActivity({ activityEntityId });
+export const onActivityStart = (
+    { activityEntityId }: { activityEntityId: string },
+) => startActivity({ activityEntityId });
 
 export const onActivityWin = ({ activityEntityId, resource }: {
     activityEntityId: string,
@@ -15,16 +35,18 @@ export const onActivityEnd = ({ activityEntityId }: { activityEntityId: string }
 //#region EVENTS
 //#region ACTIVITY BUG
 export const onActivityBugStart = ({ activityEntityId, activityBugData }: {
-    activityEntityId: string,
     activityBugData: ActivityBugData,
-}) => startActivityBug({ activityEntityId, activityBugData });
+    activityEntityId: string
+}) => startActivityBug({ activityBugData, activityEntityId });
 
 export const onActivityBugUpdate = ({ activityEntityId, activityBugData }: {
-    activityEntityId: string,
     activityBugData: ActivityBugData,
-}) => updateActivityBug({ activityEntityId, activityBugData });
+    activityEntityId: string
+}) => updateActivityBug({ activityBugData, activityEntityId });
 
-export const onActivityBugEnd = ({ activityEntityId }: { activityEntityId: string }) => endActivityBug({ activityEntityId });
+export const onActivityBugEnd = (
+    { activityEntityId }: { activityEntityId: string },
+) => endActivityBug({ activityEntityId });
 //#endregion
 
 //#region ACTIVITY FISH
@@ -38,36 +60,46 @@ export const onActivityFishUpdate = ({ activityEntityId, activityFishData }: {
     activityFishData: ActivityFishData,
 }) => updateActivityFish({ activityEntityId, activityFishData });
 
-export const onActivityFishEnd = ({ activityEntityId }: { activityEntityId: string }) => endActivityFish({ activityEntityId });
+export const onActivityFishEnd = (
+    { activityEntityId }: { activityEntityId: string },
+) => endActivityFish({ activityEntityId });
 //#endregion
 
 //#region ACTIVITY CRAFT
-export const onActivityCraftStart = ({ activityEntityId }: { activityEntityId: string }) => startActivityCraft({ activityEntityId });
+export const onActivityCraftStart = (
+    { activityEntityId }: { activityEntityId: string },
+) => startActivityCraft({ activityEntityId });
 
 export const onActivityCraftSelectStart = ({ activityEntityId, activityCraftData }: {
-    activityEntityId: string,
     activityCraftData: ActivityCraftData,
-}) => startSelectActivityCraft({ activityEntityId, activityCraftData });
+    activityEntityId: string
+}) => startSelectActivityCraft({ activityCraftData, activityEntityId });
 
 export const onActivityCraftSelectUpdate = ({ activityEntityId, activityCraftData }: {
-    activityEntityId: string,
     activityCraftData: ActivityCraftData,
-}) => updateSelectActivityCraft({ activityEntityId, activityCraftData });
+    activityEntityId: string
+}) => updateSelectActivityCraft({ activityCraftData, activityEntityId });
 
-export const onActivityCraftSelectEnd = ({ activityEntityId }: { activityEntityId: string }) => endSelectActivityCraft({ activityEntityId });
+export const onActivityCraftSelectEnd = (
+    { activityEntityId }: { activityEntityId: string },
+) => endSelectActivityCraft({ activityEntityId });
 
 export const onActivityCraftPlayStart = ({ activityEntityId, activityCraftData }: {
-    activityEntityId: string,
     activityCraftData: ActivityCraftData,
-}) => startPlayActivityCraft({ activityEntityId, activityCraftData });
+    activityEntityId: string
+}) => startPlayActivityCraft({ activityCraftData, activityEntityId });
 
 export const onActivityCraftPlayUpdate = ({ activityEntityId, activityCraftData }: {
-    activityEntityId: string,
     activityCraftData: ActivityCraftData,
-}) => updatePlayActivityCraft({ activityEntityId, activityCraftData });
+    activityEntityId: string
+}) => updatePlayActivityCraft({ activityCraftData, activityEntityId });
 
-export const onActivityCraftPlayEnd = ({ activityEntityId }: { activityEntityId: string }) => endPlayActivityCraft({ activityEntityId });
+export const onActivityCraftPlayEnd = (
+    { activityEntityId }: { activityEntityId: string }
+) => endPlayActivityCraft({ activityEntityId });
 
-export const onActivityCraftEnd = ({ activityEntityId }: { activityEntityId: string }) => endActivityCraft({ activityEntityId });
+export const onActivityCraftEnd = (
+    { activityEntityId }: { activityEntityId: string }
+) => endActivityCraft({ activityEntityId });
 //#endregion
 //#endregion
