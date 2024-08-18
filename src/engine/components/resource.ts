@@ -1,4 +1,4 @@
-import { Item } from "./inventory";
+import { Item } from './inventory';
 
 export type Resource = {
     _: 'Resource',
@@ -9,10 +9,10 @@ export type Resource = {
 };
 
 export enum ActivityTypes {
-    ITEM = 'ITEM',
     BUG = 'BUG',
-    FISH = 'FISH',
     CRAFT = 'CRAFT',
+    FISH = 'FISH',
+    ITEM = 'ITEM'
 }
 
 export type ActivityData = ActivityBugData | ActivityFishData | ActivityCraftData;
@@ -23,8 +23,8 @@ export type ActivityBugData = {
     _maxNbErrors: number,
     _nbErrors: number,
     _symbol?: string,
-    _symbolInterval: number,
     _symbolFound?: boolean,
+    _symbolInterval: number
 }
 
 export type ActivityFishData = {
@@ -35,14 +35,14 @@ export type ActivityFishData = {
     _frenzyInterval: number,
     _isFrenzy?: boolean,
     _rodDamage: number,
-    _rodTension: number,
     _rodMaxTension: number,
+    _rodTension: number
 }
 
 export type ActivityCraftData = {
-    _currentRecipeIndex?: number,
-    _nbErrors: number,
-    _maxNbErrors: number,
     _currentRecipeId?: number,
+    _currentRecipeIndex?: number,
     _hitCount?: number,
+    _maxNbErrors: number,
+    _nbErrors: number
 }
