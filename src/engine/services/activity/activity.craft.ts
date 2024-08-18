@@ -110,7 +110,7 @@ export const confirmActivityCraftRecipe = ({ activityId }: { activityId?: string
     activityCraftData._currentRecipeId = itemRecipes[activityCraftData._currentRecipeIndex].id;
     activityResource.item = {
         info: { _name: itemRecipes[activityCraftData._currentRecipeIndex].name },
-        sprite: { _image: `item_${itemRecipes[activityCraftData._currentRecipeIndex].name.toLowerCase()}.png` },
+        sprite: { _image: `item_${itemRecipes[activityCraftData._currentRecipeIndex].name.toLowerCase()}` },
     }
 
     setState('isActivityCraftSelecting', false);

@@ -120,13 +120,13 @@ export const updateActivityBug = ({ activityEntityId, activityBugData }: {
 
     const activityBugEntitySymbolFound = getEntity({ entityId: `${activityEntityId}-activity-bug-symbol-found` });
     if (activityBugData._symbolFound === undefined) {
-        activityBugEntitySymbolFound.style.backgroundImage = `url(${getSpritePath('activity_bug_symbol_blank.png')})`;
+        activityBugEntitySymbolFound.style.backgroundImage = `url(${getSpritePath('activity_bug_symbol_blank')})`;
     }
     else if (activityBugData._symbolFound === true) {
-        activityBugEntitySymbolFound.style.backgroundImage = `url(${getSpritePath('activity_bug_symbol_found.png')})`;
+        activityBugEntitySymbolFound.style.backgroundImage = `url(${getSpritePath('activity_bug_symbol_found')})`;
     }
     else if (activityBugData._symbolFound === false) {
-        activityBugEntitySymbolFound.style.backgroundImage = `url(${getSpritePath('activity_bug_symbol_error.png')})`;
+        activityBugEntitySymbolFound.style.backgroundImage = `url(${getSpritePath('activity_bug_symbol_error')})`;
     }
 };
 
@@ -248,8 +248,8 @@ export const updateActivityFish = ({ activityEntityId, activityFishData }: {
 
     const activityFishEntityFrenzyValue = getEntity({ entityId: `${activityEntityId}-activity-fish-frenzy-value` });
     activityFishEntityFrenzyValue.style.backgroundImage = (activityFishData._isFrenzy)
-        ? `url(${getSpritePath('activity_fish_frenzy_on.png')})`
-        : `url(${getSpritePath('activity_fish_frenzy_off.png')})`;
+        ? `url(${getSpritePath('activity_fish_frenzy_on')})`
+        : `url(${getSpritePath('activity_fish_frenzy_off')})`;
 };
 
 export const endActivityFish = ({ activityEntityId }: { activityEntityId: string }) => {
@@ -300,7 +300,7 @@ export const startSelectActivityCraft = ({ activityEntityId, activityCraftData }
             htmlParent: activityCraftRecipeEntity,
             htmlAbsolute: false,
         });
-        activityCraftRecipeIconEntity.style.backgroundImage = `url(${getSpritePath(`item_${itemRecipes[i].name.toLowerCase()}.png`)})`;
+        activityCraftRecipeIconEntity.style.backgroundImage = `url(${getSpritePath(`item_${itemRecipes[i].name.toLowerCase()}`)})`;
 
         const activityCraftRecipeNameEntity = createEntity({
             entityId: activityEntityId,
@@ -335,7 +335,7 @@ export const startSelectActivityCraft = ({ activityEntityId, activityCraftData }
                 htmlParent: activityCraftRecipeIngredientEntity,
                 htmlAbsolute: false,
             });
-            activityCraftRecipeIngredientIconEntity.style.backgroundImage = `url(${getSpritePath(`item_${itemRecipes[i].ingredients[j].name.toLowerCase()}.png`)})`;
+            activityCraftRecipeIngredientIconEntity.style.backgroundImage = `url(${getSpritePath(`item_${itemRecipes[i].ingredients[j].name.toLowerCase()}`)})`;
 
             const activityCraftRecipeIngredientNameEntity = createEntity({
                 entityId: activityEntityId,

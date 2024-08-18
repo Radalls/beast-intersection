@@ -12,7 +12,7 @@ export const TILE_PIXEL_SIZE = 64;
 //#region HELPERS
 export const getSpritePath = (spriteName: string) => {
     const spriteFolderPath = spriteName.replace(/^(.*?)(\/[^\/]+)?(\.[^\.\/]+)?$/, '$1').split('_')[0];
-    return `${spritePath}/${spriteFolderPath}/${spriteName}`;
+    return `${spritePath}/${spriteFolderPath}/${spriteName}.png`;
 }
 
 export const getEntity = ({ entityId }: { entityId: string }) => {
