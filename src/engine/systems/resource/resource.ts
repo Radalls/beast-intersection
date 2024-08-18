@@ -19,7 +19,7 @@ export const useResource = ({ entityId, resourceEntityId }: {
 
     const resource = getComponent({ entityId: resourceEntityId, componentId: 'Resource' });
 
-    if (resource._activityType === ActivityTypes.PICKUP) {
+    if (resource._activityType === ActivityTypes.ITEM) {
         getResourceItem({ resourceEntityId });
 
         if (resource._isTemporary) {
