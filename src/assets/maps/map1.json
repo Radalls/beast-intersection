@@ -103,16 +103,16 @@
         { "sprite": "sand", "x": 8, "y": 8 },
         { "sprite": "sand", "x": 9, "y": 8 },
 
-        { "sprite": "water", "x": 0, "y": 9 },
-        { "sprite": "water", "x": 1, "y": 9 },
-        { "sprite": "water", "x": 2, "y": 9 },
-        { "sprite": "water", "x": 3, "y": 9 },
-        { "sprite": "water", "x": 4, "y": 9 },
-        { "sprite": "water", "x": 5, "y": 9 },
-        { "sprite": "water", "x": 6, "y": 9 },
-        { "sprite": "water", "x": 7, "y": 9 },
-        { "sprite": "water", "x": 8, "y": 9 },
-        { "sprite": "water", "x": 9, "y": 9 }
+        { "sprite": "water", "x": 0, "y": 9, "solid": true },
+        { "sprite": "water", "x": 1, "y": 9, "solid": true },
+        { "sprite": "water", "x": 2, "y": 9, "solid": true },
+        { "sprite": "water", "x": 3, "y": 9, "solid": true },
+        { "sprite": "water", "x": 4, "y": 9, "solid": true },
+        { "sprite": "water", "x": 5, "y": 9, "solid": true },
+        { "sprite": "water", "x": 6, "y": 9, "solid": true },
+        { "sprite": "water", "x": 7, "y": 9, "solid": true },
+        { "sprite": "water", "x": 8, "y": 9, "solid": true },
+        { "sprite": "water", "x": 9, "y": 9, "solid": true }
     ],
     "entities": [
         { "type": "Player", "name": "Player", "x": 3, "y": 3 },
