@@ -1,6 +1,7 @@
-import { Position } from "../../components/position";
-import { addComponent, createEntity } from "../../entities/entity.manager";
-import { updatePosition } from "./position";
+import { Position } from '../../components/position';
+import { addComponent, createEntity } from '../../entities/entity.manager';
+
+import { updatePosition } from './position';
 
 jest.mock('../../../render/events/event.ts', () => ({
     event: jest.fn(),
@@ -15,18 +16,15 @@ describe('Position System', () => {
     };
 
     beforeAll(() => {
+        addComponent({ component: position, entityId });
         addComponent({
-            entityId,
-            component: position,
-        });
-        addComponent({
-            entityId,
             component: {
                 _: 'Sprite',
                 _height: 1,
                 _image: 'sprite',
                 _width: 1,
             },
+            entityId,
         });
     });
 

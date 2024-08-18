@@ -1,7 +1,7 @@
-import { event } from "../../../render/events/event";
-import { getComponent } from "../../entities/entity.manager";
-import { EventTypes } from "../../event";
-import { error } from "../../services/error";
+import { event } from '../../../render/events/event';
+import { getComponent } from '../../entities/entity.manager';
+import { EventTypes } from '../../event';
+import { error } from '../../services/error';
 
 //#region CHECKS
 const invalidPosition = ({ x, y }: {
@@ -12,7 +12,7 @@ const invalidPosition = ({ x, y }: {
 const samePosition = ({ entityPosition, inputPosition }: {
     entityPosition: { x: number, y: number },
     inputPosition: { x: number, y: number },
-}) => entityPosition.x === inputPosition.x && entityPosition.y === inputPosition.y
+}) => entityPosition.x === inputPosition.x && entityPosition.y === inputPosition.y;
 //#endregion
 
 //#region SYSTEMS
@@ -23,7 +23,7 @@ export const updatePosition = ({ entityId, x, y }: {
 }) => {
     if (invalidPosition({ x, y })) error({ message: `Position (${x}-${y}) is invalid`, where: updatePosition.name });
 
-    const position = getComponent({ entityId, componentId: 'Position' });
+    const position = getComponent({ componentId: 'Position', entityId });
     if (samePosition({
         entityPosition: { x: position._x, y: position._y },
         inputPosition: { x, y },
@@ -33,9 +33,9 @@ export const updatePosition = ({ entityId, x, y }: {
     position._y = y;
 
     event({
-        type: EventTypes.ENTITY_POSITION_UPDATE,
-        entityId,
         data: position,
+        entityId,
+        type: EventTypes.ENTITY_POSITION_UPDATE,
     });
-}
+};
 //#endregion
