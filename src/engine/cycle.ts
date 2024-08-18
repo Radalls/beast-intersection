@@ -1,23 +1,23 @@
-import { getState, setState } from "./state"
-import { tickActivityBug } from "./services/activity/activity.bug";
-import { endActivity } from "./services/activity/activity";
-import { tickActivityFish, tickActivityFishFrenzy } from "./services/activity/activity.fish";
+import { endActivity } from './services/activity/activity';
+import { tickActivityBug } from './services/activity/activity.bug';
+import { tickActivityFish, tickActivityFishFrenzy } from './services/activity/activity.fish';
+import { getState, setState } from './state';
 
 const cycle = {
-    deltaTime: 1 / 60,
-    elapsedTimeSinceInputTick: 0,
-    elapsedTimeSinceActivityWinTick: 0,
-    elapsedTimeSinceActivityBugTick: 0,
-    elapsedTimeSinceActivityFishInputTick: 0,
-    elapsedTimeSinceActivityFishFrenzyOnTick: 0,
-    elapsedTimeSinceActivityFishFrenzyOffTick: 0,
-    inputTickInterval: 1 / 10,
-    activityWinTickInterval: 0,
     activityBugTickInterval: 0,
     activityFishTickInterval: 1 / 2,
-    activityFishTickIntervalFrenzyOn: 0,
     activityFishTickIntervalFrenzyOff: 0,
-}
+    activityFishTickIntervalFrenzyOn: 0,
+    activityWinTickInterval: 0,
+    deltaTime: 1 / 60,
+    elapsedTimeSinceActivityBugTick: 0,
+    elapsedTimeSinceActivityFishFrenzyOffTick: 0,
+    elapsedTimeSinceActivityFishFrenzyOnTick: 0,
+    elapsedTimeSinceActivityFishInputTick: 0,
+    elapsedTimeSinceActivityWinTick: 0,
+    elapsedTimeSinceInputTick: 0,
+    inputTickInterval: 1 / 10,
+};
 
 export const setCycle = (key: keyof typeof cycle, value: number) => cycle[key] = value;
 export const getCycle = (key: keyof typeof cycle) => cycle[key];
@@ -52,18 +52,20 @@ export const runCycle = () => {
         if (getState('isActivityBugRunning') && cycle.activityBugTickInterval > 0) {
             cycle.elapsedTimeSinceActivityBugTick += cycle.deltaTime;
 
-            const activityBugTickIntervalProgress = cycle.elapsedTimeSinceActivityBugTick / cycle.activityBugTickInterval;
+            const activityBugTickIntervalProgress =
+                cycle.elapsedTimeSinceActivityBugTick / cycle.activityBugTickInterval;
             if (activityBugTickIntervalProgress >= 1) {
                 clearCycle('elapsedTimeSinceActivityBugTick');
 
-                tickActivityBug({})
+                tickActivityBug({});
             }
         }
 
         if (getState('isActivityFishRunning')) {
             cycle.elapsedTimeSinceActivityFishInputTick += cycle.deltaTime;
 
-            const activityFishInputTickIntervalProgress = cycle.elapsedTimeSinceActivityFishInputTick / cycle.activityFishTickInterval;
+            const activityFishInputTickIntervalProgress =
+                cycle.elapsedTimeSinceActivityFishInputTick / cycle.activityFishTickInterval;
             if (activityFishInputTickIntervalProgress >= 1) {
                 clearCycle('elapsedTimeSinceActivityFishInputTick');
 
@@ -73,7 +75,8 @@ export const runCycle = () => {
             if (getState('isActivityFishFrenzy') && cycle.activityFishTickIntervalFrenzyOn > 0) {
                 cycle.elapsedTimeSinceActivityFishFrenzyOnTick += cycle.deltaTime;
 
-                const activityFishFrenzyOnTickInvervalProgress = cycle.elapsedTimeSinceActivityFishFrenzyOnTick / cycle.activityFishTickIntervalFrenzyOn;
+                const activityFishFrenzyOnTickInvervalProgress =
+                    cycle.elapsedTimeSinceActivityFishFrenzyOnTick / cycle.activityFishTickIntervalFrenzyOn;
                 if (activityFishFrenzyOnTickInvervalProgress >= 1) {
                     clearCycle('elapsedTimeSinceActivityFishFrenzyOnTick');
 
@@ -83,7 +86,8 @@ export const runCycle = () => {
             else if (!(getState('isActivityFishFrenzy')) && cycle.activityFishTickIntervalFrenzyOff > 0) {
                 cycle.elapsedTimeSinceActivityFishFrenzyOffTick += cycle.deltaTime;
 
-                const activityFishFrenzyOffTickInvervalProgress = cycle.elapsedTimeSinceActivityFishFrenzyOffTick / cycle.activityFishTickIntervalFrenzyOff;
+                const activityFishFrenzyOffTickInvervalProgress =
+                    cycle.elapsedTimeSinceActivityFishFrenzyOffTick / cycle.activityFishTickIntervalFrenzyOff;
                 if (activityFishFrenzyOffTickInvervalProgress >= 1) {
                     clearCycle('elapsedTimeSinceActivityFishFrenzyOffTick');
 
@@ -92,4 +96,4 @@ export const runCycle = () => {
             }
         }
     }
-}
+};
