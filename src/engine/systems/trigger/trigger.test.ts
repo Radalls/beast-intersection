@@ -1,9 +1,10 @@
-import { Position } from "../../components/position";
-import { TileMap } from "../../components/tilemap";
-import { Trigger } from "../../components/trigger";
-import { addComponent, createEntity } from "../../entities/entity.manager";
-import { generateTileMap } from "../tilemap/tilemap";
-import { checkTrigger, destroyTrigger, setTrigger } from "./trigger";
+import { Position } from '../../components/position';
+import { TileMap } from '../../components/tilemap';
+import { Trigger } from '../../components/trigger';
+import { addComponent, createEntity } from '../../entities/entity.manager';
+import { generateTileMap } from '../tilemap/tilemap';
+
+import { checkTrigger, destroyTrigger, setTrigger } from './trigger';
 
 jest.mock('../tilemap/tilemap.data.ts');
 jest.mock('../../../render/events/event.ts', () => ({
@@ -52,32 +53,32 @@ describe('Trigger System', () => {
 
     beforeAll(async () => {
         addComponent({
-            entityId: tilemapEntityId,
             component: tileMap,
+            entityId: tilemapEntityId,
         });
-        await generateTileMap({ tilemapEntityId, tileMapPath: 'mock-map' });
+        await generateTileMap({ tileMapPath: 'mock-map', tilemapEntityId });
 
         addComponent({
-            entityId: playerEntityId,
             component: playerPosition,
+            entityId: playerEntityId,
         });
 
         addComponent({
-            entityId: stickEntityId,
             component: stickPosition,
+            entityId: stickEntityId,
         });
         addComponent({
-            entityId: stickEntityId,
             component: stickTrigger,
+            entityId: stickEntityId,
         });
 
         addComponent({
-            entityId: rockEntityId,
             component: rockPosition,
+            entityId: rockEntityId,
         });
         addComponent({
-            entityId: rockEntityId,
             component: rockTrigger,
+            entityId: rockEntityId,
         });
     });
 

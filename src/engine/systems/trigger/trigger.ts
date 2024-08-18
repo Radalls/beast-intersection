@@ -1,13 +1,13 @@
-import { getComponent } from "../../entities/entity.manager";
-import { error } from "../../services/error";
-import { getStore } from "../../store";
-import { findTileByPosition } from "../tilemap/tilemap";
+import { getComponent } from '../../entities/entity.manager';
+import { error } from '../../services/error';
+import { getStore } from '../../store';
+import { findTileByPosition } from '../tilemap/tilemap';
 
 //#region HELPERS
 const sortTriggersByPriority = ({ triggerEntityIds }: { triggerEntityIds: string[] }) =>
     triggerEntityIds.sort((a, b) => {
-        const aTrigger = getComponent({ entityId: a, componentId: 'Trigger' });
-        const bTrigger = getComponent({ entityId: b, componentId: 'Trigger' });
+        const aTrigger = getComponent({ componentId: 'Trigger', entityId: a });
+        const bTrigger = getComponent({ componentId: 'Trigger', entityId: b });
         return bTrigger._priority - aTrigger._priority;
     });
 
@@ -16,8 +16,8 @@ const findPriorityTriggerEntityId = ({ triggerEntityIds }: { triggerEntityIds: s
 
 //#region SYSTEMS
 export const setTrigger = ({ entityId }: { entityId: string }) => {
-    const entityPosition = getComponent({ entityId, componentId: 'Position' });
-    const entityTrigger = getComponent({ entityId, componentId: 'Trigger' });
+    const entityPosition = getComponent({ componentId: 'Position', entityId });
+    const entityTrigger = getComponent({ componentId: 'Trigger', entityId });
 
     for (const point of entityTrigger.points) {
         const pointTile = findTileByPosition({
@@ -32,29 +32,32 @@ export const setTrigger = ({ entityId }: { entityId: string }) => {
             }
         }
     }
-}
+};
 
 export const checkTrigger = ({ entityId }: { entityId?: string | null }) => {
     if (!(entityId)) entityId = getStore('playerId')
         ?? error({ message: 'Store playerId is undefined', where: checkTrigger.name });
 
-    const entityPosition = getComponent({ entityId, componentId: 'Position' });
+    const entityPosition = getComponent({ componentId: 'Position', entityId });
 
     const entityTile = findTileByPosition({
         x: entityPosition._x,
         y: entityPosition._y,
-    }) ?? error({ message: `Tile (${entityPosition._x}-${entityPosition._y}) does not exist`, where: checkTrigger.name });
+    }) ?? error({
+        message: `Tile (${entityPosition._x}-${entityPosition._y}) does not exist`,
+        where: checkTrigger.name,
+    });
 
     if (entityTile._entityTriggerIds.length === 0) {
         return null;
     }
 
     return findPriorityTriggerEntityId({ triggerEntityIds: entityTile._entityTriggerIds });
-}
+};
 
 export const destroyTrigger = ({ entityId }: { entityId: string }) => {
-    const entityPosition = getComponent({ entityId, componentId: 'Position' });
-    const entityTrigger = getComponent({ entityId, componentId: 'Trigger' });
+    const entityPosition = getComponent({ componentId: 'Position', entityId });
+    const entityTrigger = getComponent({ componentId: 'Trigger', entityId });
 
     for (const point of entityTrigger.points) {
         const pointTile = findTileByPosition({
