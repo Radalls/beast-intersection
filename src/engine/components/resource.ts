@@ -9,7 +9,7 @@ export type Resource = {
 };
 
 export enum ActivityTypes {
-    PICKUP = 'PICKUP',
+    ITEM = 'ITEM',
     BUG = 'BUG',
     FISH = 'FISH',
     CRAFT = 'CRAFT',
