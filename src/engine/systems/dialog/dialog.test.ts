@@ -6,10 +6,10 @@ jest.mock('../../../render/events/event.ts', () => ({
     event: jest.fn(),
 }));
 
-import { loadDialog } from './__mocks__/dialog.data';
+import { loadDialogData } from './__mocks__/dialog.data';
 
 describe('Dialog system', () => {
-    const entityId = createEntity('Entity');
+    const entityId = createEntity({ entityName: 'Entity' });
     const dialog: Dialog = {
         _: 'Dialog',
         texts: [],
@@ -21,7 +21,7 @@ describe('Dialog system', () => {
             component: dialog,
         });
 
-        loadDialog({ entityId });
+        loadDialogData({ entityId });
     });
 
     beforeEach(() => {
