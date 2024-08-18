@@ -1,11 +1,11 @@
-import { getComponent } from "../../entities/entity.manager";
-import { error } from "../../services/error";
-import { findTileByPosition } from "../tilemap/tilemap";
+import { getComponent } from '../../entities/entity.manager';
+import { error } from '../../services/error';
+import { findTileByPosition } from '../tilemap/tilemap';
 
 //#region ACTIONS
 export const setCollider = ({ entityId }: { entityId: string }) => {
-    const entityPosition = getComponent({ entityId, componentId: 'Position' });
-    const entityCollider = getComponent({ entityId, componentId: 'Collider' });
+    const entityPosition = getComponent({ componentId: 'Position', entityId });
+    const entityCollider = getComponent({ componentId: 'Collider', entityId });
 
     for (const point of entityCollider.points) {
         const pointTile = findTileByPosition({
@@ -17,7 +17,7 @@ export const setCollider = ({ entityId }: { entityId: string }) => {
             pointTile._entityColliderIds.push(entityId);
         }
     }
-}
+};
 
 export const checkCollider = ({ x, y }: {
     x: number,
@@ -31,11 +31,11 @@ export const checkCollider = ({ x, y }: {
     }
 
     return false;
-}
+};
 
 export const destroyCollider = ({ entityId }: { entityId: string }) => {
-    const entityPosition = getComponent({ entityId, componentId: 'Position' });
-    const entityCollider = getComponent({ entityId, componentId: 'Collider' });
+    const entityPosition = getComponent({ componentId: 'Position', entityId });
+    const entityCollider = getComponent({ componentId: 'Collider', entityId });
 
     for (const point of entityCollider.points) {
         const pointTile = findTileByPosition({
