@@ -1,6 +1,19 @@
-import { createEntity, PLAYER_ENTITY_NAME, TILEMAP_ENTITY_NAME } from "../entities/entity.manager";
-import { generateTileMap, setTile } from "../systems/tilemap/tilemap";
-import { addSprite, addPosition, addInventory, addTileMap, addResourceItem, addTrigger, addResourceBug, addCollider, addResourceFish, addDialog, addResourceCraft } from "./component";
+import { createEntity, PLAYER_ENTITY_NAME, TILEMAP_ENTITY_NAME } from '../entities/entity.manager';
+import { generateTileMap, setTile } from '../systems/tilemap/tilemap';
+
+import {
+    addSprite,
+    addPosition,
+    addInventory,
+    addTileMap,
+    addResourceItem,
+    addTrigger,
+    addResourceBug,
+    addCollider,
+    addResourceFish,
+    addDialog,
+    addResourceCraft,
+} from './component';
 
 export const createEntityPlayer = ({
     spriteHeight = 2,
@@ -8,18 +21,18 @@ export const createEntityPlayer = ({
     spritePath,
     positionX,
     positionY,
-    inventoryMaxSlots = 20
+    inventoryMaxSlots = 20,
 }: {
-    spriteHeight?: number,
-    spriteWidth?: number,
-    spritePath: string,
+    inventoryMaxSlots?: number,
     positionX: number,
     positionY: number,
-    inventoryMaxSlots?: number,
+    spriteHeight?: number,
+    spritePath: string,
+    spriteWidth?: number
 }) => {
     const entityId = createEntity({ entityName: PLAYER_ENTITY_NAME });
 
-    addSprite({ entityId, height: spriteHeight, width: spriteWidth, image: spritePath });
+    addSprite({ entityId, height: spriteHeight, image: spritePath, width: spriteWidth });
     addPosition({ entityId, x: positionX, y: positionY });
     addInventory({ entityId, maxSlots: inventoryMaxSlots });
 
@@ -45,17 +58,17 @@ export const createEntityResourceItem = ({
     resoureceItemName,
 }: {
     entityName: string,
-    spriteHeight?: number,
-    spriteWidth?: number,
-    spritePath: string,
     positionX: number,
     positionY: number,
     resourceIsTemporary?: boolean,
     resoureceItemName: string,
+    spriteHeight?: number,
+    spritePath: string,
+    spriteWidth?: number
 }) => {
     const entityId = createEntity({ entityName });
 
-    addSprite({ entityId, height: spriteHeight, width: spriteWidth, image: spritePath });
+    addSprite({ entityId, height: spriteHeight, image: spritePath, width: spriteWidth });
     addPosition({ entityId, x: positionX, y: positionY });
     addResourceItem({
         entityId,
@@ -81,28 +94,28 @@ export const createEntityResourceBug = ({
     resoureceItemName,
 }: {
     entityName: string,
-    spriteHeight?: number,
-    spriteWidth?: number,
-    spritePath: string,
     positionX: number,
     positionY: number,
-    resourceIsTemporary?: boolean,
     resourceActivityBugMaxHp: number,
     resourceActivityBugMaxNbErrors: number,
     resourceActivityBugSymbolInterval: number,
+    resourceIsTemporary?: boolean,
     resoureceItemName: string,
+    spriteHeight?: number,
+    spritePath: string,
+    spriteWidth?: number
 }) => {
     const entityId = createEntity({ entityName });
 
-    addSprite({ entityId, height: spriteHeight, width: spriteWidth, image: spritePath });
+    addSprite({ entityId, height: spriteHeight, image: spritePath, width: spriteWidth });
     addPosition({ entityId, x: positionX, y: positionY });
     addResourceBug({
         entityId,
         isTemporary: resourceIsTemporary,
+        itemName: resoureceItemName,
         maxHp: resourceActivityBugMaxHp,
         maxNbErrors: resourceActivityBugMaxNbErrors,
         symbolInterval: resourceActivityBugSymbolInterval,
-        itemName: resoureceItemName,
     });
     addTrigger({ entityId });
 
@@ -126,34 +139,34 @@ export const createEntityResourceFish = ({
     resoureceItemName,
 }: {
     entityName: string,
-    spriteHeight?: number,
-    spriteWidth?: number,
-    spritePath: string,
     positionX: number,
     positionY: number,
-    resourceIsTemporary?: boolean,
     resourceActivityFishDamage: number,
-    resourceActivityFishMaxHp: number,
     resourceActivityFishFrenzyDuration: number,
     resourceActivityFishFrenzyInterval: number,
+    resourceActivityFishMaxHp: number,
     resourceActivityFishRodDamage: number,
     resourceActivityFishRodMaxTension: number,
+    resourceIsTemporary?: boolean,
     resoureceItemName: string,
+    spriteHeight?: number,
+    spritePath: string,
+    spriteWidth?: number
 }) => {
     const entityId = createEntity({ entityName });
 
-    addSprite({ entityId, height: spriteHeight, width: spriteWidth, image: spritePath });
+    addSprite({ entityId, height: spriteHeight, image: spritePath, width: spriteWidth });
     addPosition({ entityId, x: positionX, y: positionY });
     addResourceFish({
         entityId,
-        isTemporary: resourceIsTemporary,
         fishDamage: resourceActivityFishDamage,
         fishMaxHp: resourceActivityFishMaxHp,
         frenzyDuration: resourceActivityFishFrenzyDuration,
         frenzyInterval: resourceActivityFishFrenzyInterval,
+        isTemporary: resourceIsTemporary,
+        itemName: resoureceItemName,
         rodDamage: resourceActivityFishRodDamage,
         rodMaxTension: resourceActivityFishRodMaxTension,
-        itemName: resoureceItemName,
     });
     addCollider({ entityId });
     addTrigger({
@@ -178,15 +191,15 @@ export const createEntityNpc = ({
     positionY,
 }: {
     entityName: string,
-    spriteHeight?: number,
-    spriteWidth?: number,
-    spritePath: string,
     positionX: number,
     positionY: number,
+    spriteHeight?: number,
+    spritePath: string,
+    spriteWidth?: number
 }) => {
     const entityId = createEntity({ entityName });
 
-    addSprite({ entityId, height: spriteHeight, width: spriteWidth, image: spritePath });
+    addSprite({ entityId, height: spriteHeight, image: spritePath, width: spriteWidth });
     addPosition({ entityId, x: positionX, y: positionY });
     addDialog({ entityId });
     addCollider({ entityId });
@@ -214,17 +227,17 @@ export const createEntityResourceCraft = ({
     resourceMaxNbErrors = 0,
 }: {
     entityName: string,
-    spriteHeight?: number,
-    spriteWidth?: number,
-    spritePath: string,
     positionX: number,
     positionY: number,
     resourceIsTemporary?: boolean,
     resourceMaxNbErrors?: number,
+    spriteHeight?: number,
+    spritePath: string,
+    spriteWidth?: number
 }) => {
     const entityId = createEntity({ entityName });
 
-    addSprite({ entityId, height: spriteHeight, width: spriteWidth, image: spritePath });
+    addSprite({ entityId, height: spriteHeight, image: spritePath, width: spriteWidth });
     addPosition({ entityId, x: positionX, y: positionY });
     addResourceCraft({ entityId, isTemporary: resourceIsTemporary, maxNbErrors: resourceMaxNbErrors });
     addCollider({ entityId });
