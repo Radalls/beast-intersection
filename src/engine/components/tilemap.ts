@@ -12,8 +12,9 @@ export type Tile = {
     _entityIds: string[],
     _entityColliderIds: string[],
     _entityTriggerIds: string[],
+    _solid?: boolean,
     position: TilePosition,
-    sprite: TileSprite,
+    sprite?: TileSprite,
 };
 
 type TilePosition = Pick<Position, '_x' | '_y'>;
