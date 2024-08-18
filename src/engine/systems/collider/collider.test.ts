@@ -2,30 +2,31 @@ import { Collider } from "../../components/collider";
 import { Position } from "../../components/position";
 import { TileMap } from "../../components/tilemap";
 import { addComponent, createEntity } from "../../entities/entity.manager";
-import { generateTiles } from "../tilemap/tilemap";
+import { generateTileMap } from "../tilemap/tilemap";
 import { checkCollider, destroyCollider, setCollider } from "./collider";
 
+jest.mock('../tilemap/tilemap.data.ts');
 jest.mock('../../../render/events/event.ts', () => ({
     event: jest.fn(),
 }));
 
 describe('Trigger System', () => {
-    const tilemapEntityId = createEntity('TileMap');
-    const tilemap: TileMap = {
+    const tilemapEntityId = createEntity({ entityName: 'TileMap' });
+    const tileMap: TileMap = {
         _: 'TileMap',
         _height: 3,
         _width: 3,
         tiles: [],
     };
 
-    const playerEntityId = createEntity('Player');
+    const playerEntityId = createEntity({ entityName: 'Player' });
     const playerPosition: Position = {
         _: 'Position',
         _x: 0,
         _y: 0,
     };
 
-    const fishEntityId = createEntity('ResourceFish');
+    const fishEntityId = createEntity({ entityName: 'ResourceFish' });
     const fishPosition: Position = {
         _: 'Position',
         _x: 1,
@@ -36,12 +37,12 @@ describe('Trigger System', () => {
         points: [],
     };
 
-    beforeAll(() => {
+    beforeAll(async () => {
         addComponent({
             entityId: tilemapEntityId,
-            component: tilemap,
+            component: tileMap,
         });
-        generateTiles({ tilemapEntityId });
+        await generateTileMap({ tilemapEntityId, tileMapPath: 'mock-map' });
 
         addComponent({
             entityId: playerEntityId,
@@ -62,7 +63,7 @@ describe('Trigger System', () => {
         beforeEach(() => {
             fishCollider.points = [];
 
-            for (const tile of tilemap.tiles) {
+            for (const tile of tileMap.tiles) {
                 tile._entityColliderIds = [];
             }
         });
@@ -76,8 +77,8 @@ describe('Trigger System', () => {
 
             setCollider({ entityId: fishEntityId });
 
-            expect(tilemap.tiles[4]._entityColliderIds.length).toBe(1);
-            expect(tilemap.tiles[4]._entityColliderIds[0]).toBe(fishEntityId);
+            expect(tileMap.tiles[4]._entityColliderIds.length).toBe(1);
+            expect(tileMap.tiles[4]._entityColliderIds[0]).toBe(fishEntityId);
         });
 
         test('Should set collider points around entity', () => {
@@ -86,11 +87,11 @@ describe('Trigger System', () => {
 
             setCollider({ entityId: fishEntityId });
 
-            expect(tilemap.tiles[1]._entityColliderIds.length).toBe(1);
-            expect(tilemap.tiles[1]._entityColliderIds[0]).toBe(fishEntityId);
+            expect(tileMap.tiles[1]._entityColliderIds.length).toBe(1);
+            expect(tileMap.tiles[1]._entityColliderIds[0]).toBe(fishEntityId);
 
-            expect(tilemap.tiles[7]._entityColliderIds.length).toBe(1);
-            expect(tilemap.tiles[7]._entityColliderIds[0]).toBe(fishEntityId);
+            expect(tileMap.tiles[7]._entityColliderIds.length).toBe(1);
+            expect(tileMap.tiles[7]._entityColliderIds[0]).toBe(fishEntityId);
         });
 
         test('Should not set collider point if out of bounds', () => {
@@ -99,7 +100,7 @@ describe('Trigger System', () => {
             setCollider({ entityId: fishEntityId });
 
             // expect all tiles to have no collider point assigned
-            for (const tile of tilemap.tiles) {
+            for (const tile of tileMap.tiles) {
                 expect(tile._entityColliderIds.length).toBe(0);
             }
         });
@@ -150,7 +151,7 @@ describe('Trigger System', () => {
         test('Should destroy collider points', () => {
             destroyCollider({ entityId: fishEntityId });
 
-            expect(tilemap.tiles[4]._entityTriggerIds).not.toContain(fishEntityId);
+            expect(tileMap.tiles[4]._entityTriggerIds).not.toContain(fishEntityId);
         });
     });
 });
