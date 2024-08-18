@@ -1,10 +1,10 @@
 import { checkEntityId } from './entities/entity.manager';
 
 const store = {
-    playerId: '',
-    tilemapId: '',
     activityId: '',
     dialogId: '',
+    playerId: '',
+    tilemapId: '',
 };
 
 export const setStore = (key: keyof typeof store, value: string) => store[key] = value;
