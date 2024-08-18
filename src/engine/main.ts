@@ -1,6 +1,6 @@
-import { setState } from './state';
 import { getCycle, runCycle } from './cycle';
 import { createEntityTileMap } from './services/entity';
+import { setState } from './state';
 
 export const main = async () => {
     setState('isGameRunning', true);
