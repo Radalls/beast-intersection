@@ -1,38 +1,39 @@
-import { Dialog } from "../../engine/components/dialog";
-import { createEntity, destroyEntity, getEntity } from "./template";
+import { Dialog } from '../../engine/components/dialog';
+
+import { createEntity, destroyEntity, getEntity } from './template';
 
 //#region TEMPLATES
 export const startDialog = ({ entityId, dialog }: {
-    entityId: string,
     dialog: Dialog,
+    entityId: string
 }) => {
     const entityDialog = createEntity({
         entityId,
-        htmlId: `${entityId}-dialog`,
         htmlClass: 'dialog',
+        htmlId: `${entityId}-dialog`,
     });
 
     createEntity({
         entityId,
-        htmlId: `${entityId}-dialog-text`,
-        htmlClass: 'dialog-text',
-        htmlParent: entityDialog,
         htmlAbsolute: false,
+        htmlClass: 'dialog-text',
+        htmlId: `${entityId}-dialog-text`,
+        htmlParent: entityDialog,
     });
 
     createEntity({
         entityId,
-        htmlId: `${entityId}-dialog-text-options`,
         htmlClass: 'dialog-text-options',
+        htmlId: `${entityId}-dialog-text-options`,
         htmlParent: entityDialog,
     });
 
-    updateDialog({ entityId, dialog });
-}
+    updateDialog({ dialog, entityId });
+};
 
 export const updateDialog = ({ entityId, dialog }: {
-    entityId: string,
     dialog: Dialog,
+    entityId: string
 }) => {
     const entityDialogText = getEntity({ entityId: `${entityId}-dialog-text` });
     entityDialogText.textContent = dialog._currentValue ?? 'DIALOG TEXT ERROR';
@@ -47,10 +48,10 @@ export const updateDialog = ({ entityId, dialog }: {
             for (let i = 0; i < dialog._currentOptionsValues.length; i++) {
                 const entityDialogOption = createEntity({
                     entityId,
-                    htmlId: `${entityId}-dialog-text-options-${i}`,
-                    htmlClass: 'dialog-text-option',
-                    htmlParent: entityDialogTextOptions,
                     htmlAbsolute: false,
+                    htmlClass: 'dialog-text-option',
+                    htmlId: `${entityId}-dialog-text-options-${i}`,
+                    htmlParent: entityDialogTextOptions,
                 });
                 entityDialogOption.textContent = dialog._currentOptionsValues[i];
             }
@@ -61,7 +62,7 @@ export const updateDialog = ({ entityId, dialog }: {
             entityDialogOption.style.fontWeight = (i === dialog._currentOptionIndex) ? 'bold' : 'normal';
         }
     }
-}
+};
 
 const destroyDialogOptions = ({ entityId }: { entityId: string }) => {
     const entityDialogTextOptions = getEntity({ entityId: `${entityId}-dialog-text-options` });
@@ -70,10 +71,10 @@ const destroyDialogOptions = ({ entityId }: { entityId: string }) => {
             destroyEntity({ entityId: entityDialogTextOptions.children[0].id });
         }
     }
-}
+};
 
 export const endDialog = ({ entityId }: { entityId: string }) => {
     destroyDialogOptions({ entityId });
     destroyEntity({ entityId: `${entityId}-dialog` });
-}
+};
 //#endregion

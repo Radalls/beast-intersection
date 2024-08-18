@@ -1,7 +1,7 @@
-import { Sprite } from "../../engine/components/sprite";
-import { app } from "../main";
 import { Position } from '../../engine/components/position';
-import { error } from "../../engine/services/error";
+import { Sprite } from '../../engine/components/sprite';
+import { error } from '../../engine/services/error';
+import { app } from '../main';
 
 //#region CONSTANTS
 export const spritePath = new URL('../../assets/sprites', import.meta.url).pathname;
@@ -11,29 +11,29 @@ export const TILE_PIXEL_SIZE = 64;
 
 //#region HELPERS
 export const getSpritePath = (spriteName: string) => {
-    const spriteFolderPath = spriteName.replace(/^(.*?)(\/[^\/]+)?(\.[^\.\/]+)?$/, '$1').split('_')[0];
+    const spriteFolderPath = spriteName.replace(/^(.*?)(\/[^/]+)?(\.[^./]+)?$/, '$1').split('_')[0];
     return `${spritePath}/${spriteFolderPath}/${spriteName}.png`;
-}
+};
 
 export const getEntity = ({ entityId }: { entityId: string }) => {
     const entity = document.getElementById(entityId)
         ?? error({ message: `HTML Entity ${entityId} does not exist`, where: getEntity.name });
 
     return entity;
-}
+};
 
 export const checkEntity = ({ entityId }: { entityId: string }) => {
     return document.getElementById(entityId) !== null;
-}
+};
 //#endregion
 
 //#region TEMPLATES
 export const createEntity = ({ entityId, htmlId, htmlClass, htmlParent, htmlAbsolute = true }: {
     entityId: string,
-    htmlId?: string,
-    htmlClass?: string,
-    htmlParent?: HTMLElement,
     htmlAbsolute?: boolean,
+    htmlClass?: string,
+    htmlId?: string,
+    htmlParent?: HTMLElement
 }) => {
     const entity = document.createElement('div');
 
@@ -65,7 +65,8 @@ export const updatePosition = ({ entityId, position }: {
     const entity = getEntity({ entityId });
 
     entity.style.left = `${position._x * TILE_PIXEL_SIZE + TILE_PIXEL_SIZE}px`;
-    entity.style.top = `${position._y * TILE_PIXEL_SIZE + TILE_PIXEL_SIZE - (((parseInt(entity.style.height) / TILE_PIXEL_SIZE) - 1) * TILE_PIXEL_SIZE)}px`;
+    entity.style.top = `${position._y * TILE_PIXEL_SIZE + TILE_PIXEL_SIZE
+        - (((parseInt(entity.style.height) / TILE_PIXEL_SIZE) - 1) * TILE_PIXEL_SIZE)}px`;
     entity.style.zIndex = `${position._y}`;
 };
 

@@ -1,5 +1,6 @@
-import { Inventory } from "../../engine/components/inventory";
-import { checkEntity, createEntity, destroyEntity, getEntity, getSpritePath } from "./template";
+import { Inventory } from '../../engine/components/inventory';
+
+import { checkEntity, createEntity, destroyEntity, getEntity, getSpritePath } from './template';
 
 //#region CONSTANTS
 const INVENTORY_SLOT_SIZE = 64;
@@ -13,8 +14,8 @@ export const createInventory = ({ entityId, inventory }: {
 }) => {
     const entityInventory = createEntity({
         entityId,
-        htmlId: `${entityId}-inventory`,
         htmlClass: 'inventory',
+        htmlId: `${entityId}-inventory`,
     });
 
     const inventoryWidth = INVENTORY_SLOTS_PER_ROW * INVENTORY_SLOT_SIZE + (INVENTORY_SLOTS_PER_ROW - 1) * 2;
@@ -25,19 +26,19 @@ export const createInventory = ({ entityId, inventory }: {
     for (let i = 0; i < inventory._maxSlots; i++) {
         createEntity({
             entityId,
-            htmlId: `${entityId}-inventory-slot-${i}`,
-            htmlClass: 'inventory-slot',
-            htmlParent: entityInventory,
             htmlAbsolute: false,
+            htmlClass: 'inventory-slot',
+            htmlId: `${entityId}-inventory-slot-${i}`,
+            htmlParent: entityInventory,
         });
     }
-}
+};
 
 export const displayInventory = ({ entityId }: { entityId: string }) => {
     const entityInventory = getEntity({ entityId: `${entityId}-inventory` });
 
     entityInventory.style.display = (entityInventory.style.display === 'flex') ? 'none' : 'flex';
-}
+};
 
 export const updateInventory = ({ entityId, inventory }: {
     entityId: string,
@@ -46,21 +47,25 @@ export const updateInventory = ({ entityId, inventory }: {
     clearInventory({ entityId });
 
     for (const slot of inventory.slots) {
-        const entityInventorySlot = getEntity({ entityId: `${entityId}-inventory-slot-${inventory.slots.indexOf(slot)}` });
+        const entityInventorySlot = getEntity({
+            entityId: `${entityId}-inventory-slot-${inventory.slots.indexOf(slot)}`,
+        });
         entityInventorySlot.style.backgroundImage = `url(${getSpritePath(slot.item.sprite._image)})`;
 
-        const entityInventorySlotAmount = checkEntity({ entityId: `${entityId}-inventory-slot-${inventory.slots.indexOf(slot)}-amount` })
+        const entityInventorySlotAmount = checkEntity({
+            entityId: `${entityId}-inventory-slot-${inventory.slots.indexOf(slot)}-amount`,
+        })
             ? getEntity({ entityId: `${entityId}-inventory-slot-${inventory.slots.indexOf(slot)}-amount` })
             : createEntity({
                 entityId,
-                htmlId: `${entityId}-inventory-slot-${inventory.slots.indexOf(slot)}-amount`,
                 htmlClass: 'inventory-slot-amount',
+                htmlId: `${entityId}-inventory-slot-${inventory.slots.indexOf(slot)}-amount`,
                 htmlParent: entityInventorySlot,
             });
 
         entityInventorySlotAmount.textContent = `x${slot._amount.toString()}`;
     }
-}
+};
 
 const clearInventory = ({ entityId }: { entityId: string }) => {
     const entityInventory = getEntity({ entityId: `${entityId}-inventory` });
@@ -73,5 +78,5 @@ const clearInventory = ({ entityId }: { entityId: string }) => {
             destroyEntity({ entityId: `${entityId}-inventory-slot-${i}-amount` });
         }
     }
-}
+};
 //#endregion

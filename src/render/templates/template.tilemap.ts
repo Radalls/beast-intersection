@@ -1,13 +1,14 @@
-import { TileMap, Tile } from "../../engine/components/tilemap";
-import { getEntity, createEntity, getSpritePath, TILE_PIXEL_SIZE } from "./template";
+import { TileMap, Tile } from '../../engine/components/tilemap';
+
+import { getEntity, createEntity, getSpritePath, TILE_PIXEL_SIZE } from './template';
 
 //#region CONSTANTS
 //#endregion
 
 //#region TEMPLATES
 export const createTileMap = ({ tilemapEntityId, tilemap }: {
-    tilemapEntityId: string,
     tilemap: Pick<TileMap, '_height' | '_width'>,
+    tilemapEntityId: string
 }) => {
     const tilemapEntity = getEntity({ entityId: tilemapEntityId });
 
@@ -18,15 +19,15 @@ export const createTileMap = ({ tilemapEntityId, tilemap }: {
 };
 
 export const createTileMapTile = ({ tilemapEntityId, tile }: {
-    tilemapEntityId: string,
     tile: Pick<Tile, 'position' | 'sprite'>,
+    tilemapEntityId: string
 }) => {
     const tilemapEntity = getEntity({ entityId: tilemapEntityId });
 
     const tileEntity = createEntity({
         entityId: tilemapEntityId,
+        htmlClass: 'tile',
         htmlId: `${tilemapEntityId}-tile-${tile.position._x}-${tile.position._y}`,
-        htmlClass: "tile",
         htmlParent: tilemapEntity,
     });
 
