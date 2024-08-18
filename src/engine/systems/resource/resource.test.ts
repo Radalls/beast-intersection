@@ -8,18 +8,18 @@ jest.mock('../../../render/events/event.ts', () => ({
 }));
 
 describe('Resource System', () => {
-    const resourceEntityId = createEntity('ResourceWood1');
+    const resourceEntityId = createEntity({ entityName: 'ResourceWood1' });
     const resource: Resource = {
         _: 'Resource',
-        _activityType: ActivityTypes.PICKUP,
+        _activityType: ActivityTypes.ITEM,
         _isTemporary: false,
         item: {
             info: { _name: 'Wood1' },
-            sprite: { _image: 'item_wood1.png' },
+            sprite: { _image: 'item_wood1' },
         }
     };
 
-    const playerEntityId = createEntity('Player');
+    const playerEntityId = createEntity({ entityName: 'Player' });
     const playerInventory: Inventory = {
         _: 'Inventory',
         _maxSlots: 3,
@@ -43,8 +43,8 @@ describe('Resource System', () => {
             expect(typeof useResource).toBe('function');
         });
 
-        test('Should use temp pickup resource', () => {
-            const temporaryResourceEntityId = createEntity('TemporaryResource');
+        test('Should use temp item resource', () => {
+            const temporaryResourceEntityId = createEntity({ entityName: 'TemporaryResource' });
 
             addComponent({
                 entityId: temporaryResourceEntityId,
@@ -61,7 +61,7 @@ describe('Resource System', () => {
         });
 
         test('Should use bug resource', () => {
-            const bugResourceEntityId = createEntity('ResourceBug');
+            const bugResourceEntityId = createEntity({ entityName: 'ResourceBug' });
 
             addComponent({
                 entityId: bugResourceEntityId,
