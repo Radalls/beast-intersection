@@ -2,22 +2,23 @@ import { Position } from "../../components/position";
 import { Sprite } from "../../components/sprite";
 import { TileMap } from "../../components/tilemap";
 import { addComponent, createEntity } from "../../entities/entity.manager";
-import { generateTiles, setTile, updateTile } from "./tilemap";
+import { generateTileMap, setTile, updateTile } from "./tilemap";
 
+jest.mock('./tilemap.data.ts');
 jest.mock('../../../render/events/event.ts', () => ({
     event: jest.fn(),
 }));
 
 describe('TileMap System', () => {
-    const tilemapEntityId = createEntity('TileMap');
-    const tilemap: TileMap = {
+    const tilemapEntityId = createEntity({ entityName: 'TileMap' });
+    const tileMap: TileMap = {
         _: 'TileMap',
-        _height: 3,
-        _width: 3,
+        _height: 0,
+        _width: 0,
         tiles: [],
     };
 
-    const playerEntityId = createEntity('Player');
+    const playerEntityId = createEntity({ entityName: 'Player' });
     const playerPosition: Position = {
         _: 'Position',
         _x: 1,
@@ -35,7 +36,7 @@ describe('TileMap System', () => {
     beforeAll(() => {
         addComponent({
             entityId: tilemapEntityId,
-            component: tilemap,
+            component: tileMap,
         });
 
         addComponent({
@@ -48,36 +49,39 @@ describe('TileMap System', () => {
         });
     });
 
-    describe(generateTiles.name, () => {
+    describe(generateTileMap.name, () => {
         afterAll(() => {
-            tilemap.tiles = [];
+            tileMap.tiles = [];
         });
 
         test('Should be a function', () => {
-            expect(typeof generateTiles).toBe('function');
+            expect(typeof generateTileMap).toBe('function');
         });
 
-        test('Should generate tiles', () => {
-            generateTiles({ tilemapEntityId });
+        test('Should generate tiles', async () => {
+            await generateTileMap({ tilemapEntityId, tileMapPath: 'mock-map' });
 
-            expect(tilemap.tiles.length).toBe(9);
-            expect(tilemap.tiles[0]._entityIds.length).toBe(0);
-            expect(tilemap.tiles[0].position._x).toBe(0);
-            expect(tilemap.tiles[0].position._y).toBe(0);
-            expect(tilemap.tiles[playerStartTileId].position._x).toBe(1);
-            expect(tilemap.tiles[playerStartTileId].position._y).toBe(1);
-            expect(tilemap.tiles[tilemap.tiles.length - 1].position._x).toBe(2);
-            expect(tilemap.tiles[tilemap.tiles.length - 1].position._y).toBe(2);
+            expect(tileMap._height).toBe(3);
+            expect(tileMap._width).toBe(3);
+            expect(tileMap.tiles.length).toBe(9);
+            expect(tileMap.tiles[0]._entityIds.length).toBe(0);
+            expect(tileMap.tiles[0].position._x).toBe(0);
+            expect(tileMap.tiles[0].position._y).toBe(0);
+            expect(tileMap.tiles[playerStartTileId].position._x).toBe(1);
+            expect(tileMap.tiles[playerStartTileId].position._y).toBe(1);
+            expect(tileMap.tiles[playerStartTileId]._entityIds.length).toBe(1);
+            expect(tileMap.tiles[tileMap.tiles.length - 1].position._x).toBe(2);
+            expect(tileMap.tiles[tileMap.tiles.length - 1].position._y).toBe(2);
         });
     });
 
     describe(setTile.name, () => {
-        beforeAll(() => {
-            generateTiles({ tilemapEntityId });
+        beforeAll(async () => {
+            await generateTileMap({ tilemapEntityId, tileMapPath: 'mock-map' });
         });
 
         beforeEach(() => {
-            tilemap.tiles.forEach(tile => tile._entityIds = []);
+            tileMap.tiles.forEach(tile => tile._entityIds = []);
             playerPosition._x = 1;
             playerPosition._y = 1;
         });
@@ -101,18 +105,18 @@ describe('TileMap System', () => {
                 entityId: playerEntityId,
             });
 
-            expect(tilemap.tiles[playerStartTileId]._entityIds).toContain(playerEntityId);
+            expect(tileMap.tiles[playerStartTileId]._entityIds).toContain(playerEntityId);
         });
     });
 
     describe(updateTile.name, () => {
-        beforeAll(() => {
-            generateTiles({ tilemapEntityId });
+        beforeAll(async () => {
+            await generateTileMap({ tilemapEntityId, tileMapPath: 'mock-map' });
         });
 
         beforeEach(() => {
-            tilemap.tiles.forEach(tile => tile._entityIds = []);
-            tilemap.tiles[playerStartTileId]._entityIds = [playerEntityId];
+            tileMap.tiles.forEach(tile => tile._entityIds = []);
+            tileMap.tiles[playerStartTileId]._entityIds = [playerEntityId];
             playerPosition._x = 1;
             playerPosition._y = 1;
         });
@@ -137,6 +141,32 @@ describe('TileMap System', () => {
             })).toThrow();
         });
 
+        test('Should throw if target tile is solid', () => {
+            tileMap.tiles[1]._solid = true;
+
+            expect(() => updateTile({
+                tilemapEntityId,
+                entityId: playerEntityId,
+                targetX: 1,
+                targetY: 0,
+            })).toThrow();
+
+            tileMap.tiles[1]._solid = false;
+        });
+
+        test('Should throw if target tile has a collider entity inside it', () => {
+            tileMap.tiles[1]._entityColliderIds = ['mockColliderId'];
+
+            expect(() => updateTile({
+                tilemapEntityId,
+                entityId: playerEntityId,
+                targetX: 1,
+                targetY: 0,
+            })).toThrow();
+
+            tileMap.tiles[1]._entityColliderIds = [];
+        });
+
         test('Should update tile', () => {
             updateTile({
                 tilemapEntityId,
@@ -145,8 +175,8 @@ describe('TileMap System', () => {
                 targetY: playerPosition._y,
             });
 
-            expect(tilemap.tiles[5]._entityIds).toContain(playerEntityId);
-            expect(tilemap.tiles[playerStartTileId]._entityIds).not.toContain(playerEntityId);
+            expect(tileMap.tiles[5]._entityIds).toContain(playerEntityId);
+            expect(tileMap.tiles[playerStartTileId]._entityIds).not.toContain(playerEntityId);
             expect(playerPosition._x).toBe(2);
             expect(playerPosition._y).toBe(1);
         });
