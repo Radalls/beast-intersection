@@ -1,10 +1,12 @@
-import { event } from "../../render/events/event";
-import { Component } from "../components/@component";
-import { EventTypes } from "../event";
-import { setStore } from "../store";
-import { Entity } from "./entity";
-import { error } from "../services/error";
 import { v4 as uuidv4 } from 'uuid';
+
+import { event } from '../../render/events/event';
+import { Component } from '../components/@component';
+import { EventTypes } from '../event';
+import { error } from '../services/error';
+import { setStore } from '../store';
+
+import { Entity } from './entity';
 
 export const entities: Record<string, Entity> = {};
 
@@ -17,17 +19,17 @@ export const PLAYER_ENTITY_NAME = 'Player';
 export const getEntity = (entityId: string) => entities[entityId] ? entities[entityId] : null;
 export const checkEntityId = (entityId: string) => entities[entityId] ? entityId : null;
 
-export const generateEntityId = (entityId: string) => `${entityId}-${uuidv4()}`
+export const generateEntityId = (entityId: string) => `${entityId}-${uuidv4()}`;
 
 export const checkComponent = <T extends keyof Component>({ entityId, componentId }: {
-    entityId: string,
     componentId: T,
+    entityId: string
 }) => {
     const entity = getEntity(entityId)
         ?? error({ message: `Entity ${entityId} does not exist`, where: checkComponent.name });
 
     return entity[componentId] ? componentId : null;
-}
+};
 //#endregion
 
 //#region SERVICES
@@ -47,16 +49,16 @@ export const createEntity = ({ entityName }: { entityName: string }) => {
     }
 
     event({
-        type: EventTypes.ENTITY_CREATE,
         entityId,
+        type: EventTypes.ENTITY_CREATE,
     });
 
     return entityId;
-}
+};
 
 export const addComponent = <T extends keyof Component>({ entityId, component }: {
-    entityId: string,
     component: Component[T],
+    entityId: string
 }) => {
     const entity = getEntity(entityId)
         ?? error({ message: `Entity ${entityId} does not exist`, where: addComponent.name });
@@ -66,14 +68,17 @@ export const addComponent = <T extends keyof Component>({ entityId, component }:
 };
 
 export const getComponent = <T extends keyof Component>({ entityId, componentId }: {
-    entityId: string,
     componentId: T,
+    entityId: string
 }): Component[T] => {
     const entity = getEntity(entityId)
         ?? error({ message: `Entity ${entityId} does not exist`, where: getComponent.name });
 
     const component = entity[componentId]
-        ?? error({ message: `Component ${componentId} does not exist on entity ${entityId}`, where: getComponent.name });
+        ?? error({
+            message: `Component ${componentId} does not exist on entity ${entityId}`,
+            where: getComponent.name,
+        });
 
     return component;
 };
@@ -84,8 +89,8 @@ export const destroyEntity = ({ entityId }: {
     delete entities[entityId];
 
     event({
-        type: EventTypes.ENTITY_DESTROY,
         entityId,
+        type: EventTypes.ENTITY_DESTROY,
     });
-}
+};
 //#endregion
