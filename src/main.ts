@@ -1,5 +1,5 @@
-import { main as engineMain } from "./engine/main";
-import { main as renderMain } from "./render/main";
+import { main as engineMain } from './engine/main';
+import { main as renderMain } from './render/main';
 
 import './render/styles/activity.css';
 import './render/styles/inventory.css';
