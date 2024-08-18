@@ -1,16 +1,17 @@
-import { event } from "../../../render/events/event";
-import { ActivityBugData } from "../../components/resource";
-import { clearCycle, setCycle } from "../../cycle";
-import { getComponent } from "../../entities/entity.manager";
-import { EventInputMoveKeys, EventTypes } from "../../event";
-import { getState, setState } from "../../state";
-import { checkActivityId, endActivity, startActivity, winActivity } from "./activity";
+import { event } from '../../../render/events/event';
+import { ActivityBugData } from '../../components/resource';
+import { clearCycle, setCycle } from '../../cycle';
+import { getComponent } from '../../entities/entity.manager';
+import { EventInputMoveKeys, EventTypes } from '../../event';
+import { getState, setState } from '../../state';
+
+import { checkActivityId, endActivity, startActivity, winActivity } from './activity';
 
 //#region SERVICES
 export const startActivityBug = ({ activityId }: { activityId: string }) => {
     startActivity({ activityId });
 
-    const activityResource = getComponent({ entityId: activityId, componentId: 'Resource' });
+    const activityResource = getComponent({ componentId: 'Resource', entityId: activityId });
     const activityBugData = activityResource.activityData as ActivityBugData;
     activityBugData._hp = activityBugData._maxHp;
     activityBugData._nbErrors = 0;
@@ -21,16 +22,16 @@ export const startActivityBug = ({ activityId }: { activityId: string }) => {
     setCycle('activityBugTickInterval', activityBugData._symbolInterval);
 
     event({
-        type: EventTypes.ACTIVITY_BUG_START,
-        entityId: activityId,
         data: activityBugData,
+        entityId: activityId,
+        type: EventTypes.ACTIVITY_BUG_START,
     });
 };
 
 export const tickActivityBug = ({ activityId }: { activityId?: string | null }) => {
     activityId = checkActivityId({ activityId });
 
-    const activityResource = getComponent({ entityId: activityId, componentId: 'Resource' });
+    const activityResource = getComponent({ componentId: 'Resource', entityId: activityId });
     const activityBugData = activityResource.activityData as ActivityBugData;
     activityBugData._symbol = EventInputMoveKeys[Object.keys(EventInputMoveKeys)[
         Math.floor(Math.random() * Object.keys(EventInputMoveKeys).length)
@@ -42,11 +43,11 @@ export const tickActivityBug = ({ activityId }: { activityId?: string | null }) 
     }
 
     event({
-        type: EventTypes.ACTIVITY_BUG_UPDATE,
-        entityId: activityId,
         data: activityBugData,
+        entityId: activityId,
+        type: EventTypes.ACTIVITY_BUG_UPDATE,
     });
-}
+};
 
 export const playActivityBug = ({ activityId, symbol }: {
     activityId?: string | null,
@@ -54,7 +55,7 @@ export const playActivityBug = ({ activityId, symbol }: {
 }) => {
     activityId = checkActivityId({ activityId });
 
-    const activityResource = getComponent({ entityId: activityId, componentId: 'Resource' });
+    const activityResource = getComponent({ componentId: 'Resource', entityId: activityId });
     const activityBugData = activityResource.activityData as ActivityBugData;
     if (symbol === activityBugData._symbol && activityBugData._hp > 0) {
         activityBugData._hp -= 1;
@@ -79,11 +80,11 @@ export const playActivityBug = ({ activityId, symbol }: {
     }
 
     event({
-        type: EventTypes.ACTIVITY_BUG_UPDATE,
-        entityId: activityId,
         data: activityBugData,
+        entityId: activityId,
+        type: EventTypes.ACTIVITY_BUG_UPDATE,
     });
-}
+};
 
 export const endActivityBug = ({ activityId }: { activityId?: string | null }) => {
     activityId = checkActivityId({ activityId });
@@ -93,8 +94,8 @@ export const endActivityBug = ({ activityId }: { activityId?: string | null }) =
     clearCycle('activityBugTickInterval');
 
     event({
-        type: EventTypes.ACTIVITY_BUG_END,
         entityId: activityId,
+        type: EventTypes.ACTIVITY_BUG_END,
     });
-}
+};
 //#endregion
