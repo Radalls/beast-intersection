@@ -1,0 +1,18 @@
+[
+    {
+        "type": "ResourceBug",
+        "name": "Bug1",
+        "isTemporary": true,
+        "maxHp": 3,
+        "maxNbErrors": 3,
+        "symbolInterval": 2
+    },
+    {
+        "type": "ResourceBug",
+        "name": "Bug2",
+        "isTemporary": true,
+        "maxHp": 3,
+        "maxNbErrors": 1,
+        "symbolInterval": 2
+    }
+]

@@ -1,0 +1,12 @@
+[
+    {
+        "type": "ResourceItem",
+        "name": "Wood1",
+        "isTemporary": true
+    },
+    {
+        "type": "ResourceItem",
+        "name": "Rock1",
+        "isTemporary": true
+    }
+]
