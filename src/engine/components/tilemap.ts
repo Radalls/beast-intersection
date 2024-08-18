@@ -9,8 +9,8 @@ export type TileMap = {
 };
 
 export type Tile = {
-    _entityIds: string[],
     _entityColliderIds: string[],
+    _entityIds: string[],
     _entityTriggerIds: string[],
     _solid?: boolean,
     position: TilePosition,
