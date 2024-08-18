@@ -1,38 +1,41 @@
-import { createEntity, PLAYER_ENTITY_ID, TILEMAP_ENTITY_ID } from "../entities/entity.manager";
-import { setTile } from "../systems/tilemap/tilemap";
-import { addSprite, addPosition, addInventory, addTileMap, addResourcePickUp, addTrigger, addResourceBug, addCollider, addResourceFish, addDialog, addResourceCraft } from "./component";
+import { createEntity, PLAYER_ENTITY_NAME, TILEMAP_ENTITY_NAME } from "../entities/entity.manager";
+import { generateTileMap, setTile } from "../systems/tilemap/tilemap";
+import { addSprite, addPosition, addInventory, addTileMap, addResourceItem, addTrigger, addResourceBug, addCollider, addResourceFish, addDialog, addResourceCraft } from "./component";
 
 export const createEntityPlayer = ({
     spriteHeight = 2,
     spriteWidth = 1,
     spritePath,
-    positionX = 0,
-    positionY = 0,
+    positionX,
+    positionY,
     inventoryMaxSlots = 20
 }: {
     spriteHeight?: number,
     spriteWidth?: number,
     spritePath: string,
-    positionX?: number,
-    positionY?: number,
+    positionX: number,
+    positionY: number,
     inventoryMaxSlots?: number,
 }) => {
-    const entityId = PLAYER_ENTITY_ID;
-    createEntity(entityId);
+    const entityId = createEntity({ entityName: PLAYER_ENTITY_NAME });
+
     addSprite({ entityId, height: spriteHeight, width: spriteWidth, image: spritePath });
     addPosition({ entityId, x: positionX, y: positionY });
     addInventory({ entityId, maxSlots: inventoryMaxSlots });
+
     setTile({ entityId });
 };
 
-export const createEntityTileMap = () => {
-    const entityId = TILEMAP_ENTITY_ID;
-    createEntity(entityId);
+export const createEntityTileMap = async ({ tileMapPath }: { tileMapPath: string }) => {
+    const entityId = createEntity({ entityName: TILEMAP_ENTITY_NAME });
+
     addTileMap({ entityId });
+
+    await generateTileMap({ tileMapPath });
 };
 
-export const createEntityResourcePickUp = ({
-    entityId,
+export const createEntityResourceItem = ({
+    entityName,
     spriteHeight = 1,
     spriteWidth = 1,
     spritePath,
@@ -41,7 +44,7 @@ export const createEntityResourcePickUp = ({
     resourceIsTemporary = false,
     resoureceItemName,
 }: {
-    entityId: string,
+    entityName: string,
     spriteHeight?: number,
     spriteWidth?: number,
     spritePath: string,
@@ -50,20 +53,22 @@ export const createEntityResourcePickUp = ({
     resourceIsTemporary?: boolean,
     resoureceItemName: string,
 }) => {
-    createEntity(entityId);
+    const entityId = createEntity({ entityName });
+
     addSprite({ entityId, height: spriteHeight, width: spriteWidth, image: spritePath });
     addPosition({ entityId, x: positionX, y: positionY });
-    addResourcePickUp({
+    addResourceItem({
         entityId,
         isTemporary: resourceIsTemporary,
         itemName: resoureceItemName,
     });
     addTrigger({ entityId });
+
     setTile({ entityId });
 };
 
 export const createEntityResourceBug = ({
-    entityId,
+    entityName,
     spriteHeight = 1,
     spriteWidth = 1,
     spritePath,
@@ -75,7 +80,7 @@ export const createEntityResourceBug = ({
     resourceActivityBugSymbolInterval,
     resoureceItemName,
 }: {
-    entityId: string,
+    entityName: string,
     spriteHeight?: number,
     spriteWidth?: number,
     spritePath: string,
@@ -87,7 +92,8 @@ export const createEntityResourceBug = ({
     resourceActivityBugSymbolInterval: number,
     resoureceItemName: string,
 }) => {
-    createEntity(entityId);
+    const entityId = createEntity({ entityName });
+
     addSprite({ entityId, height: spriteHeight, width: spriteWidth, image: spritePath });
     addPosition({ entityId, x: positionX, y: positionY });
     addResourceBug({
@@ -99,11 +105,12 @@ export const createEntityResourceBug = ({
         itemName: resoureceItemName,
     });
     addTrigger({ entityId });
+
     setTile({ entityId });
 };
 
 export const createEntityResourceFish = ({
-    entityId,
+    entityName,
     spriteHeight = 1,
     spriteWidth = 1,
     spritePath,
@@ -118,7 +125,7 @@ export const createEntityResourceFish = ({
     resourceActivityFishRodMaxTension,
     resoureceItemName,
 }: {
-    entityId: string,
+    entityName: string,
     spriteHeight?: number,
     spriteWidth?: number,
     spritePath: string,
@@ -133,7 +140,8 @@ export const createEntityResourceFish = ({
     resourceActivityFishRodMaxTension: number,
     resoureceItemName: string,
 }) => {
-    createEntity(entityId);
+    const entityId = createEntity({ entityName });
+
     addSprite({ entityId, height: spriteHeight, width: spriteWidth, image: spritePath });
     addPosition({ entityId, x: positionX, y: positionY });
     addResourceFish({
@@ -157,31 +165,33 @@ export const createEntityResourceFish = ({
             { x: 0, y: 1 },
         ],
     });
+
     setTile({ entityId });
 };
 
 export const createEntityNpc = ({
-    entityId,
+    entityName,
     spriteHeight = 2,
     spriteWidth = 1,
     spritePath,
     positionX,
     positionY,
 }: {
-    entityId: string,
+    entityName: string,
     spriteHeight?: number,
     spriteWidth?: number,
     spritePath: string,
     positionX: number,
     positionY: number,
 }) => {
-    const npcEntityId = createEntity(entityId);
+    const entityId = createEntity({ entityName });
+
     addSprite({ entityId, height: spriteHeight, width: spriteWidth, image: spritePath });
     addPosition({ entityId, x: positionX, y: positionY });
-    addDialog({ entityId: npcEntityId });
-    addCollider({ entityId: npcEntityId });
+    addDialog({ entityId });
+    addCollider({ entityId });
     addTrigger({
-        entityId: npcEntityId,
+        entityId,
         points: [
             { x: -1, y: 0 },
             { x: 0, y: -1 },
@@ -189,29 +199,31 @@ export const createEntityNpc = ({
             { x: 0, y: 1 },
         ],
     });
-    setTile({ entityId: npcEntityId });
+
+    setTile({ entityId });
 };
 
 export const createEntityResourceCraft = ({
-    entityId,
+    entityName,
     spriteHeight = 1,
     spriteWidth = 1,
     spritePath,
     positionX,
     positionY,
     resourceIsTemporary = false,
-    resourceMaxNbErrors,
+    resourceMaxNbErrors = 0,
 }: {
-    entityId: string,
+    entityName: string,
     spriteHeight?: number,
     spriteWidth?: number,
     spritePath: string,
     positionX: number,
     positionY: number,
     resourceIsTemporary?: boolean,
-    resourceMaxNbErrors: number,
+    resourceMaxNbErrors?: number,
 }) => {
-    createEntity(entityId);
+    const entityId = createEntity({ entityName });
+
     addSprite({ entityId, height: spriteHeight, width: spriteWidth, image: spritePath });
     addPosition({ entityId, x: positionX, y: positionY });
     addResourceCraft({ entityId, isTemporary: resourceIsTemporary, maxNbErrors: resourceMaxNbErrors });
@@ -225,5 +237,6 @@ export const createEntityResourceCraft = ({
             { x: 0, y: 1 },
         ],
     });
+
     setTile({ entityId });
 };
