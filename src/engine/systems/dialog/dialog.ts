@@ -1,10 +1,10 @@
-import { getComponent } from "../../entities/entity.manager";
-import { error } from '../../services/error';
 import { event } from '../../../render/events/event';
+import { Dialog, DialogText } from '../../components/dialog';
+import { getComponent } from '../../entities/entity.manager';
 import { EventTypes } from '../../event';
-import { setState } from "../../state";
-import { clearStore, setStore } from "../../store";
-import { Dialog, DialogText } from "../../components/dialog";
+import { error } from '../../services/error';
+import { setState } from '../../state';
+import { clearStore, setStore } from '../../store';
 
 //#region CHECKS
 const invalidDialog = (dialog: Dialog) => !(dialog.texts.length) || !(dialog.texts.some((text) => text._id === 1));
@@ -23,7 +23,10 @@ const setDialogCurrentText = (entityId: string, dialog: Dialog, textIndex: numbe
     dialog._currentId = textIndex;
 
     const dialogCurrentText = getDialogCurrentText(dialog)
-        ?? error({ message: `DialogText ${entityId}-${dialog._currentId} not found`, where: setDialogCurrentText.name });
+        ?? error({
+            message: `DialogText ${entityId}-${dialog._currentId} not found`,
+            where: setDialogCurrentText.name,
+        });
 
     if (invalidDialogText(dialogCurrentText)) {
         error({ message: `DialogText ${entityId}-${dialog._currentId} is invalid`, where: setDialogCurrentText.name });
@@ -37,7 +40,7 @@ const setDialogCurrentText = (entityId: string, dialog: Dialog, textIndex: numbe
     }
 
     setDialogCurrentValues(dialog);
-}
+};
 
 const setDialogCurrentValues = (dialog: Dialog) => {
     dialog._currentValue = undefined;
@@ -48,15 +51,18 @@ const setDialogCurrentValues = (dialog: Dialog) => {
     dialog._currentOptionsValues = undefined;
     if (isDialogTextOptionsSet(dialogCurrentText)) {
         dialog._currentOptionsValues = dialogCurrentText._options.map((option) => getDialogText(dialog, option)?._value
-            ?? error({ message: `DialogText ${dialog._currentId} option ${option} not found`, where: setDialogCurrentValues.name }),
+            ?? error({
+                message: `DialogText ${dialog._currentId} option ${option} not found`,
+                where: setDialogCurrentValues.name,
+            }),
         );
     }
-}
+};
 //#endregion
 
 //#region SYSTEMS
 export const startDialog = ({ entityId }: { entityId: string }) => {
-    const entityDialog = getComponent({ entityId, componentId: 'Dialog' });
+    const entityDialog = getComponent({ componentId: 'Dialog', entityId });
     if (invalidDialog(entityDialog)) {
         error({ message: `Dialog ${entityId} is invalid`, where: startDialog.name });
     }
@@ -67,14 +73,14 @@ export const startDialog = ({ entityId }: { entityId: string }) => {
     setStore('dialogId', entityId);
 
     event({
-        type: EventTypes.DIALOG_START,
-        entityId,
         data: entityDialog,
+        entityId,
+        type: EventTypes.DIALOG_START,
     });
 };
 
 export const nextDialog = ({ entityId }: { entityId: string }) => {
-    const entityDialog = getComponent({ entityId, componentId: 'Dialog' });
+    const entityDialog = getComponent({ componentId: 'Dialog', entityId });
 
     const dialogPreviousText = getDialogCurrentText(entityDialog)
         ?? error({ message: `DialogText ${entityId}-${entityDialog._currentId} not found`, where: nextDialog.name });
@@ -98,42 +104,51 @@ export const nextDialog = ({ entityId }: { entityId: string }) => {
     setDialogCurrentText(entityId, entityDialog, dialogCurrentText._next);
 
     event({
-        type: EventTypes.DIALOG_UPDATE,
-        entityId,
         data: entityDialog,
+        entityId,
+        type: EventTypes.DIALOG_UPDATE,
     });
 };
 
 export const selectDialogOption = ({ entityId, offset }: { entityId: string, offset: 1 | -1 }) => {
-    const entityDialog = getComponent({ entityId, componentId: 'Dialog' });
+    const entityDialog = getComponent({ componentId: 'Dialog', entityId });
 
     if (!(entityDialog._currentOptionIndex)) {
         entityDialog._currentOptionIndex = 0;
     }
 
     const dialogCurrentText = getDialogCurrentText(entityDialog)
-        ?? error({ message: `DialogText ${entityId}-${entityDialog._currentId} not found`, where: selectDialogOption.name });
+        ?? error({
+            message: `DialogText ${entityId}-${entityDialog._currentId} not found`,
+            where: selectDialogOption.name,
+        });
 
     if (!(isDialogTextOptionsSet(dialogCurrentText))) {
-        error({ message: `DialogText ${entityId}-${entityDialog._currentId} options not found`, where: selectDialogOption.name });
+        error({
+            message: `DialogText ${entityId}-${entityDialog._currentId} options not found`,
+            where: selectDialogOption.name,
+        });
     }
 
     if (offset === -1) {
-        entityDialog._currentOptionIndex = Math.max(0, entityDialog._currentOptionIndex - 1)
+        entityDialog._currentOptionIndex = Math.max(0, entityDialog._currentOptionIndex - 1);
     }
     else if (offset === 1) {
-        entityDialog._currentOptionIndex = Math.min(dialogCurrentText._options.length - 1, entityDialog._currentOptionIndex + 1)
+        entityDialog._currentOptionIndex = Math.min(
+            dialogCurrentText._options.length - 1,
+            entityDialog._currentOptionIndex + 1,
+        );
     }
 
     event({
-        type: EventTypes.DIALOG_UPDATE,
-        entityId,
         data: entityDialog,
+        entityId,
+        type: EventTypes.DIALOG_UPDATE,
     });
 };
 
 export const endDialog = ({ entityId }: { entityId: string }) => {
-    const entityDialog = getComponent({ entityId, componentId: 'Dialog' });
+    const entityDialog = getComponent({ componentId: 'Dialog', entityId });
 
     entityDialog._currentId = undefined;
     entityDialog._currentOptionIndex = undefined;
@@ -142,8 +157,8 @@ export const endDialog = ({ entityId }: { entityId: string }) => {
     clearStore('dialogId');
 
     event({
-        type: EventTypes.DIALOG_END,
         entityId,
+        type: EventTypes.DIALOG_END,
     });
 };
 //#endregion SYSTEMS

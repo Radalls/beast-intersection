@@ -1,12 +1,12 @@
-import { addComponent, createEntity } from "../../entities/entity.manager";
 import { Dialog } from '../../components/dialog';
-import { endDialog, nextDialog, selectDialogOption, startDialog } from "./dialog";
+import { addComponent, createEntity } from '../../entities/entity.manager';
+
+import { loadDialogData } from './__mocks__/dialog.data';
+import { endDialog, nextDialog, selectDialogOption, startDialog } from './dialog';
 
 jest.mock('../../../render/events/event.ts', () => ({
     event: jest.fn(),
 }));
-
-import { loadDialogData } from './__mocks__/dialog.data';
 
 describe('Dialog system', () => {
     const entityId = createEntity({ entityName: 'Entity' });
@@ -17,8 +17,8 @@ describe('Dialog system', () => {
 
     beforeAll(() => {
         addComponent({
-            entityId,
             component: dialog,
+            entityId,
         });
 
         loadDialogData({ entityId });
