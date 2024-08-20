@@ -1,7 +1,7 @@
 import { Component } from './components/@component';
 import { ActivityData } from './components/resource';
 import { Tile } from './components/tilemap';
-import { checkComponent, getComponent } from './entities/entity.manager';
+import { checkComponent, getComponent } from './entities';
 import {
     playActivityBug,
     confirmActivityCraftRecipe,

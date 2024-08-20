@@ -1,7 +1,7 @@
 import { addItemToInventory, removeItemFromInventory } from './inventory';
 
 import { Inventory, Item } from '@/engine/components/inventory';
-import { addComponent, createEntity } from '@/engine/entities/entity.manager';
+import { addComponent, createEntity } from '@/engine/entities';
 
 // maxAmount is always 2
 vi.mock('./inventory.data');

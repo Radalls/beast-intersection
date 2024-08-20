@@ -1,4 +1,4 @@
-import { getComponent } from '@/engine/entities/entity.manager';
+import { getComponent } from '@/engine/entities';
 import { error } from '@/engine/services/error';
 import { getStore } from '@/engine/store';
 

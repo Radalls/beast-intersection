@@ -2,7 +2,7 @@ import { destroyResource, getResourceItem, useResource } from './resource';
 
 import { Inventory } from '@/engine/components/inventory';
 import { Resource, ActivityTypes } from '@/engine/components/resource';
-import { addComponent, createEntity, getEntity } from '@/engine/entities/entity.manager';
+import { addComponent, createEntity, getEntity } from '@/engine/entities';
 
 describe('Resource System', () => {
     const resourceEntityId = createEntity({ entityName: 'ResourceWood1' });

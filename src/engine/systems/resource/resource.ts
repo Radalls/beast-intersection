@@ -1,5 +1,5 @@
 import { ActivityTypes } from '@/engine/components/resource';
-import { getComponent, checkComponent, destroyEntity } from '@/engine/entities/entity.manager';
+import { getComponent, checkComponent, destroyEntity } from '@/engine/entities';
 import { startActivityBug, startActivityCraft, startActivityFish } from '@/engine/services/activity';
 import { error } from '@/engine/services/error';
 import { getStore } from '@/engine/store';

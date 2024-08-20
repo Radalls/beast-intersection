@@ -1,4 +1,4 @@
-import { getComponent } from '@/engine/entities/entity.manager';
+import { getComponent } from '@/engine/entities';
 import { EventTypes } from '@/engine/event';
 import { error } from '@/engine/services/error';
 import { event } from '@/render/events';

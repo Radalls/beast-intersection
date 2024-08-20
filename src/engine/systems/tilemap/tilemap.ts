@@ -2,7 +2,7 @@ import { EntityDataTypes, loadTileMapData, loadTileMapEntityData, TileMapData } 
 import { findTileByPosition, findTileByEntityId } from './tilemap.utils';
 
 import { Tile, TileExit, TileMap } from '@/engine/components/tilemap';
-import { checkComponent, destroyAllEntities, getComponent } from '@/engine/entities/entity.manager';
+import { checkComponent, destroyAllEntities, getComponent } from '@/engine/entities';
 import { EventTypes } from '@/engine/event';
 import {
     createEntityNpc,

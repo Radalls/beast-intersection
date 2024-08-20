@@ -12,7 +12,7 @@ import {
     addResourceCraft,
 } from './component';
 
-import { createEntity, PLAYER_ENTITY_NAME, TILEMAP_ENTITY_NAME } from '@/engine/entities/entity.manager';
+import { createEntity, PLAYER_ENTITY_NAME, TILEMAP_ENTITY_NAME } from '@/engine/entities';
 import { generateTileMap, setTile } from '@/engine/systems/tilemap';
 
 export const createEntityPlayer = ({

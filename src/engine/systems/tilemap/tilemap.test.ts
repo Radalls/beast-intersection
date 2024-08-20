@@ -3,7 +3,7 @@ import { generateTileMap, setTile, updateTile } from './tilemap';
 import { Position } from '@/engine/components/position';
 import { Sprite } from '@/engine/components/sprite';
 import { TileMap } from '@/engine/components/tilemap';
-import { addComponent, createEntity } from '@/engine/entities/entity.manager';
+import { addComponent, createEntity } from '@/engine/entities';
 
 vi.mock('./tilemap.data.ts');
 

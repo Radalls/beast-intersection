@@ -2,7 +2,7 @@ import { checkActivityId, endActivity, startActivity, winActivity } from './acti
 
 import itemRecipes from '@/assets/items/item_recipes.json';
 import { ActivityCraftData, ActivityData } from '@/engine/components/resource';
-import { addComponent, getComponent } from '@/engine/entities/entity.manager';
+import { addComponent, getComponent } from '@/engine/entities';
 import { EventInputActionKeys, EventTypes } from '@/engine/event';
 import { error } from '@/engine/services/error';
 import { getState, setState } from '@/engine/state';

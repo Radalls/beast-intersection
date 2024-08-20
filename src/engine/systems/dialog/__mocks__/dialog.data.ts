@@ -1,6 +1,6 @@
 import dialogData from './mock-dialog.json';
 
-import { getComponent } from '@/engine/entities/entity.manager';
+import { getComponent } from '@/engine/entities';
 
 export const loadDialogData = ({ entityId }: { entityId: string }) => {
     const entityDialog = getComponent({ componentId: 'Dialog', entityId });

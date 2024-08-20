@@ -1,5 +1,5 @@
 import { DialogText } from '@/engine/components/dialog';
-import { getComponent } from '@/engine/entities/entity.manager';
+import { getComponent } from '@/engine/entities';
 import { error } from '@/engine/services/error';
 
 const dialogRecords: Record<string, { default: DialogTextData[] }>

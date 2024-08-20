@@ -2,7 +2,7 @@ import { loadDialogData } from './__mocks__/dialog.data';
 import { endDialog, nextDialog, selectDialogOption, startDialog } from './dialog';
 
 import { Dialog } from '@/engine/components/dialog';
-import { addComponent, createEntity } from '@/engine/entities/entity.manager';
+import { addComponent, createEntity } from '@/engine/entities';
 
 describe('Dialog system', () => {
     const entityId = createEntity({ entityName: 'Entity' });

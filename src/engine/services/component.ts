@@ -12,7 +12,7 @@ import {
 import { Sprite } from '@/engine/components/sprite';
 import { TileMap } from '@/engine/components/tilemap';
 import { Trigger } from '@/engine/components/trigger';
-import { PLAYER_ENTITY_NAME, addComponent } from '@/engine/entities/entity.manager';
+import { PLAYER_ENTITY_NAME, addComponent } from '@/engine/entities';
 import { EventTypes } from '@/engine/event';
 import { loadDialogData } from '@/engine/systems/dialog/dialog.data';
 import { event } from '@/render/events';

@@ -2,7 +2,7 @@ import { checkActivityId, endActivity, startActivity, winActivity } from './acti
 
 import { ActivityBugData } from '@/engine/components/resource';
 import { clearCycle, setCycle } from '@/engine/cycle';
-import { getComponent } from '@/engine/entities/entity.manager';
+import { getComponent } from '@/engine/entities';
 import { EventInputMoveKeys, EventTypes } from '@/engine/event';
 import { getState, setState } from '@/engine/state';
 import { event } from '@/render/events';

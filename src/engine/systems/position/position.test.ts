@@ -1,7 +1,7 @@
 import { updatePosition } from './position';
 
 import { Position } from '@/engine/components/position';
-import { addComponent, createEntity } from '@/engine/entities/entity.manager';
+import { addComponent, createEntity } from '@/engine/entities';
 
 describe('Position System', () => {
     const entityId = createEntity({ entityName: 'Entity' });

@@ -3,7 +3,7 @@ import { checkTrigger, destroyTrigger, setTrigger } from './trigger';
 import { Position } from '@/engine/components/position';
 import { TileMap } from '@/engine/components/tilemap';
 import { Trigger } from '@/engine/components/trigger';
-import { addComponent, createEntity } from '@/engine/entities/entity.manager';
+import { addComponent, createEntity } from '@/engine/entities';
 import { generateTileMap } from '@/engine/systems/tilemap';
 
 vi.mock('../tilemap/tilemap.data.ts');

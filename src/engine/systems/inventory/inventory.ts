@@ -1,7 +1,7 @@
 import { findItemRule } from './inventory.data';
 
 import { Inventory, Item } from '@/engine/components/inventory';
-import { getComponent } from '@/engine/entities/entity.manager';
+import { getComponent } from '@/engine/entities';
 import { EventTypes } from '@/engine/event';
 import { error } from '@/engine/services/error';
 import { event } from '@/render/events';

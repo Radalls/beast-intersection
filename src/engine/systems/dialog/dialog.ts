@@ -1,5 +1,5 @@
 import { Dialog, DialogText } from '@/engine/components/dialog';
-import { getComponent } from '@/engine/entities/entity.manager';
+import { getComponent } from '@/engine/entities';
 import { EventTypes } from '@/engine/event';
 import { error } from '@/engine/services/error';
 import { setState } from '@/engine/state';
