@@ -13,8 +13,15 @@ export type Tile = {
     _entityIds: string[],
     _entityTriggerIds: string[],
     _solid?: boolean,
+    exits?: TileExit[],
     position: TilePosition,
     sprite: TileSprite,
+};
+
+export type TileExit = {
+    _direction: 'up' | 'down' | 'left' | 'right',
+    _targetMap: string,
+    targetPosition: TilePosition,
 };
 
 type TilePosition = Pick<Position, '_x' | '_y'>;
