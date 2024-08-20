@@ -1,24 +1,24 @@
-import { event } from '../render/events/event';
-
 import { Component } from './components/@component';
 import { ActivityData } from './components/resource';
 import { Tile } from './components/tilemap';
-import { getComponent, checkComponent } from './entities/entity.manager';
-import { playActivityBug } from './services/activity/activity.bug';
+import { checkComponent, getComponent } from './entities/entity.manager';
 import {
+    playActivityBug,
     confirmActivityCraftRecipe,
     endActivityCraft,
     playActivityCraft,
     selectActivityCraftRecipe,
-} from './services/activity/activity.craft';
-import { playActivityFish } from './services/activity/activity.fish';
+    playActivityFish,
+} from './services/activity';
 import { error } from './services/error';
 import { getState, setState } from './state';
 import { getStore } from './store';
-import { nextDialog, selectDialogOption, startDialog } from './systems/dialog/dialog';
-import { useResource } from './systems/resource/resource';
-import { updateTile } from './systems/tilemap/tilemap';
-import { checkTrigger } from './systems/trigger/trigger';
+import { nextDialog, selectDialogOption, startDialog } from './systems/dialog';
+import { useResource } from './systems/resource';
+import { updateTile } from './systems/tilemap';
+import { checkTrigger } from './systems/trigger';
+
+import { event } from '@/render/events';
 
 export type Event<K extends keyof Component = keyof Component> = {
     data?: EventData<K>,
@@ -76,6 +76,7 @@ export enum EventTypes {
     /* Tilemap */
     TILEMAP_CREATE = 'TILEMAP_CREATE',
     TILEMAP_TILE_CREATE = 'TILEMAP_TILE_CREATE',
+    TILEMAP_TILE_DESTROY = 'TILEMAP_TILE_DESTROY',
 }
 
 export const onInputKeyDown = (inputKey: EventInputActionKeys | EventInputMoveKeys) => {
