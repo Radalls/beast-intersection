@@ -1,13 +1,19 @@
 import { getCycle, runCycle } from './cycle';
-import { createEntityTileMap } from './services/entity';
+import { createEntityPlayer, createEntityTileMap } from './services/entity';
 import { setState } from './state';
 
-export const main = async () => {
+export const main = () => {
     setState('isGameRunning', true);
 
     setInterval(() => {
         runCycle();
     }, getCycle('deltaTime') * 1000);
 
-    await createEntityTileMap({ tileMapPath: 'map1' });
+    createEntityTileMap({ tileMapName: 'map1' });
+
+    createEntityPlayer({
+        positionX: 3,
+        positionY: 3,
+        spritePath: 'player',
+    });
 };
