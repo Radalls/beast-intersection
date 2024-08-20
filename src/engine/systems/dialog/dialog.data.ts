@@ -1,35 +1,35 @@
-import { getComponent } from '../../entities/entity.manager';
+import { DialogText } from '@/engine/components/dialog';
+import { getComponent } from '@/engine/entities/entity.manager';
+import { error } from '@/engine/services/error';
+
+const dialogRecords: Record<string, { default: DialogTextData[] }>
+    = import.meta.glob('../../../assets/dialogs/*.json', { eager: true });
 
 //#region TYPES
 export type DialogTextData = {
     id: number,
-    next: number | null,
+    next?: number,
     options: number[],
     value: string
 };
 //#endregion
 
 //#region DATA
-export const loadDialogData = async ({ entityId }: { entityId: string }) => {
+export const loadDialogData = ({ entityId }: { entityId: string }) => {
     const entityDialog = getComponent({ componentId: 'Dialog', entityId });
+    const dialogPath = `../../../assets/dialogs/${entityId.split('-')[0].toLowerCase()}.json`;
+    const dialogData = dialogRecords[dialogPath].default
+        ?? error({ message: `DialogData for ${entityId} not found`, where: loadDialogData.name });
 
-    try {
-        const { default: dialogData } = await import(
-            `../../../assets/dialogs/${entityId.split('-')[0].toLowerCase()}.json`,
-        );
+    entityDialog.texts = dialogData.map((dialogText: DialogTextData) => {
+        const text: DialogText = {
+            _id: dialogText.id,
+            _next: dialogText.next,
+            _options: dialogText.options,
+            _value: dialogText.value,
+        };
 
-        entityDialog.texts = dialogData.map((dialogText: DialogTextData) => {
-            const { id, value, next, options } = dialogText;
-
-            return {
-                _id: id,
-                _next: next,
-                _options: options,
-                _value: value,
-            };
-        });
-    } catch (e) {
-        console.error(e);
-    }
+        return text;
+    });
 };
 //#endregion
