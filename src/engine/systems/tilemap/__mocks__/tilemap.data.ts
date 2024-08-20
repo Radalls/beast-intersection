@@ -6,12 +6,19 @@ export type TileMapData = {
         name: string,
         type: string,
         x: number,
-        y: number
+        y: number,
     }[],
     height: number,
     id: number,
     name: string,
     tiles: {
+        exits?: {
+            direction: 'up' | 'down' | 'left' | 'right',
+            map: string,
+            x: number,
+            y: number
+        }[],
+        solid?: boolean,
         sprite: string,
         x: number,
         y: number
@@ -36,9 +43,9 @@ export enum EntityDataTypes {
 //#endregion
 
 //#region DATA
-export const loadTileMapData = async () => tileMapData as TileMapData;
+export const loadTileMapData = () => tileMapData as TileMapData;
 
-export const loadTileMapEntityData = async () => {
+export const loadTileMapEntityData = () => {
     const mockEntityData: EntityData = {
         name: 'Player',
         type: 'Player',
