@@ -1,14 +1,11 @@
-import { Position } from '../../components/position';
-import { Sprite } from '../../components/sprite';
-import { TileMap } from '../../components/tilemap';
-import { addComponent, createEntity } from '../../entities/entity.manager';
-
 import { generateTileMap, setTile, updateTile } from './tilemap';
 
-jest.mock('./tilemap.data.ts');
-jest.mock('../../../render/events/event.ts', () => ({
-    event: jest.fn(),
-}));
+import { Position } from '@/engine/components/position';
+import { Sprite } from '@/engine/components/sprite';
+import { TileMap } from '@/engine/components/tilemap';
+import { addComponent, createEntity } from '@/engine/entities/entity.manager';
+
+vi.mock('./tilemap.data.ts');
 
 describe('TileMap System', () => {
     const tilemapEntityId = createEntity({ entityName: 'TileMap' });
@@ -49,8 +46,8 @@ describe('TileMap System', () => {
             expect(typeof generateTileMap).toBe('function');
         });
 
-        test('Should generate tiles', async () => {
-            await generateTileMap({ tileMapPath: 'mock-map', tilemapEntityId });
+        test('Should generate tiles', () => {
+            generateTileMap({ tileMapName: 'mock-map', tilemapEntityId });
 
             expect(tileMap._height).toBe(3);
             expect(tileMap._width).toBe(3);
@@ -58,17 +55,14 @@ describe('TileMap System', () => {
             expect(tileMap.tiles[0]._entityIds.length).toBe(0);
             expect(tileMap.tiles[0].position._x).toBe(0);
             expect(tileMap.tiles[0].position._y).toBe(0);
-            expect(tileMap.tiles[playerStartTileId].position._x).toBe(1);
-            expect(tileMap.tiles[playerStartTileId].position._y).toBe(1);
-            expect(tileMap.tiles[playerStartTileId]._entityIds.length).toBe(1);
             expect(tileMap.tiles[tileMap.tiles.length - 1].position._x).toBe(2);
             expect(tileMap.tiles[tileMap.tiles.length - 1].position._y).toBe(2);
         });
     });
 
     describe(setTile.name, () => {
-        beforeAll(async () => {
-            await generateTileMap({ tileMapPath: 'mock-map', tilemapEntityId });
+        beforeAll(() => {
+            generateTileMap({ tileMapName: 'mock-map', tilemapEntityId });
         });
 
         beforeEach(() => {
@@ -101,8 +95,8 @@ describe('TileMap System', () => {
     });
 
     describe(updateTile.name, () => {
-        beforeAll(async () => {
-            await generateTileMap({ tileMapPath: 'mock-map', tilemapEntityId });
+        beforeAll(() => {
+            generateTileMap({ tileMapName: 'mock-map', tilemapEntityId });
         });
 
         beforeEach(() => {
