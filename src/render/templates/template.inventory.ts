@@ -1,6 +1,6 @@
-import { Inventory } from '../../engine/components/inventory';
-
 import { checkEntity, createEntity, destroyEntity, getEntity, getSpritePath } from './template';
+
+import { Inventory } from '@/engine/components/inventory';
 
 //#region CONSTANTS
 const INVENTORY_SLOT_SIZE = 64;

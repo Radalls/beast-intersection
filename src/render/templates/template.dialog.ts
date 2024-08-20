@@ -1,6 +1,6 @@
-import { Dialog } from '../../engine/components/dialog';
-
 import { createEntity, destroyEntity, getEntity } from './template';
+
+import { Dialog } from '@/engine/components/dialog';
 
 //#region TEMPLATES
 export const startDialog = ({ entityId, dialog }: {

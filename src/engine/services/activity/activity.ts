@@ -1,11 +1,11 @@
-import { event } from '../../../render/events/event';
-import { setCycle } from '../../cycle';
-import { getComponent } from '../../entities/entity.manager';
-import { EventTypes } from '../../event';
-import { setState } from '../../state';
-import { getStore, clearStore, setStore } from '../../store';
-import { destroyResource, getResourceItem } from '../../systems/resource/resource';
-import { error } from '../error';
+import { setCycle } from '@/engine/cycle';
+import { getComponent } from '@/engine/entities/entity.manager';
+import { EventTypes } from '@/engine/event';
+import { error } from '@/engine/services/error';
+import { setState } from '@/engine/state';
+import { clearStore, getStore, setStore } from '@/engine/store';
+import { destroyResource, getResourceItem } from '@/engine/systems/resource';
+import { event } from '@/render/events';
 
 //#region HELPERS
 export const checkActivityId = ({ activityId }: { activityId: string | null | undefined }) => {

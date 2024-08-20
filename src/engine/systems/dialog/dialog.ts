@@ -1,10 +1,10 @@
-import { event } from '../../../render/events/event';
-import { Dialog, DialogText } from '../../components/dialog';
-import { getComponent } from '../../entities/entity.manager';
-import { EventTypes } from '../../event';
-import { error } from '../../services/error';
-import { setState } from '../../state';
-import { clearStore, setStore } from '../../store';
+import { Dialog, DialogText } from '@/engine/components/dialog';
+import { getComponent } from '@/engine/entities/entity.manager';
+import { EventTypes } from '@/engine/event';
+import { error } from '@/engine/services/error';
+import { setState } from '@/engine/state';
+import { setStore, clearStore } from '@/engine/store';
+import { event } from '@/render/events';
 
 //#region CHECKS
 const invalidDialog = (dialog: Dialog) => !(dialog.texts.length) || !(dialog.texts.some((text) => text._id === 1));

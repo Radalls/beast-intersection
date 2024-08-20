@@ -1,12 +1,8 @@
-import { Dialog } from '../../components/dialog';
-import { addComponent, createEntity } from '../../entities/entity.manager';
-
 import { loadDialogData } from './__mocks__/dialog.data';
 import { endDialog, nextDialog, selectDialogOption, startDialog } from './dialog';
 
-jest.mock('../../../render/events/event.ts', () => ({
-    event: jest.fn(),
-}));
+import { Dialog } from '@/engine/components/dialog';
+import { addComponent, createEntity } from '@/engine/entities/entity.manager';
 
 describe('Dialog system', () => {
     const entityId = createEntity({ entityName: 'Entity' });

@@ -1,15 +1,21 @@
-import { event } from '../../render/events/event';
-import { Collider } from '../components/collider';
-import { Dialog } from '../components/dialog';
-import { Inventory } from '../components/inventory';
-import { Position } from '../components/position';
-import { Resource, ActivityTypes, ActivityBugData, ActivityFishData, ActivityCraftData } from '../components/resource';
-import { Sprite } from '../components/sprite';
-import { TileMap } from '../components/tilemap';
-import { Trigger } from '../components/trigger';
-import { PLAYER_ENTITY_NAME, addComponent } from '../entities/entity.manager';
-import { EventTypes } from '../event';
-import { loadDialogData } from '../systems/dialog/dialog.data';
+import { Collider } from '@/engine/components/collider';
+import { Dialog } from '@/engine/components/dialog';
+import { Inventory } from '@/engine/components/inventory';
+import { Position } from '@/engine/components/position';
+import {
+    ActivityBugData,
+    ActivityCraftData,
+    ActivityFishData,
+    ActivityTypes,
+    Resource,
+} from '@/engine/components/resource';
+import { Sprite } from '@/engine/components/sprite';
+import { TileMap } from '@/engine/components/tilemap';
+import { Trigger } from '@/engine/components/trigger';
+import { PLAYER_ENTITY_NAME, addComponent } from '@/engine/entities/entity.manager';
+import { EventTypes } from '@/engine/event';
+import { loadDialogData } from '@/engine/systems/dialog/dialog.data';
+import { event } from '@/render/events';
 
 export const addPosition = ({ entityId, x = 0, y = 0 }: {
     entityId: string,

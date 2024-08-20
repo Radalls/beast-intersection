@@ -1,11 +1,11 @@
-import { event } from '../../../render/events/event';
-import { ActivityFishData } from '../../components/resource';
-import { clearCycle, setCycle } from '../../cycle';
-import { getComponent } from '../../entities/entity.manager';
-import { EventInputActionKeys, EventTypes } from '../../event';
-import { setState } from '../../state';
-
 import { checkActivityId, endActivity, startActivity, winActivity } from './activity';
+
+import { ActivityFishData } from '@/engine/components/resource';
+import { clearCycle, setCycle } from '@/engine/cycle';
+import { getComponent } from '@/engine/entities/entity.manager';
+import { EventInputActionKeys, EventTypes } from '@/engine/event';
+import { setState } from '@/engine/state';
+import { event } from '@/render/events';
 
 //#region SERVICES
 export const startActivityFish = ({ activityId }: { activityId: string }) => {

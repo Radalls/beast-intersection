@@ -1,15 +1,12 @@
-import { Position } from '../../components/position';
-import { TileMap } from '../../components/tilemap';
-import { Trigger } from '../../components/trigger';
-import { addComponent, createEntity } from '../../entities/entity.manager';
-import { generateTileMap } from '../tilemap/tilemap';
-
 import { checkTrigger, destroyTrigger, setTrigger } from './trigger';
 
-jest.mock('../tilemap/tilemap.data.ts');
-jest.mock('../../../render/events/event.ts', () => ({
-    event: jest.fn(),
-}));
+import { Position } from '@/engine/components/position';
+import { TileMap } from '@/engine/components/tilemap';
+import { Trigger } from '@/engine/components/trigger';
+import { addComponent, createEntity } from '@/engine/entities/entity.manager';
+import { generateTileMap } from '@/engine/systems/tilemap';
+
+vi.mock('../tilemap/tilemap.data.ts');
 
 describe('Trigger System', () => {
     const tilemapEntityId = createEntity({ entityName: 'TileMap' });
@@ -51,12 +48,12 @@ describe('Trigger System', () => {
         points: [],
     };
 
-    beforeAll(async () => {
+    beforeAll(() => {
         addComponent({
             component: tileMap,
             entityId: tilemapEntityId,
         });
-        await generateTileMap({ tileMapPath: 'mock-map', tilemapEntityId });
+        generateTileMap({ tileMapName: 'mock-map', tilemapEntityId });
 
         addComponent({
             component: playerPosition,

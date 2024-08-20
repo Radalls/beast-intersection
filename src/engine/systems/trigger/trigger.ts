@@ -1,7 +1,7 @@
-import { getComponent } from '../../entities/entity.manager';
-import { error } from '../../services/error';
-import { getStore } from '../../store';
-import { findTileByPosition } from '../tilemap/tilemap';
+import { getComponent } from '@/engine/entities/entity.manager';
+import { error } from '@/engine/services/error';
+import { getStore } from '@/engine/store';
+import { findTileByPosition } from '@/engine/systems/tilemap';
 
 //#region HELPERS
 const sortTriggersByPriority = ({ triggerEntityIds }: { triggerEntityIds: string[] }) =>

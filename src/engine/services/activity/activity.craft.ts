@@ -1,14 +1,14 @@
-import itemRecipes from '../../../assets/items/item_recipes.json';
-import { event } from '../../../render/events/event';
-import { ActivityCraftData, ActivityData } from '../../components/resource';
-import { addComponent, getComponent } from '../../entities/entity.manager';
-import { EventInputActionKeys, EventTypes } from '../../event';
-import { getState, setState } from '../../state';
-import { getStore } from '../../store';
-import { removeItemFromInventory } from '../../systems/inventory/inventory';
-import { error } from '../error';
-
 import { checkActivityId, endActivity, startActivity, winActivity } from './activity';
+
+import itemRecipes from '@/assets/items/item_recipes.json';
+import { ActivityCraftData, ActivityData } from '@/engine/components/resource';
+import { addComponent, getComponent } from '@/engine/entities/entity.manager';
+import { EventInputActionKeys, EventTypes } from '@/engine/event';
+import { error } from '@/engine/services/error';
+import { getState, setState } from '@/engine/state';
+import { getStore } from '@/engine/store';
+import { removeItemFromInventory } from '@/engine/systems/inventory';
+import { event } from '@/render/events';
 
 //#region HELPERS
 const checkActivityCraftData = (activityData: ActivityData): activityData is ActivityCraftData =>

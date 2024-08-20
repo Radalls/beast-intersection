@@ -1,11 +1,11 @@
-import { event } from '../../../render/events/event';
-import { ActivityBugData } from '../../components/resource';
-import { clearCycle, setCycle } from '../../cycle';
-import { getComponent } from '../../entities/entity.manager';
-import { EventInputMoveKeys, EventTypes } from '../../event';
-import { getState, setState } from '../../state';
-
 import { checkActivityId, endActivity, startActivity, winActivity } from './activity';
+
+import { ActivityBugData } from '@/engine/components/resource';
+import { clearCycle, setCycle } from '@/engine/cycle';
+import { getComponent } from '@/engine/entities/entity.manager';
+import { EventInputMoveKeys, EventTypes } from '@/engine/event';
+import { getState, setState } from '@/engine/state';
+import { event } from '@/render/events';
 
 //#region SERVICES
 export const startActivityBug = ({ activityId }: { activityId: string }) => {

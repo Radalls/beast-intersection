@@ -1,12 +1,8 @@
-import { Inventory } from '../../components/inventory';
-import { Resource, ActivityTypes } from '../../components/resource';
-import { addComponent, createEntity, getEntity } from '../../entities/entity.manager';
-
 import { destroyResource, getResourceItem, useResource } from './resource';
 
-jest.mock('../../../render/events/event.ts', () => ({
-    event: jest.fn(),
-}));
+import { Inventory } from '@/engine/components/inventory';
+import { Resource, ActivityTypes } from '@/engine/components/resource';
+import { addComponent, createEntity, getEntity } from '@/engine/entities/entity.manager';
 
 describe('Resource System', () => {
     const resourceEntityId = createEntity({ entityName: 'ResourceWood1' });

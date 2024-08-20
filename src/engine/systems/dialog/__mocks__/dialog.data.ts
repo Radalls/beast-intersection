@@ -1,8 +1,8 @@
-import { getComponent } from '../../../entities/entity.manager';
-
 import dialogData from './mock-dialog.json';
 
-export const loadDialogData = async ({ entityId }: { entityId: string }) => {
+import { getComponent } from '@/engine/entities/entity.manager';
+
+export const loadDialogData = ({ entityId }: { entityId: string }) => {
     const entityDialog = getComponent({ componentId: 'Dialog', entityId });
 
     //@ts-expect-error - ts error but parsing is correct

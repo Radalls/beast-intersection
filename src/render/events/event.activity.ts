@@ -1,4 +1,4 @@
-import { ActivityBugData, ActivityCraftData, ActivityFishData, Resource } from '../../engine/components/resource';
+import { ActivityBugData, ActivityCraftData, ActivityFishData, Resource } from '@/engine/components/resource';
 import {
     endActivity,
     endActivityBug,
@@ -17,7 +17,7 @@ import {
     updatePlayActivityCraft,
     updateSelectActivityCraft,
     winActivity,
-} from '../templates/template.activity';
+} from '@/render/templates';
 
 //#region MAIN ACTIVITY
 export const onActivityStart = (

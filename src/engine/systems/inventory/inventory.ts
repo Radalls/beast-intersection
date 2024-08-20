@@ -1,10 +1,10 @@
-import { event } from '../../../render/events/event';
-import { Inventory, Item } from '../../components/inventory';
-import { getComponent } from '../../entities/entity.manager';
-import { EventTypes } from '../../event';
-import { error } from '../../services/error';
-
 import { findItemRule } from './inventory.data';
+
+import { Inventory, Item } from '@/engine/components/inventory';
+import { getComponent } from '@/engine/entities/entity.manager';
+import { EventTypes } from '@/engine/event';
+import { error } from '@/engine/services/error';
+import { event } from '@/render/events';
 
 //#region CHECKS
 const invalidItemName = (itemName: string) => !(itemName) || itemName === '';

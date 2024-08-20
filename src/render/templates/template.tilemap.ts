@@ -1,6 +1,6 @@
-import { TileMap, Tile } from '../../engine/components/tilemap';
-
 import { getEntity, createEntity, getSpritePath, TILE_PIXEL_SIZE } from './template';
+
+import { TileMap, Tile } from '@/engine/components/tilemap';
 
 //#region CONSTANTS
 //#endregion

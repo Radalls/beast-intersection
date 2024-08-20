@@ -1,7 +1,7 @@
-import itemRecipes from '../../assets/items/item_recipes.json';
-import { Resource, ActivityBugData, ActivityFishData, ActivityCraftData } from '../../engine/components/resource';
-
 import { checkEntity, createEntity, destroyEntity, getEntity, getSpritePath } from './template';
+
+import itemRecipes from '@/assets/items/item_recipes.json';
+import { Resource, ActivityBugData, ActivityFishData, ActivityCraftData } from '@/engine/components/resource';
 
 //#region CONSTANTS
 //#endregion

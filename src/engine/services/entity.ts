@@ -1,6 +1,3 @@
-import { createEntity, PLAYER_ENTITY_NAME, TILEMAP_ENTITY_NAME } from '../entities/entity.manager';
-import { generateTileMap, setTile } from '../systems/tilemap/tilemap';
-
 import {
     addSprite,
     addPosition,
@@ -14,6 +11,9 @@ import {
     addDialog,
     addResourceCraft,
 } from './component';
+
+import { createEntity, PLAYER_ENTITY_NAME, TILEMAP_ENTITY_NAME } from '@/engine/entities/entity.manager';
+import { generateTileMap, setTile } from '@/engine/systems/tilemap';
 
 export const createEntityPlayer = ({
     spriteHeight = 2,
@@ -39,12 +39,12 @@ export const createEntityPlayer = ({
     setTile({ entityId });
 };
 
-export const createEntityTileMap = async ({ tileMapPath }: { tileMapPath: string }) => {
+export const createEntityTileMap = ({ tileMapName }: { tileMapName: string }) => {
     const entityId = createEntity({ entityName: TILEMAP_ENTITY_NAME });
 
     addTileMap({ entityId });
 
-    await generateTileMap({ tileMapPath });
+    generateTileMap({ tileMapName });
 };
 
 export const createEntityResourceItem = ({

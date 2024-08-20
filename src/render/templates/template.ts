@@ -1,7 +1,7 @@
-import { Position } from '../../engine/components/position';
-import { Sprite } from '../../engine/components/sprite';
-import { error } from '../../engine/services/error';
-import { app } from '../main';
+import { Position } from '@/engine/components/position';
+import { Sprite } from '@/engine/components/sprite';
+import { error } from '@/engine/services/error';
+import { app } from '@/render/main';
 
 //#region CONSTANTS
 export const spritePath = new URL('../../assets/sprites', import.meta.url).pathname;

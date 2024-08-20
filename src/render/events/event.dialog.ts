@@ -1,5 +1,5 @@
-import { Dialog } from '../../engine/components/dialog';
-import { startDialog, updateDialog, endDialog } from '../templates/template.dialog';
+import { Dialog } from '@/engine/components/dialog';
+import { startDialog, updateDialog, endDialog } from '@/render/templates';
 
 //#region EVENTS
 export const onDialogStart = ({ entityId, dialog }: {

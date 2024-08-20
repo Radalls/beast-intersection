@@ -1,14 +1,10 @@
-import { addComponent, createEntity } from '../../entities/entity.manager';
-
-import { Inventory, Item } from './../../components/inventory';
 import { addItemToInventory, removeItemFromInventory } from './inventory';
 
-jest.mock('../../../render/events/event.ts', () => ({
-    event: jest.fn(),
-}));
+import { Inventory, Item } from '@/engine/components/inventory';
+import { addComponent, createEntity } from '@/engine/entities/entity.manager';
 
 // maxAmount is always 2
-jest.mock('./inventory.data');
+vi.mock('./inventory.data');
 
 describe('Inventory system', () => {
     const entityId = createEntity({ entityName: 'Entity' });

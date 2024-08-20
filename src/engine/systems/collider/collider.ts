@@ -1,6 +1,6 @@
-import { getComponent } from '../../entities/entity.manager';
-import { error } from '../../services/error';
-import { findTileByPosition } from '../tilemap/tilemap';
+import { getComponent } from '@/engine/entities/entity.manager';
+import { error } from '@/engine/services/error';
+import { findTileByPosition } from '@/engine/systems/tilemap/tilemap.utils';
 
 //#region ACTIONS
 export const setCollider = ({ entityId }: { entityId: string }) => {

@@ -1,11 +1,7 @@
-import { Position } from '../../components/position';
-import { addComponent, createEntity } from '../../entities/entity.manager';
-
 import { updatePosition } from './position';
 
-jest.mock('../../../render/events/event.ts', () => ({
-    event: jest.fn(),
-}));
+import { Position } from '@/engine/components/position';
+import { addComponent, createEntity } from '@/engine/entities/entity.manager';
 
 describe('Position System', () => {
     const entityId = createEntity({ entityName: 'Entity' });

@@ -1,4 +1,4 @@
-import { onInputKeyDown } from './events/event';
+import { onInputKeyDown } from './events';
 
 export const app = document.getElementById('app')!;
 

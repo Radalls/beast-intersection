@@ -1,6 +1,4 @@
-import { endActivity } from './services/activity/activity';
-import { tickActivityBug } from './services/activity/activity.bug';
-import { tickActivityFish, tickActivityFishFrenzy } from './services/activity/activity.fish';
+import { endActivity, tickActivityBug, tickActivityFish, tickActivityFishFrenzy } from './services/activity';
 import { getState, setState } from './state';
 
 const cycle = {

@@ -1,13 +1,11 @@
-import { ActivityTypes } from '../../components/resource';
-import { checkComponent, destroyEntity, getComponent } from '../../entities/entity.manager';
-import { startActivityBug } from '../../services/activity/activity.bug';
-import { startActivityCraft } from '../../services/activity/activity.craft';
-import { startActivityFish } from '../../services/activity/activity.fish';
-import { error } from '../../services/error';
-import { getStore } from '../../store';
-import { destroyCollider } from '../collider/collider';
-import { addItemToInventory } from '../inventory/inventory';
-import { destroyTrigger } from '../trigger/trigger';
+import { ActivityTypes } from '@/engine/components/resource';
+import { getComponent, checkComponent, destroyEntity } from '@/engine/entities/entity.manager';
+import { startActivityBug, startActivityCraft, startActivityFish } from '@/engine/services/activity';
+import { error } from '@/engine/services/error';
+import { getStore } from '@/engine/store';
+import { destroyCollider } from '@/engine/systems/collider';
+import { addItemToInventory } from '@/engine/systems/inventory';
+import { destroyTrigger } from '@/engine/systems/trigger';
 
 //#region SYSTEMS
 export const useResource = ({ entityId, resourceEntityId }: {
