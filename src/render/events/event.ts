@@ -1,14 +1,3 @@
-import { Component } from '../../engine/components/@component';
-import { Dialog } from '../../engine/components/dialog';
-import { Inventory } from '../../engine/components/inventory';
-import { Position } from '../../engine/components/position';
-import { ActivityBugData, ActivityCraftData, ActivityFishData, Resource } from '../../engine/components/resource';
-import { Sprite } from '../../engine/components/sprite';
-import { Tile, TileMap } from '../../engine/components/tilemap';
-import { Event, EventTypes, onInputKeyDown as engineOnInputKeyDown } from '../../engine/event';
-import { error } from '../../engine/services/error';
-import { createEntity, createSprite, destroyEntity, updatePosition } from '../templates/template';
-
 import {
     onActivityBugEnd,
     onActivityBugStart,
@@ -30,7 +19,19 @@ import {
 } from './event.activity';
 import { onDialogEnd, onDialogNext, onDialogStart } from './event.dialog';
 import { onEntityInventoryCreate, onEntityInventoryDisplay, onEntityInventoryUpdate } from './event.inventory';
-import { onTileMapCreate, onTileMapTileCreate } from './event.tilemap';
+import { onTileMapCreate, onTileMapTileCreate, onTileMapTileDestroy } from './event.tilemap';
+
+import { Component } from '@/engine/components/@component';
+import { Dialog } from '@/engine/components/dialog';
+import { Inventory } from '@/engine/components/inventory';
+import { Position } from '@/engine/components/position';
+import { Resource, ActivityBugData, ActivityFishData, ActivityCraftData } from '@/engine/components/resource';
+import { Sprite } from '@/engine/components/sprite';
+import { TileMap, Tile } from '@/engine/components/tilemap';
+import { onInputKeyDown as engineOnInputKeyDown, Event } from '@/engine/event';
+import { EventTypes } from '@/engine/event';
+import { error } from '@/engine/services/error';
+import { createEntity, destroyEntity, updatePosition, createSprite } from '@/render/templates';
 
 export const onInputKeyDown = (e: any) => engineOnInputKeyDown(e.key);
 
@@ -94,6 +95,12 @@ export const event = <T extends keyof Component>(event: Event<T>) => {
         }
         else if (event.type === EventTypes.TILEMAP_TILE_CREATE && checkTileData(event.data)) {
             onTileMapTileCreate({
+                tile: event.data,
+                tilemapEntityId: event.entityId,
+            });
+        }
+        else if (event.type === EventTypes.TILEMAP_TILE_DESTROY && checkTileData(event.data)) {
+            onTileMapTileDestroy({
                 tile: event.data,
                 tilemapEntityId: event.entityId,
             });
