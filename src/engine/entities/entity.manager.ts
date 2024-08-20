@@ -1,12 +1,12 @@
 import { v4 as uuidv4 } from 'uuid';
 
-import { event } from '../../render/events/event';
-import { Component } from '../components/@component';
-import { EventTypes } from '../event';
-import { error } from '../services/error';
-import { setStore } from '../store';
-
 import { Entity } from './entity';
+
+import { Component } from '@/engine/components/@component';
+import { EventTypes } from '@/engine/event';
+import { error } from '@/engine/services/error';
+import { setStore } from '@/engine/store';
+import { event } from '@/render/events';
 
 export const entities: Record<string, Entity> = {};
 
@@ -91,6 +91,15 @@ export const destroyEntity = ({ entityId }: {
     event({
         entityId,
         type: EventTypes.ENTITY_DESTROY,
+    });
+};
+
+export const destroyAllEntities = () => {
+    Object.keys(entities).forEach((entityId) => {
+        if (!(entities[entityId])) return;
+        if (entityId.includes(PLAYER_ENTITY_NAME) || entityId.includes(TILEMAP_ENTITY_NAME)) return;
+
+        destroyEntity({ entityId });
     });
 };
 //#endregion
