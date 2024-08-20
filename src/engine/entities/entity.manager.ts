@@ -1,6 +1,5 @@
-import { v4 as uuidv4 } from 'uuid';
-
 import { Entity } from './entity';
+import { generateEntityId, getEntity } from './entity.utils';
 
 import { Component } from '@/engine/components/@component';
 import { EventTypes } from '@/engine/event';
@@ -13,23 +12,6 @@ export const entities: Record<string, Entity> = {};
 //#region CONSTANTS
 export const TILEMAP_ENTITY_NAME = 'TileMap';
 export const PLAYER_ENTITY_NAME = 'Player';
-//#endregion
-
-//#region HELPERS
-export const getEntity = (entityId: string) => entities[entityId] ? entities[entityId] : null;
-export const checkEntityId = (entityId: string) => entities[entityId] ? entityId : null;
-
-export const generateEntityId = (entityId: string) => `${entityId}-${uuidv4()}`;
-
-export const checkComponent = <T extends keyof Component>({ entityId, componentId }: {
-    componentId: T,
-    entityId: string
-}) => {
-    const entity = getEntity(entityId)
-        ?? error({ message: `Entity ${entityId} does not exist`, where: checkComponent.name });
-
-    return entity[componentId] ? componentId : null;
-};
 //#endregion
 
 //#region SERVICES
