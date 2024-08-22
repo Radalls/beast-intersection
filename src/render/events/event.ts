@@ -19,6 +19,7 @@ import {
 } from './event.activity';
 import { onDialogEnd, onDialogNext, onDialogStart } from './event.dialog';
 import { onEntityInventoryCreate, onEntityInventoryDisplay, onEntityInventoryUpdate } from './event.inventory';
+import { onLoadingDisplay } from './event.menu';
 import { onTileMapCreate, onTileMapTileCreate, onTileMapTileDestroy } from './event.tilemap';
 
 import { Component } from '@/engine/components/@component';
@@ -51,8 +52,12 @@ export const checkDialogData = (data: any): data is Dialog => data;
 //#region EVENTS
 export const event = <T extends keyof Component>(event: Event<T>) => {
     try {
+        /* Menu */
+        if (event.type === EventTypes.MENU_LOADING_ON || event.type === EventTypes.MENU_LOADING_OFF) {
+            onLoadingDisplay({ display: event.type === EventTypes.MENU_LOADING_ON });
+        }
         /* Entity */
-        if (event.type === EventTypes.ENTITY_CREATE) {
+        else if (event.type === EventTypes.ENTITY_CREATE) {
             onEntityCreate({ entityId: event.entityId });
         }
         else if (event.type === EventTypes.ENTITY_DESTROY) {
