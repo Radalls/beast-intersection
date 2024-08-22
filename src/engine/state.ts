@@ -8,6 +8,7 @@ const state = {
     isActivityFishRunning: false,
     isActivityRunning: false,
     isActivityWin: false,
+    isGameLoading: false,
     isGameRunning: false,
     isInputCooldown: false,
     isPlayerDialogOpen: false,

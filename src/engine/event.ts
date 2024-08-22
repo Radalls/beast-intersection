@@ -73,6 +73,9 @@ export enum EventTypes {
     INVENTORY_CREATE = 'INVENTORY_CREATE',
     INVENTORY_DISPLAY = 'INVENTORY_DISPLAY',
     INVENTORY_UPDATE = 'INVENTORY_UPDATE',
+    /* Menu */
+    MENU_LOADING_OFF = 'MENU_LOADING_OFF',
+    MENU_LOADING_ON = 'MENU_LOADING_ON',
     /* Tilemap */
     TILEMAP_CREATE = 'TILEMAP_CREATE',
     TILEMAP_TILE_CREATE = 'TILEMAP_TILE_CREATE',
@@ -87,6 +90,7 @@ export const onInputKeyDown = (inputKey: EventInputActionKeys | EventInputMoveKe
 
     try {
         if (
+            getState('isGameLoading') ||
             !(getState('isGameRunning')) ||
             getState('isInputCooldown') ||
             getState('isActivityBugCooldown')
