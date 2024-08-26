@@ -1,4 +1,5 @@
-import { checkEntity, createEntity, destroyEntity, getEntity, getSpritePath } from './template';
+import { createEntity, destroyEntity } from './template';
+import { getEntity, checkEntity, getSpritePath } from './template.utils';
 
 import itemRecipes from '@/assets/items/item_recipes.json';
 import { Resource, ActivityBugData, ActivityFishData, ActivityCraftData } from '@/engine/components/resource';

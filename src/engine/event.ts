@@ -1,4 +1,5 @@
 import { Component } from './components/@component';
+import { AudioData } from './components/manager';
 import { ActivityData } from './components/resource';
 import { Tile } from './components/tilemap';
 import { checkComponent, getComponent } from './entities';
@@ -11,14 +12,14 @@ import {
     playActivityFish,
 } from './services/activity';
 import { error } from './services/error';
+import { closeSettings, confirmSetting, openSettings, selectSetting } from './services/settings';
 import { getState, setState } from './state';
 import { getStore } from './store';
 import { nextDialog, selectDialogOption, startDialog } from './systems/dialog';
+import { closePlayerInventory, openPlayerInventory } from './systems/inventory';
 import { useResource } from './systems/resource';
 import { updateTile } from './systems/tilemap';
 import { checkTrigger } from './systems/trigger';
-
-import { event } from '@/render/events';
 
 export type Event<K extends keyof Component = keyof Component> = {
     data?: EventData<K>,
@@ -26,20 +27,7 @@ export type Event<K extends keyof Component = keyof Component> = {
     type: EventTypes
 };
 
-export type EventData<K extends keyof Component = keyof Component> = Component[K] | Tile | ActivityData;
-
-export enum EventInputActionKeys {
-    ACT = 'e',
-    BACK = 'Escape',
-    INVENTORY = 'i'
-}
-
-export enum EventInputMoveKeys {
-    DOWN = 's',
-    LEFT = 'q',
-    RIGHT = 'd',
-    UP = 'z'
-}
+export type EventData<K extends keyof Component = keyof Component> = Component[K] | Tile | ActivityData | AudioData;
 
 export enum EventTypes {
     /* Activity */
@@ -60,6 +48,10 @@ export enum EventTypes {
     ACTIVITY_FISH_UPDATE = 'ACTIVITY_FISH_UPDATE',
     ACTIVITY_START = 'ACTIVITY_START',
     ACTIVITY_WIN = 'ACTIVITY_WIN',
+    /* Audio */
+    AUDIO_PAUSE = 'AUDIO_PAUSE',
+    AUDIO_PLAY = 'AUDIO_PLAY',
+    AUDIO_STOP = 'AUDIO_STOP',
     /* Dialog */
     DIALOG_END = 'DIALOG_END',
     DIALOG_START = 'DIALOG_START',
@@ -76,13 +68,21 @@ export enum EventTypes {
     /* Menu */
     MENU_LOADING_OFF = 'MENU_LOADING_OFF',
     MENU_LOADING_ON = 'MENU_LOADING_ON',
+    MENU_SETTINGS_DISPLAY = 'MENU_SETTINGS_DISPLAY',
+    MENU_SETTINGS_DISPLAY_EDIT = 'MENU_SETTINGS_DISPLAY_EDIT',
+    MENU_SETTINGS_UPDATE = 'MENU_SETTINGS_UPDATE',
     /* Tilemap */
     TILEMAP_CREATE = 'TILEMAP_CREATE',
     TILEMAP_TILE_CREATE = 'TILEMAP_TILE_CREATE',
     TILEMAP_TILE_DESTROY = 'TILEMAP_TILE_DESTROY',
 }
 
-export const onInputKeyDown = (inputKey: EventInputActionKeys | EventInputMoveKeys) => {
+export const onInputKeyDown = (inputKey: string) => {
+    const managerEntityId = getStore('managerId')
+        ?? error({ message: 'Store managerId is undefined', where: onInputKeyDown.name });
+
+    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
+
     const playerEntityId = getStore('playerId')
         ?? error({ message: 'Store playerId is undefined', where: onInputKeyDown.name });
 
@@ -98,15 +98,24 @@ export const onInputKeyDown = (inputKey: EventInputActionKeys | EventInputMoveKe
 
         setState('isInputCooldown', true);
 
-        if (getState('isPlayerInventoryOpen')) {
-            if (inputKey === EventInputActionKeys.INVENTORY || inputKey === EventInputActionKeys.BACK) {
-                setState('isPlayerInventoryOpen', false);
+        if (getState('isGamePaused')) {
+            if (inputKey === manager.settings.keys.action._back) {
+                if (getState('isSettingEditOpen')) return;
 
-                event({
-                    entityId: playerEntityId,
-                    type: EventTypes.INVENTORY_DISPLAY,
-                });
-
+                closeSettings({});
+                return;
+            }
+            else {
+                onSettingsInput({ inputKey });
+                return;
+            }
+        }
+        else if (getState('isPlayerInventoryOpen')) {
+            if (
+                inputKey === manager.settings.keys.action._inventory
+                || inputKey === manager.settings.keys.action._back
+            ) {
+                closePlayerInventory({ playerEntityId });
                 return;
             }
             else return;
@@ -130,32 +139,30 @@ export const onInputKeyDown = (inputKey: EventInputActionKeys | EventInputMoveKe
             const dialogEntityId = getStore('dialogId')
                 ?? error({ message: 'Store dialogId is undefined', where: onInputKeyDown.name });
 
-            if (inputKey === EventInputMoveKeys.UP) {
+            if (inputKey === manager.settings.keys.move._up) {
                 selectDialogOption({ entityId: dialogEntityId, offset: -1 });
                 return;
             }
-            else if (inputKey === EventInputMoveKeys.DOWN) {
+            else if (inputKey === manager.settings.keys.move._down) {
                 selectDialogOption({ entityId: dialogEntityId, offset: 1 });
                 return;
             }
-            else if (inputKey === EventInputActionKeys.ACT) {
+            else if (inputKey === manager.settings.keys.action._act) {
                 nextDialog({ entityId: dialogEntityId });
                 return;
             }
             else return;
         }
         else {
-            if (inputKey === EventInputActionKeys.INVENTORY) {
-                setState('isPlayerInventoryOpen', true);
-
-                event({
-                    entityId: playerEntityId,
-                    type: EventTypes.INVENTORY_DISPLAY,
-                });
-
+            if (inputKey === manager.settings.keys.action._back) {
+                openSettings({});
                 return;
             }
-            else if (inputKey === EventInputMoveKeys.UP) {
+            else if (inputKey === manager.settings.keys.action._inventory) {
+                openPlayerInventory({ playerEntityId });
+                return;
+            }
+            else if (inputKey === manager.settings.keys.move._up) {
                 updateTile({
                     entityId: playerEntityId,
                     targetX: playerPosition._x,
@@ -164,7 +171,7 @@ export const onInputKeyDown = (inputKey: EventInputActionKeys | EventInputMoveKe
 
                 return;
             }
-            else if (inputKey === EventInputMoveKeys.LEFT) {
+            else if (inputKey === manager.settings.keys.move._left) {
                 updateTile({
                     entityId: playerEntityId,
                     targetX: playerPosition._x - 1,
@@ -173,7 +180,7 @@ export const onInputKeyDown = (inputKey: EventInputActionKeys | EventInputMoveKe
 
                 return;
             }
-            else if (inputKey === EventInputMoveKeys.DOWN) {
+            else if (inputKey === manager.settings.keys.move._down) {
                 updateTile({
                     entityId: playerEntityId,
                     targetX: playerPosition._x,
@@ -182,7 +189,7 @@ export const onInputKeyDown = (inputKey: EventInputActionKeys | EventInputMoveKe
 
                 return;
             }
-            else if (inputKey === EventInputMoveKeys.RIGHT) {
+            else if (inputKey === manager.settings.keys.move._right) {
                 updateTile({
                     entityId: playerEntityId,
                     targetX: playerPosition._x + 1,
@@ -191,7 +198,7 @@ export const onInputKeyDown = (inputKey: EventInputActionKeys | EventInputMoveKe
 
                 return;
             }
-            else if (inputKey === EventInputActionKeys.ACT) {
+            else if (inputKey === manager.settings.keys.action._act) {
                 const triggeredEntityId = checkTrigger({});
                 if (triggeredEntityId) {
                     onTrigger({ triggeredEntityId });
@@ -226,39 +233,64 @@ const onTrigger = ({ entityId, triggeredEntityId }: {
     }
 };
 
-const onActivityBugInput = ({ inputKey }: { inputKey: EventInputActionKeys | EventInputMoveKeys }) => {
+const onActivityBugInput = ({ inputKey }: { inputKey: string }) => {
     const activityBugEntityId = getStore('activityId')
         ?? error({ message: 'Store activityId is undefined ', where: onActivityBugInput.name });
 
     playActivityBug({ activityId: activityBugEntityId, symbol: inputKey });
 };
 
-const onActivityFishInput = ({ inputKey }: { inputKey: EventInputActionKeys | EventInputMoveKeys }) => {
+const onActivityFishInput = ({ inputKey }: { inputKey: string }) => {
     const activityFishEntityId = getStore('activityId')
         ?? error({ message: 'Store activityId is undefined ', where: onActivityFishInput.name });
 
     playActivityFish({ activityId: activityFishEntityId, symbol: inputKey });
 };
 
-const onActivityCraftInput = ({ inputKey }: { inputKey: EventInputActionKeys | EventInputMoveKeys }) => {
+const onActivityCraftInput = ({ inputKey }: { inputKey: string }) => {
+    const managerEntityId = getStore('managerId')
+        ?? error({ message: 'Store managerId is undefined', where: onInputKeyDown.name });
+
+    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
+
     const activityCraftEntityId = getStore('activityId')
         ?? error({ message: 'Store activityId is undefined ', where: onActivityCraftInput.name });
 
     if (getState('isActivityCraftSelecting')) {
-        if (inputKey === EventInputActionKeys.ACT) {
+        if (inputKey === manager.settings.keys.action._act) {
             confirmActivityCraftRecipe({ activityId: activityCraftEntityId });
         }
-        else if (inputKey === EventInputMoveKeys.UP) {
+        else if (inputKey === manager.settings.keys.move._up) {
             selectActivityCraftRecipe({ activityId: activityCraftEntityId, offset: -1 });
         }
-        else if (inputKey === EventInputMoveKeys.DOWN) {
+        else if (inputKey === manager.settings.keys.move._down) {
             selectActivityCraftRecipe({ activityId: activityCraftEntityId, offset: 1 });
         }
-        else if (inputKey === EventInputActionKeys.BACK) {
+        else if (inputKey === manager.settings.keys.action._back) {
             endActivityCraft({ activityId: activityCraftEntityId });
         }
     }
     else if (getState('isActivityCraftPlaying')) {
         playActivityCraft({ activityId: activityCraftEntityId, symbol: inputKey });
+    }
+};
+
+const onSettingsInput = ({ inputKey }: { inputKey: string }) => {
+    const managerEntityId = getStore('managerId')
+        ?? error({ message: 'Store managerId is undefined', where: onInputKeyDown.name });
+
+    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
+
+    if (getState('isSettingEditOpen')) {
+        confirmSetting({ editKey: inputKey });
+    }
+    else if (inputKey === manager.settings.keys.action._act) {
+        confirmSetting({});
+    }
+    else if (inputKey === manager.settings.keys.move._up) {
+        selectSetting({ offset: -1 });
+    }
+    else if (inputKey === manager.settings.keys.move._down) {
+        selectSetting({ offset: 1 });
     }
 };

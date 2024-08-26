@@ -1,30 +1,11 @@
+import { getEntity, getSpritePath } from './template.utils';
+
 import { Position } from '@/engine/components/position';
 import { Sprite } from '@/engine/components/sprite';
-import { error } from '@/engine/services/error';
 import { app } from '@/render/main';
 
 //#region CONSTANTS
-export const spritePath = new URL('../../assets/sprites', import.meta.url).pathname;
-
 export const TILE_PIXEL_SIZE = 64;
-//#endregion
-
-//#region HELPERS
-export const getSpritePath = (spriteName: string) => {
-    const spriteFolderPath = spriteName.replace(/^(.*?)(\/[^/]+)?(\.[^./]+)?$/, '$1').split('_')[0];
-    return `${spritePath}/${spriteFolderPath}/${spriteName}.png`;
-};
-
-export const getEntity = ({ entityId }: { entityId: string }) => {
-    const entity = document.getElementById(entityId)
-        ?? error({ message: `HTML Entity ${entityId} does not exist`, where: getEntity.name });
-
-    return entity;
-};
-
-export const checkEntity = ({ entityId }: { entityId: string }) => {
-    return document.getElementById(entityId) !== null;
-};
 //#endregion
 
 //#region TEMPLATES

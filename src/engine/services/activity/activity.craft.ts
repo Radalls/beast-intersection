@@ -3,11 +3,12 @@ import { checkActivityId, endActivity, startActivity, winActivity } from './acti
 import itemRecipes from '@/assets/items/item_recipes.json';
 import { ActivityCraftData, ActivityData } from '@/engine/components/resource';
 import { addComponent, getComponent } from '@/engine/entities';
-import { EventInputActionKeys, EventTypes } from '@/engine/event';
+import { EventTypes } from '@/engine/event';
 import { error } from '@/engine/services/error';
 import { getState, setState } from '@/engine/state';
 import { getStore } from '@/engine/store';
 import { removeItemFromInventory } from '@/engine/systems/inventory';
+import { randAudio } from '@/render/audio';
 import { event } from '@/render/events';
 
 //#region HELPERS
@@ -37,11 +38,15 @@ export const startActivityCraft = ({ activityId }: { activityId: string }) => {
         entityId: activityId,
         type: EventTypes.ACTIVITY_CRAFT_START,
     });
-
     event({
         data: activityCraftData,
         entityId: activityId,
         type: EventTypes.ACTIVITY_CRAFT_SELECT_START,
+    });
+    event({
+        data: { audioName: 'activity_craft_start' },
+        entityId: activityId,
+        type: EventTypes.AUDIO_PLAY,
     });
 };
 
@@ -72,6 +77,11 @@ export const selectActivityCraftRecipe = ({ activityId, offset }: { activityId?:
         data: activityCraftData,
         entityId: activityId,
         type: EventTypes.ACTIVITY_CRAFT_SELECT_UPDATE,
+    });
+    event({
+        data: { audioName: 'activity_craft_recipe_select' },
+        entityId: activityId,
+        type: EventTypes.AUDIO_PLAY,
     });
 };
 
@@ -128,11 +138,15 @@ export const confirmActivityCraftRecipe = ({ activityId }: { activityId?: string
         entityId: activityId,
         type: EventTypes.ACTIVITY_CRAFT_SELECT_END,
     });
-
     event({
         data: activityCraftData,
         entityId: activityId,
         type: EventTypes.ACTIVITY_CRAFT_PLAY_START,
+    });
+    event({
+        data: { audioName: 'activity_craft_recipe_confirm' },
+        entityId: activityId,
+        type: EventTypes.AUDIO_PLAY,
     });
 };
 //#endregion
@@ -142,7 +156,12 @@ export const playActivityCraft = ({ activityId, symbol }: {
     activityId?: string | null,
     symbol: string,
 }) => {
-    if (symbol !== EventInputActionKeys.ACT) return;
+    const managerEntityId = getStore('managerId')
+        ?? error({ message: 'Store managerId is undefined', where: playActivityCraft.name });
+
+    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
+
+    if (symbol !== manager.settings.keys.action._act) return;
 
     activityId = checkActivityId({ activityId });
 
@@ -161,6 +180,13 @@ export const playActivityCraft = ({ activityId, symbol }: {
     if (activityCraftData._hitCount >= 10) {
         endActivityCraft({ activityId });
         winActivity({ activityId });
+
+        event({
+            data: { audioName: 'activity_craft_win' },
+            entityId: activityId,
+            type: EventTypes.AUDIO_PLAY,
+        });
+
         return;
     }
 
@@ -168,6 +194,11 @@ export const playActivityCraft = ({ activityId, symbol }: {
         data: activityCraftData,
         entityId: activityId,
         type: EventTypes.ACTIVITY_CRAFT_PLAY_UPDATE,
+    });
+    event({
+        data: { audioName: `activity_craft_play${randAudio({ nb: 6 })}` },
+        entityId: activityId,
+        type: EventTypes.AUDIO_PLAY,
     });
 };
 
@@ -186,6 +217,11 @@ export const endActivityCraft = ({ activityId }: { activityId?: string | null })
         event({
             entityId: activityId,
             type: EventTypes.ACTIVITY_CRAFT_SELECT_END,
+        });
+        event({
+            data: { audioName: 'activity_craft_end' },
+            entityId: activityId,
+            type: EventTypes.AUDIO_PLAY,
         });
 
         endActivity({ activityId });

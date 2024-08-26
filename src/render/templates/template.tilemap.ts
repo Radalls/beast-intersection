@@ -1,4 +1,5 @@
-import { getEntity, createEntity, getSpritePath, TILE_PIXEL_SIZE } from './template';
+import { createEntity, TILE_PIXEL_SIZE } from './template';
+import { getEntity, getSpritePath } from './template.utils';
 
 import { TileMap, Tile } from '@/engine/components/tilemap';
 

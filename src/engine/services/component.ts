@@ -1,6 +1,7 @@
 import { Collider } from '@/engine/components/collider';
 import { Dialog } from '@/engine/components/dialog';
 import { Inventory } from '@/engine/components/inventory';
+import { Manager } from '@/engine/components/manager';
 import { Position } from '@/engine/components/position';
 import {
     ActivityBugData,
@@ -91,6 +92,33 @@ export const addTileMap = ({ entityId }: {
     };
 
     addComponent({ component: tileMap, entityId });
+};
+
+export const addManager = ({ entityId }: {
+    entityId: string,
+}) => {
+    const manager: Manager = {
+        _: 'Manager',
+        _selectedSetting: 0,
+        settings: {
+            _audio: false,
+            keys: {
+                action: {
+                    _act: 'e',
+                    _back: 'Escape',
+                    _inventory: 'i',
+                },
+                move: {
+                    _down: 's',
+                    _left: 'q',
+                    _right: 'd',
+                    _up: 'z',
+                },
+            },
+        },
+    };
+
+    addComponent({ component: manager, entityId });
 };
 
 export const addTrigger = ({ entityId, priority = 0, points }: {

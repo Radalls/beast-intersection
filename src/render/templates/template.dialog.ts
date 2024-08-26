@@ -1,4 +1,5 @@
-import { createEntity, destroyEntity, getEntity } from './template';
+import { createEntity, destroyEntity } from './template';
+import { getEntity } from './template.utils';
 
 import { Dialog } from '@/engine/components/dialog';
 

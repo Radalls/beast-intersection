@@ -3,6 +3,7 @@ import { checkEntityId } from './entities';
 const store = {
     activityId: '',
     dialogId: '',
+    managerId: '',
     playerId: '',
     tilemapId: '',
 };
