@@ -1,4 +1,5 @@
-import { checkEntity, createEntity, destroyEntity, getEntity, getSpritePath } from './template';
+import { createEntity, destroyEntity } from './template';
+import { getEntity, getSpritePath, checkEntity } from './template.utils';
 
 import { Inventory } from '@/engine/components/inventory';
 

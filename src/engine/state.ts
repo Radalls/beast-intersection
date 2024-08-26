@@ -9,10 +9,13 @@ const state = {
     isActivityRunning: false,
     isActivityWin: false,
     isGameLoading: false,
+    isGamePaused: false,
     isGameRunning: false,
     isInputCooldown: false,
     isPlayerDialogOpen: false,
     isPlayerInventoryOpen: false,
+    isSettingAudioAllowed: false,
+    isSettingEditOpen: false,
 };
 
 export const setState = (key: keyof typeof state, value: boolean) => state[key] = value;

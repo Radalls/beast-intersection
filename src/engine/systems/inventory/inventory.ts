@@ -4,6 +4,7 @@ import { Inventory, Item } from '@/engine/components/inventory';
 import { getComponent } from '@/engine/entities';
 import { EventTypes } from '@/engine/event';
 import { error } from '@/engine/services/error';
+import { getStore } from '@/engine/store';
 import { event } from '@/render/events';
 
 //#region CHECKS
@@ -44,13 +45,16 @@ const removeSlots = ({ inventory, slotsToRemove }: {
  * @returns whether the item was added to the inventory
  */
 export const addItemToInventory = ({ entityId, item, itemAmount }: {
-    entityId: string,
+    entityId?: string | null,
     item: Item,
     itemAmount: number,
 }): {
     amountRemaining?: number,
     success: boolean
 } => {
+    if (!(entityId)) entityId = getStore('playerId')
+        ?? error({ message: 'Store playerId is undefined', where: addItemToInventory.name });
+
     if (invalidItemName(item.info._name) || invalidItemAmount(itemAmount) || invalidItemSprite(item.sprite._image)) {
         error({ message: `Item ${item.info._name} is invalid`, where: addItemToInventory.name });
     }
@@ -137,10 +141,13 @@ export const addItemToInventory = ({ entityId, item, itemAmount }: {
  * @returns whether the item was removed from the inventory
  */
 export const removeItemFromInventory = ({ entityId, itemName, itemAmount }: {
-    entityId: string,
+    entityId?: string | null,
     itemAmount: number,
     itemName: string
 }): boolean => {
+    if (!(entityId)) entityId = getStore('playerId')
+        ?? error({ message: 'Store playerId is undefined', where: addItemToInventory.name });
+
     if (invalidItemName(itemName) || invalidItemAmount(itemAmount)) {
         error({ message: `Item ${itemName} is invalid`, where: addItemToInventory.name });
     }

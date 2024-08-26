@@ -9,7 +9,7 @@ import { generateTileMap } from '@/engine/systems/tilemap';
 vi.mock('../tilemap/tilemap.data.ts');
 
 describe('Trigger System', () => {
-    const tilemapEntityId = createEntity({ entityName: 'TileMap' });
+    const tileMapEntityId = createEntity({ entityName: 'TileMap' });
     const tileMap: TileMap = {
         _: 'TileMap',
         _height: 3,
@@ -36,8 +36,8 @@ describe('Trigger System', () => {
     };
 
     beforeAll(() => {
-        addComponent({ component: tileMap, entityId: tilemapEntityId });
-        generateTileMap({ tileMapName: 'mock-map', tilemapEntityId });
+        addComponent({ component: tileMap, entityId: tileMapEntityId });
+        generateTileMap({ tileMapEntityId, tileMapName: 'mock-map' });
 
         addComponent({ component: playerPosition, entityId: playerEntityId });
 

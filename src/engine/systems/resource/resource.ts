@@ -1,11 +1,13 @@
 import { ActivityTypes } from '@/engine/components/resource';
 import { getComponent, checkComponent, destroyEntity } from '@/engine/entities';
+import { EventTypes } from '@/engine/event';
 import { startActivityBug, startActivityCraft, startActivityFish } from '@/engine/services/activity';
 import { error } from '@/engine/services/error';
 import { getStore } from '@/engine/store';
 import { destroyCollider } from '@/engine/systems/collider';
 import { addItemToInventory } from '@/engine/systems/inventory';
 import { destroyTrigger } from '@/engine/systems/trigger';
+import { event } from '@/render/events';
 
 //#region SYSTEMS
 export const useResource = ({ entityId, resourceEntityId }: {
@@ -19,6 +21,12 @@ export const useResource = ({ entityId, resourceEntityId }: {
 
     if (resource._activityType === ActivityTypes.ITEM) {
         getResourceItem({ resourceEntityId });
+
+        event({
+            data: { audioName: 'activity_pickup' },
+            entityId,
+            type: EventTypes.AUDIO_PLAY,
+        });
 
         if (resource._isTemporary) {
             destroyResource({ resourceEntityId });

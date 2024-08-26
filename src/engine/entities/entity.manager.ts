@@ -12,6 +12,7 @@ export const entities: Record<string, Entity> = {};
 //#region CONSTANTS
 export const TILEMAP_ENTITY_NAME = 'TileMap';
 export const PLAYER_ENTITY_NAME = 'Player';
+export const MANAGER_ENTITY_NAME = 'Manager';
 //#endregion
 
 //#region SERVICES
@@ -26,8 +27,11 @@ export const createEntity = ({ entityName }: { entityName: string }) => {
     if (entityName === PLAYER_ENTITY_NAME) {
         setStore('playerId', entityId);
     }
-    if (entityName === TILEMAP_ENTITY_NAME) {
+    else if (entityName === TILEMAP_ENTITY_NAME) {
         setStore('tilemapId', entityId);
+    }
+    else if (entityName === MANAGER_ENTITY_NAME) {
+        setStore('managerId', entityId);
     }
 
     event({
@@ -79,7 +83,11 @@ export const destroyEntity = ({ entityId }: {
 export const destroyAllEntities = () => {
     Object.keys(entities).forEach((entityId) => {
         if (!(entities[entityId])) return;
-        if (entityId.includes(PLAYER_ENTITY_NAME) || entityId.includes(TILEMAP_ENTITY_NAME)) return;
+        if (
+            entityId.includes(PLAYER_ENTITY_NAME)
+            || entityId.includes(TILEMAP_ENTITY_NAME)
+            || entityId.includes(MANAGER_ENTITY_NAME)
+        ) return;
 
         destroyEntity({ entityId });
     });

@@ -3,8 +3,11 @@ import { checkActivityId, endActivity, startActivity, winActivity } from './acti
 import { ActivityFishData } from '@/engine/components/resource';
 import { clearCycle, setCycle } from '@/engine/cycle';
 import { getComponent } from '@/engine/entities';
-import { EventInputActionKeys, EventTypes } from '@/engine/event';
+import { EventTypes } from '@/engine/event';
+import { error } from '@/engine/services/error';
 import { setState } from '@/engine/state';
+import { getStore } from '@/engine/store';
+import { randAudio } from '@/render/audio';
 import { event } from '@/render/events';
 
 //#region SERVICES
@@ -27,6 +30,11 @@ export const startActivityFish = ({ activityId }: { activityId: string }) => {
         entityId: activityId,
         type: EventTypes.ACTIVITY_FISH_START,
     });
+    event({
+        data: { audioName: 'activity_fish_start' },
+        entityId: activityId,
+        type: EventTypes.AUDIO_PLAY,
+    });
 };
 
 export const tickActivityFish = ({ activityId }: { activityId?: string | null }) => {
@@ -44,6 +52,14 @@ export const tickActivityFish = ({ activityId }: { activityId?: string | null })
         entityId: activityId,
         type: EventTypes.ACTIVITY_FISH_UPDATE,
     });
+
+    if (activityFishData._isFrenzy) {
+        event({
+            data: { audioName: 'activity_fish_frenzy' },
+            entityId: activityId,
+            type: EventTypes.AUDIO_PLAY,
+        });
+    }
 };
 
 export const tickActivityFishFrenzy = ({ activityId }: { activityId?: string | null }) => {
@@ -66,9 +82,14 @@ export const playActivityFish = ({ activityId, symbol }: {
     activityId?: string | null,
     symbol: string,
 }) => {
+    const managerEntityId = getStore('managerId')
+        ?? error({ message: 'Store managerId is undefined', where: playActivityFish.name });
+
+    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
+
     activityId = checkActivityId({ activityId });
 
-    if (symbol !== EventInputActionKeys.ACT) return;
+    if (symbol !== manager.settings.keys.action._act) return;
 
     const activityResource = getComponent({ componentId: 'Resource', entityId: activityId });
     const activityFishData = activityResource.activityData as ActivityFishData;
@@ -84,11 +105,19 @@ export const playActivityFish = ({ activityId, symbol }: {
     if (activityFishData._fishHp <= 0) {
         endActivityFish({ activityId });
         winActivity({ activityId });
+
+        event({
+            data: { audioName: 'activity_fish_win' },
+            entityId: activityId,
+            type: EventTypes.AUDIO_PLAY,
+        });
+
         return;
     }
     else if (activityFishData._rodTension > activityFishData._rodMaxTension) {
         endActivityFish({ activityId });
         endActivity({ activityId });
+
         return;
     }
 
@@ -96,6 +125,11 @@ export const playActivityFish = ({ activityId, symbol }: {
         data: activityFishData,
         entityId: activityId,
         type: EventTypes.ACTIVITY_FISH_UPDATE,
+    });
+    event({
+        data: { audioName: `activity_fish_play${randAudio({ nb: 2 })}` },
+        entityId: activityId,
+        type: EventTypes.AUDIO_PLAY,
     });
 };
 

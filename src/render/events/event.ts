@@ -17,14 +17,16 @@ import {
     onActivityStart,
     onActivityWin,
 } from './event.activity';
+import { onAudioPlay, onAudioStop } from './event.audio';
 import { onDialogEnd, onDialogNext, onDialogStart } from './event.dialog';
 import { onEntityInventoryCreate, onEntityInventoryDisplay, onEntityInventoryUpdate } from './event.inventory';
-import { onLoadingDisplay } from './event.menu';
+import { onLoadingDisplay, onSettingsMenuDisplay, onSettingsMenuDisplayEdit, onSettingsMenuUpdate } from './event.menu';
 import { onTileMapCreate, onTileMapTileCreate, onTileMapTileDestroy } from './event.tilemap';
 
 import { Component } from '@/engine/components/@component';
 import { Dialog } from '@/engine/components/dialog';
 import { Inventory } from '@/engine/components/inventory';
+import { AudioData, Manager } from '@/engine/components/manager';
 import { Position } from '@/engine/components/position';
 import { Resource, ActivityBugData, ActivityFishData, ActivityCraftData } from '@/engine/components/resource';
 import { Sprite } from '@/engine/components/sprite';
@@ -47,6 +49,8 @@ export const checkActivityBugData = (data: any): data is ActivityBugData => data
 export const checkActivityFishData = (data: any): data is ActivityFishData => data;
 export const checkActivityCraftData = (data: any): data is ActivityCraftData => data;
 export const checkDialogData = (data: any): data is Dialog => data;
+export const checkManagerData = (data: any): data is Manager => data;
+export const checkAudioData = (data: any): data is AudioData => data;
 //#endregion
 
 //#region EVENTS
@@ -55,6 +59,22 @@ export const event = <T extends keyof Component>(event: Event<T>) => {
         /* Menu */
         if (event.type === EventTypes.MENU_LOADING_ON || event.type === EventTypes.MENU_LOADING_OFF) {
             onLoadingDisplay({ display: event.type === EventTypes.MENU_LOADING_ON });
+        }
+        else if (event.type === EventTypes.MENU_SETTINGS_DISPLAY) {
+            onSettingsMenuDisplay();
+        }
+        else if (event.type === EventTypes.MENU_SETTINGS_UPDATE && checkManagerData(event.data)) {
+            onSettingsMenuUpdate({ manager: event.data });
+        }
+        else if (event.type === EventTypes.MENU_SETTINGS_DISPLAY_EDIT) {
+            onSettingsMenuDisplayEdit();
+        }
+        /* Audio */
+        else if (event.type === EventTypes.AUDIO_PLAY && checkAudioData(event.data)) {
+            onAudioPlay({ audioName: event.data.audioName, loop: event.data.loop, volume: event.data.volume });
+        }
+        else if (event.type === EventTypes.AUDIO_STOP && checkAudioData(event.data)) {
+            onAudioStop({ audioName: event.data.audioName });
         }
         /* Entity */
         else if (event.type === EventTypes.ENTITY_CREATE) {

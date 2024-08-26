@@ -10,10 +10,17 @@ import {
     addResourceFish,
     addDialog,
     addResourceCraft,
+    addManager,
 } from './component';
 
-import { createEntity, PLAYER_ENTITY_NAME, TILEMAP_ENTITY_NAME } from '@/engine/entities';
+import { createEntity, MANAGER_ENTITY_NAME, PLAYER_ENTITY_NAME, TILEMAP_ENTITY_NAME } from '@/engine/entities';
 import { generateTileMap, setTile } from '@/engine/systems/tilemap';
+
+export const createEntityManager = () => {
+    const entityId = createEntity({ entityName: MANAGER_ENTITY_NAME });
+
+    addManager({ entityId });
+};
 
 export const createEntityPlayer = ({
     spriteHeight = 2,
