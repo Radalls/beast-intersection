@@ -1,5 +1,6 @@
 import { Collider } from './collider';
 import { Dialog } from './dialog';
+import { Energy } from './energy';
 import { Inventory } from './inventory';
 import { Manager } from './manager';
 import { Position } from './position';
@@ -11,6 +12,7 @@ import { Trigger } from './trigger';
 export type Component = {
     'Collider': Collider;
     'Dialog': Dialog;
+    'Energy': Energy;
     'Inventory': Inventory;
     'Manager': Manager;
     'Position': Position;

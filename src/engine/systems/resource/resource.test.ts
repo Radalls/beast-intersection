@@ -1,5 +1,6 @@
 import { destroyResource, getResourceItem, useResource } from './resource';
 
+import { Energy } from '@/engine/components/energy';
 import { Inventory } from '@/engine/components/inventory';
 import { Resource, ActivityTypes } from '@/engine/components/resource';
 import { addComponent, createEntity, getEntity } from '@/engine/entities';
@@ -22,10 +23,16 @@ describe('Resource System', () => {
         _maxSlots: 3,
         slots: [],
     };
+    const playerEnergy: Energy = {
+        _: 'Energy',
+        _current: 2,
+        _max: 3,
+    };
 
     beforeAll(() => {
         addComponent({ component: resource, entityId: resourceEntityId });
         addComponent({ component: playerInventory, entityId: playerEntityId });
+        addComponent({ component: playerEnergy, entityId: playerEntityId });
     });
 
     describe(useResource.name, () => {

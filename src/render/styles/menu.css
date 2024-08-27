@@ -34,7 +34,7 @@
 .settings {
     align-items: center;
     background-color: rgba(0, 0, 0, 0.995);
-    color: rgb(240, 240, 240);
+    color: rgb(245, 245, 245);
     display: none;
     flex-direction: column;
     gap: 16px;
@@ -46,7 +46,7 @@
 
 .settings-edit {
     align-items: center;
-    background-color: rgb(240, 240, 240);
+    background-color: rgb(245, 245, 245);
     display: none;
     font-size: 26px;
     height: 64px;
@@ -59,7 +59,7 @@
 }
 
 .setting-header {
-    border-bottom: 2px solid rgb(240, 240, 240);
+    border-bottom: 2px solid rgb(245, 245, 245);
     font-size: 22px;
     padding-top: 32px;
     width: 128px;
@@ -67,7 +67,7 @@
 
 .setting-container {
     align-items: center;
-    border-left: 5px solid rgb(180, 180, 180);
+    border-left: 5px solid rgb(245, 245, 245);
     display: flex;
     gap: 16px;
     justify-content: space-between;
@@ -76,7 +76,7 @@
 }
 
 .setting-label {
-    color: rgb(240, 240, 240);
+    color: rgb(245, 245, 245);
     font-size: 16px;
 }
 
@@ -89,7 +89,7 @@
 
 .setting-icon {
     align-items: center;
-    background-color: rgb(240, 240, 240);
+    background-color: rgb(245, 245, 245);
     color: rgb(0, 0, 0);
     display: flex;
     height: 32px;
@@ -98,7 +98,7 @@
 }
 
 .setting-value {
-    color: rgb(240, 240, 240);
+    color: rgb(245, 245, 245);
     font-size: 24px;
     height: 32px;
     width: 32px;

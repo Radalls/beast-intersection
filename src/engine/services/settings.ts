@@ -55,6 +55,13 @@ export const openSettings = ({ managerEntityId }: { managerEntityId?: string | n
 
     setState('isGamePaused', true);
 
+    const playerEntityId = getStore('playerId')
+        ?? error({ message: 'Store playerId is undefined', where: openSettings.name });
+    event({
+        entityId: playerEntityId,
+        type: EventTypes.ENERGY_DISPLAY,
+    });
+
     event({
         data: manager,
         entityId: managerEntityId,
@@ -79,6 +86,13 @@ export const closeSettings = ({ managerEntityId }: { managerEntityId?: string | 
     const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
 
     setState('isGamePaused', false);
+
+    const playerEntityId = getStore('playerId')
+        ?? error({ message: 'Store playerId is undefined', where: closeSettings.name });
+    event({
+        entityId: playerEntityId,
+        type: EventTypes.ENERGY_DISPLAY,
+    });
 
     event({
         data: manager,
