@@ -56,6 +56,10 @@ export enum EventTypes {
     DIALOG_END = 'DIALOG_END',
     DIALOG_START = 'DIALOG_START',
     DIALOG_UPDATE = 'DIALOG_UPDATE',
+    /* Energy */
+    ENERGY_CREATE = 'ENERGY_CREATE',
+    ENERGY_DISPLAY = 'ENERGY_DISPLAY',
+    ENERGY_UPDATE = 'ENERGY_UPDATE',
     /* Entity */
     ENTITY_CREATE = 'ENTITY_CREATE',
     ENTITY_DESTROY = 'ENTITY_DESTROY',
@@ -88,128 +92,123 @@ export const onInputKeyDown = (inputKey: string) => {
 
     const playerPosition = getComponent({ componentId: 'Position', entityId: playerEntityId });
 
-    try {
-        if (
-            getState('isGameLoading') ||
-            !(getState('isGameRunning')) ||
-            getState('isInputCooldown') ||
-            getState('isActivityBugCooldown')
-        ) return;
+    if (
+        getState('isGameLoading') ||
+        !(getState('isGameRunning')) ||
+        getState('isInputCooldown') ||
+        getState('isActivityBugCooldown')
+    ) return;
 
-        setState('isInputCooldown', true);
+    setState('isInputCooldown', true);
 
-        if (getState('isGamePaused')) {
-            if (inputKey === manager.settings.keys.action._back) {
-                if (getState('isSettingEditOpen')) return;
+    if (getState('isGamePaused')) {
+        if (inputKey === manager.settings.keys.action._back) {
+            if (getState('isSettingEditOpen')) return;
 
-                closeSettings({});
-                return;
-            }
-            else {
-                onSettingsInput({ inputKey });
-                return;
-            }
-        }
-        else if (getState('isPlayerInventoryOpen')) {
-            if (
-                inputKey === manager.settings.keys.action._inventory
-                || inputKey === manager.settings.keys.action._back
-            ) {
-                closePlayerInventory({ playerEntityId });
-                return;
-            }
-            else return;
-        }
-        else if (getState('isActivityRunning')) {
-            if (getState('isActivityBugRunning')) {
-                onActivityBugInput({ inputKey });
-                return;
-            }
-            else if (getState('isActivityFishRunning')) {
-                onActivityFishInput({ inputKey });
-                return;
-            }
-            else if (getState('isActivityCraftRunning')) {
-                onActivityCraftInput({ inputKey });
-                return;
-            }
-            else return;
-        }
-        else if (getState('isPlayerDialogOpen')) {
-            const dialogEntityId = getStore('dialogId')
-                ?? error({ message: 'Store dialogId is undefined', where: onInputKeyDown.name });
-
-            if (inputKey === manager.settings.keys.move._up) {
-                selectDialogOption({ entityId: dialogEntityId, offset: -1 });
-                return;
-            }
-            else if (inputKey === manager.settings.keys.move._down) {
-                selectDialogOption({ entityId: dialogEntityId, offset: 1 });
-                return;
-            }
-            else if (inputKey === manager.settings.keys.action._act) {
-                nextDialog({ entityId: dialogEntityId });
-                return;
-            }
-            else return;
+            closeSettings({});
+            return;
         }
         else {
-            if (inputKey === manager.settings.keys.action._back) {
-                openSettings({});
-                return;
-            }
-            else if (inputKey === manager.settings.keys.action._inventory) {
-                openPlayerInventory({ playerEntityId });
-                return;
-            }
-            else if (inputKey === manager.settings.keys.move._up) {
-                updateTile({
-                    entityId: playerEntityId,
-                    targetX: playerPosition._x,
-                    targetY: playerPosition._y - 1,
-                });
-
-                return;
-            }
-            else if (inputKey === manager.settings.keys.move._left) {
-                updateTile({
-                    entityId: playerEntityId,
-                    targetX: playerPosition._x - 1,
-                    targetY: playerPosition._y,
-                });
-
-                return;
-            }
-            else if (inputKey === manager.settings.keys.move._down) {
-                updateTile({
-                    entityId: playerEntityId,
-                    targetX: playerPosition._x,
-                    targetY: playerPosition._y + 1,
-                });
-
-                return;
-            }
-            else if (inputKey === manager.settings.keys.move._right) {
-                updateTile({
-                    entityId: playerEntityId,
-                    targetX: playerPosition._x + 1,
-                    targetY: playerPosition._y,
-                });
-
-                return;
-            }
-            else if (inputKey === manager.settings.keys.action._act) {
-                const triggeredEntityId = checkTrigger({});
-                if (triggeredEntityId) {
-                    onTrigger({ triggeredEntityId });
-                }
-
-                return;
-            }
+            onSettingsInput({ inputKey });
+            return;
         }
     }
-    catch (e) {
-        console.error(e);
+    else if (getState('isPlayerInventoryOpen')) {
+        if (
+            inputKey === manager.settings.keys.action._inventory
+            || inputKey === manager.settings.keys.action._back
+        ) {
+            closePlayerInventory({ playerEntityId });
+            return;
+        }
+        else return;
+    }
+    else if (getState('isActivityRunning')) {
+        if (getState('isActivityBugRunning')) {
+            onActivityBugInput({ inputKey });
+            return;
+        }
+        else if (getState('isActivityFishRunning')) {
+            onActivityFishInput({ inputKey });
+            return;
+        }
+        else if (getState('isActivityCraftRunning')) {
+            onActivityCraftInput({ inputKey });
+            return;
+        }
+        else return;
+    }
+    else if (getState('isPlayerDialogOpen')) {
+        const dialogEntityId = getStore('dialogId')
+            ?? error({ message: 'Store dialogId is undefined', where: onInputKeyDown.name });
+
+        if (inputKey === manager.settings.keys.move._up) {
+            selectDialogOption({ entityId: dialogEntityId, offset: -1 });
+            return;
+        }
+        else if (inputKey === manager.settings.keys.move._down) {
+            selectDialogOption({ entityId: dialogEntityId, offset: 1 });
+            return;
+        }
+        else if (inputKey === manager.settings.keys.action._act) {
+            nextDialog({ entityId: dialogEntityId });
+            return;
+        }
+        else return;
+    }
+    else {
+        if (inputKey === manager.settings.keys.action._back) {
+            openSettings({});
+            return;
+        }
+        else if (inputKey === manager.settings.keys.action._inventory) {
+            openPlayerInventory({ playerEntityId });
+            return;
+        }
+        else if (inputKey === manager.settings.keys.move._up) {
+            updateTile({
+                entityId: playerEntityId,
+                targetX: playerPosition._x,
+                targetY: playerPosition._y - 1,
+            });
+
+            return;
+        }
+        else if (inputKey === manager.settings.keys.move._left) {
+            updateTile({
+                entityId: playerEntityId,
+                targetX: playerPosition._x - 1,
+                targetY: playerPosition._y,
+            });
+
+            return;
+        }
+        else if (inputKey === manager.settings.keys.move._down) {
+            updateTile({
+                entityId: playerEntityId,
+                targetX: playerPosition._x,
+                targetY: playerPosition._y + 1,
+            });
+
+            return;
+        }
+        else if (inputKey === manager.settings.keys.move._right) {
+            updateTile({
+                entityId: playerEntityId,
+                targetX: playerPosition._x + 1,
+                targetY: playerPosition._y,
+            });
+
+            return;
+        }
+        else if (inputKey === manager.settings.keys.action._act) {
+            const triggeredEntityId = checkTrigger({});
+            if (triggeredEntityId) {
+                onTrigger({ triggeredEntityId });
+            }
+
+            return;
+        }
     }
 };
 

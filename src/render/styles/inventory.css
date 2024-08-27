@@ -1,6 +1,6 @@
 .inventory {
-    background-color: rgb(70, 70, 70);
-    bottom: 64px;
+    background-color: rgb(0, 0, 0);
+    bottom: 32px;
     display: none;
     flex-wrap: wrap;
     gap: 2px;

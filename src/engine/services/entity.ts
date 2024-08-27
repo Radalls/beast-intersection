@@ -11,6 +11,7 @@ import {
     addDialog,
     addResourceCraft,
     addManager,
+    addEnergy,
 } from './component';
 
 import { createEntity, MANAGER_ENTITY_NAME, PLAYER_ENTITY_NAME, TILEMAP_ENTITY_NAME } from '@/engine/entities';
@@ -29,19 +30,22 @@ export const createEntityPlayer = ({
     positionX,
     positionY,
     inventoryMaxSlots = 20,
+    energyMax = 10,
 }: {
+    energyMax?: number
     inventoryMaxSlots?: number,
     positionX: number,
     positionY: number,
     spriteHeight?: number,
     spritePath: string,
-    spriteWidth?: number
+    spriteWidth?: number,
 }) => {
     const entityId = createEntity({ entityName: PLAYER_ENTITY_NAME });
 
     addSprite({ entityId, height: spriteHeight, image: spritePath, width: spriteWidth });
     addPosition({ entityId, x: positionX, y: positionY });
     addInventory({ entityId, maxSlots: inventoryMaxSlots });
+    addEnergy({ current: energyMax, entityId, max: energyMax });
 
     setTile({ entityId });
 };
