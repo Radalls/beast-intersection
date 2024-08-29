@@ -6,5 +6,7 @@
     { "id": 5, "name": "Campfire", "maxAmount": 1 },
     { "id": 6, "name": "Bug1", "maxAmount": 1 },
     { "id": 7, "name": "Bug2", "maxAmount": 1 },
-    { "id": 8, "name": "Fish1", "maxAmount": 1 }
+    { "id": 8, "name": "Fish1", "maxAmount": 1 },
+    { "id": 9, "name": "FishRod1", "maxAmount": 1, "tool": "FISH" },
+    { "id": 10, "name": "BugNet1", "maxAmount": 1, "tool": "BUG" }
 ]

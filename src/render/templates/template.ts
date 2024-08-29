@@ -1,4 +1,4 @@
-import { getEntity, getSpritePath } from './template.utils';
+import { getElement, getSpritePath } from './template.utils';
 
 import { Position } from '@/engine/components/position';
 import { Sprite } from '@/engine/components/sprite';
@@ -9,56 +9,56 @@ export const TILE_PIXEL_SIZE = 64;
 //#endregion
 
 //#region TEMPLATES
-export const createEntity = ({ entityId, htmlId, htmlClass, htmlParent, htmlAbsolute = true }: {
+export const createElement = ({ entityId, elementId, elementClass, elementParent, elementAbsolute = true }: {
+    elementAbsolute?: boolean,
+    elementClass?: string,
+    elementId?: string,
+    elementParent?: HTMLElement
     entityId: string,
-    htmlAbsolute?: boolean,
-    htmlClass?: string,
-    htmlId?: string,
-    htmlParent?: HTMLElement
 }) => {
-    const entity = document.createElement('div');
+    const element = document.createElement('div');
 
-    entity.setAttribute('id', htmlId ?? entityId);
-    entity.setAttribute('class', htmlClass ?? entityId.toLowerCase());
+    element.setAttribute('id', elementId ?? entityId);
+    element.setAttribute('class', elementClass ?? entityId.toLowerCase());
 
-    entity.style.position = htmlAbsolute ? 'absolute' : 'relative';
+    element.style.position = elementAbsolute ? 'absolute' : 'relative';
 
-    const parent = htmlParent ?? app;
-    parent.appendChild(entity);
+    const parent = elementParent ?? app;
+    parent.appendChild(element);
 
-    return entity;
+    return element;
 };
 
-export const destroyEntity = ({ entityId }: { entityId: string }) => {
-    const entity = getEntity({ entityId });
+export const destroyElement = ({ elementId }: { elementId: string }) => {
+    const element = getElement({ elementId });
 
-    while (entity.firstChild) {
-        entity.removeChild(entity.firstChild);
+    while (element.firstChild) {
+        element.removeChild(element.firstChild);
     }
 
-    entity.remove();
+    element.remove();
 };
 
-export const updatePosition = ({ entityId, position }: {
-    entityId: string,
+export const updatePosition = ({ elementId, position }: {
+    elementId: string,
     position: Position,
 }) => {
-    const entity = getEntity({ entityId });
+    const element = getElement({ elementId });
 
-    entity.style.left = `${position._x * TILE_PIXEL_SIZE + TILE_PIXEL_SIZE}px`;
-    entity.style.top = `${position._y * TILE_PIXEL_SIZE + TILE_PIXEL_SIZE
-        - (((parseInt(entity.style.height) / TILE_PIXEL_SIZE) - 1) * TILE_PIXEL_SIZE)}px`;
-    entity.style.zIndex = `${position._y}`;
+    element.style.left = `${position._x * TILE_PIXEL_SIZE + TILE_PIXEL_SIZE}px`;
+    element.style.top = `${position._y * TILE_PIXEL_SIZE + TILE_PIXEL_SIZE
+        - (((parseInt(element.style.height) / TILE_PIXEL_SIZE) - 1) * TILE_PIXEL_SIZE)}px`;
+    element.style.zIndex = `${position._y}`;
 };
 
-export const createSprite = ({ entityId, sprite }: {
-    entityId: string,
+export const createSprite = ({ elementId, sprite }: {
+    elementId: string,
     sprite: Sprite,
 }) => {
-    const entity = getEntity({ entityId });
+    const element = getElement({ elementId });
 
-    entity.style.backgroundImage = `url(${getSpritePath(sprite._image)})`;
-    entity.style.width = `${sprite._width * TILE_PIXEL_SIZE}px`;
-    entity.style.height = `${sprite._height * TILE_PIXEL_SIZE}px`;
+    element.style.backgroundImage = `url(${getSpritePath(sprite._image)})`;
+    element.style.width = `${sprite._width * TILE_PIXEL_SIZE}px`;
+    element.style.height = `${sprite._height * TILE_PIXEL_SIZE}px`;
 };
 //#endregion

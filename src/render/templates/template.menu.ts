@@ -1,27 +1,37 @@
-import { createEntity } from './template';
-import { getEntity, searchEntitiesByClassName, searchEntityById, getSettingId, getSettingName } from './template.utils';
+import { createElement } from './template';
+import { getElement, searchElementsByClassName, searchElementById } from './template.utils';
 
 import { Manager } from '@/engine/components/manager';
 import { SETTINGS, SETTINGS_KEYS_PATHS } from '@/engine/services/settings';
 
+//#region HELPERS
+const getSettingId = ({ settingName }: { settingName: string }) => {
+    return settingName.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+};
+
+const getSettingName = ({ settingId }: { settingId: string }) => {
+    return settingId.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+};
+//#endregion
+
 //#region TEMPLATES
 //#region LOADING MENU
 export const createLoadingMenu = () => {
-    const entityLoading = createEntity({
+    const loading = createElement({
+        elementClass: 'loading',
         entityId: 'LoadingMenu',
-        htmlClass: 'loading',
     });
 
-    createEntity({
+    createElement({
+        elementAbsolute: false,
+        elementClass: 'loader',
+        elementParent: loading,
         entityId: 'LoadingLoader',
-        htmlAbsolute: false,
-        htmlClass: 'loader',
-        htmlParent: entityLoading,
     });
 };
 
 export const displayLoadingMenu = ({ display }: { display: boolean }) => {
-    const entityLoading = getEntity({ entityId: 'LoadingMenu' });
+    const entityLoading = getElement({ elementId: 'LoadingMenu' });
 
     if (display) {
         entityLoading.style.display = 'flex';
@@ -36,318 +46,356 @@ export const displayLoadingMenu = ({ display }: { display: boolean }) => {
 
 //#region SETTINGS MENU
 export const createSettingsMenu = () => {
-    const entitySetting = createEntity({
+    const settings = createElement({
+        elementClass: 'settings',
         entityId: 'settings-menu',
-        htmlClass: 'settings',
     });
 
-    const entitySettingEdit = createEntity({
+    const edit = createElement({
+        elementClass: 'settings-edit',
         entityId: 'settings-menu-edit',
-        htmlClass: 'settings-edit',
     });
-    entitySettingEdit.innerText = 'ENTER NEW KEY';
+    edit.innerText = 'ENTER NEW KEY';
 
     /* General */
-    const entitySettingGeneralSettings = createEntity({
+    const generalSettings = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-header',
+        elementParent: settings,
         entityId: 'settings-menu-general',
-        htmlAbsolute: false,
-        htmlClass: 'setting-header',
-        htmlParent: entitySetting,
     });
-    entitySettingGeneralSettings.innerText = 'GENERAL';
+    generalSettings.innerText = 'GENERAL';
 
     /* Audio */
-    const entitySettingAudioSettingContainer = createEntity({
+    const audioContainer = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-container',
+        elementParent: settings,
         entityId: 'settings-menu-audio-container',
-        htmlAbsolute: false,
-        htmlClass: 'setting-container',
-        htmlParent: entitySetting,
     });
 
-    const entitySettingAudioSettingLabel = createEntity({
+    const audioLabel = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-label',
+        elementParent: audioContainer,
         entityId: 'settings-menu-audio-label',
-        htmlAbsolute: false,
-        htmlClass: 'setting-label',
-        htmlParent: entitySettingAudioSettingContainer,
     });
-    entitySettingAudioSettingLabel.innerText = 'AUDIO: ';
+    audioLabel.innerText = 'AUDIO: ';
 
-    const entitySettingAudioSetting = createEntity({
+    const audioSetting = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting',
+        elementParent: audioContainer,
         entityId: 'settings-menu-audio-setting',
-        htmlAbsolute: false,
-        htmlClass: 'setting',
-        htmlParent: entitySettingAudioSettingContainer,
     });
 
-    const entitySettingAudioSettingIcon = createEntity({
+    const audioSettingIcon = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-icon',
+        elementParent: audioSetting,
         entityId: 'settings-menu-audio-setting-icon',
-        htmlAbsolute: false,
-        htmlClass: 'setting-icon',
-        htmlParent: entitySettingAudioSetting,
     });
-    entitySettingAudioSettingIcon.innerText = '🎵';
+    audioSettingIcon.innerText = '🎵';
 
-    createEntity({
+    createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-value',
+        elementParent: audioSetting,
         entityId: 'settings-menu-audio-setting-value',
-        htmlAbsolute: false,
-        htmlClass: 'setting-value',
-        htmlParent: entitySettingAudioSetting,
     });
 
     /* Keybinds */
-    const entitySettingKeyMoveSettings = createEntity({
+    const keybindsSettings = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-header',
+        elementParent: settings,
         entityId: 'settings-menu-keybinds',
-        htmlAbsolute: false,
-        htmlClass: 'setting-header',
-        htmlParent: entitySetting,
     });
-    entitySettingKeyMoveSettings.innerText = 'KEYBINDS';
+    keybindsSettings.innerText = 'KEYBINDS';
 
     /* Move UP */
-    const entitySettingKeyMoveUpSettingContainer = createEntity({
+    const moveUpContainer = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-container',
+        elementParent: settings,
         entityId: 'settings-menu-key-move-up-container',
-        htmlAbsolute: false,
-        htmlClass: 'setting-container',
-        htmlParent: entitySetting,
     });
 
-    const entitySettingKeyMoveUpSettingLabel = createEntity({
+    const moveUpLabel = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-label',
+        elementParent: moveUpContainer,
         entityId: 'settings-menu-key-move-up-label',
-        htmlAbsolute: false,
-        htmlClass: 'setting-label',
-        htmlParent: entitySettingKeyMoveUpSettingContainer,
     });
-    entitySettingKeyMoveUpSettingLabel.innerText = 'UP: ';
+    moveUpLabel.innerText = 'UP: ';
 
-    const entitySettingKeyMoveUpSetting = createEntity({
+    const moveUpSetting = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting',
+        elementParent: moveUpContainer,
         entityId: 'settings-menu-key-move-up-setting',
-        htmlAbsolute: false,
-        htmlClass: 'setting',
-        htmlParent: entitySettingKeyMoveUpSettingContainer,
     });
 
-    const entitySettingKeyMoveUpSettingIcon = createEntity({
+    const moveUpSettingIcon = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-icon',
+        elementParent: moveUpSetting,
         entityId: 'settings-menu-key-move-up-setting-icon',
-        htmlAbsolute: false,
-        htmlClass: 'setting-icon',
-        htmlParent: entitySettingKeyMoveUpSetting,
     });
-    entitySettingKeyMoveUpSettingIcon.innerText = '⬆';
+    moveUpSettingIcon.innerText = '⬆';
 
-    createEntity({
+    createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-value',
+        elementParent: moveUpSetting,
         entityId: 'settings-menu-key-move-up-setting-value',
-        htmlAbsolute: false,
-        htmlClass: 'setting-value',
-        htmlParent: entitySettingKeyMoveUpSetting,
     });
 
     /* Move DOWN */
-    const entitySettingKeyMoveDownSettingContainer = createEntity({
+    const moveDownContainer = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-container',
+        elementParent: settings,
         entityId: 'settings-menu-key-move-down-container',
-        htmlAbsolute: false,
-        htmlClass: 'setting-container',
-        htmlParent: entitySetting,
     });
 
-    const entitySettingKeyMoveDownSettingLabel = createEntity({
+    const moveDownLabel = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-label',
+        elementParent: moveDownContainer,
         entityId: 'settings-menu-key-move-down-label',
-        htmlAbsolute: false,
-        htmlClass: 'setting-label',
-        htmlParent: entitySettingKeyMoveDownSettingContainer,
     });
-    entitySettingKeyMoveDownSettingLabel.innerText = 'DOWN: ';
+    moveDownLabel.innerText = 'DOWN: ';
 
-    const entitySettingKeyMoveDownSetting = createEntity({
+    const moveDownSetting = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting',
+        elementParent: moveDownContainer,
         entityId: 'settings-menu-key-move-down-setting',
-        htmlAbsolute: false,
-        htmlClass: 'setting',
-        htmlParent: entitySettingKeyMoveDownSettingContainer,
     });
 
-    const entitySettingKeyMoveDownSettingIcon = createEntity({
+    const moveDownSettingIcon = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-icon',
+        elementParent: moveDownSetting,
         entityId: 'settings-menu-key-move-down-setting-icon',
-        htmlAbsolute: false,
-        htmlClass: 'setting-icon',
-        htmlParent: entitySettingKeyMoveDownSetting,
     });
-    entitySettingKeyMoveDownSettingIcon.innerText = '⬇';
+    moveDownSettingIcon.innerText = '⬇';
 
-    createEntity({
+    createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-value',
+        elementParent: moveDownSetting,
         entityId: 'settings-menu-key-move-down-setting-value',
-        htmlAbsolute: false,
-        htmlClass: 'setting-value',
-        htmlParent: entitySettingKeyMoveDownSetting,
     });
 
     /* Move LEFT */
-    const entitySettingKeyMoveLeftSettingContainer = createEntity({
+    const moveLeftContainer = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-container',
+        elementParent: settings,
         entityId: 'settings-menu-key-move-left-container',
-        htmlAbsolute: false,
-        htmlClass: 'setting-container',
-        htmlParent: entitySetting,
     });
 
-    const entitySettingKeyMoveLeftSettingLabel = createEntity({
+    const moveLeftLabel = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-label',
+        elementParent: moveLeftContainer,
         entityId: 'settings-menu-key-move-left-label',
-        htmlAbsolute: false,
-        htmlClass: 'setting-label',
-        htmlParent: entitySettingKeyMoveLeftSettingContainer,
     });
-    entitySettingKeyMoveLeftSettingLabel.innerText = 'LEFT: ';
+    moveLeftLabel.innerText = 'LEFT: ';
 
-    const entitySettingKeyMoveLeftSetting = createEntity({
+    const moveLeftSetting = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting',
+        elementParent: moveLeftContainer,
         entityId: 'settings-menu-key-move-left-setting',
-        htmlAbsolute: false,
-        htmlClass: 'setting',
-        htmlParent: entitySettingKeyMoveLeftSettingContainer,
     });
 
-    const entitySettingKeyMoveLeftSettingIcon = createEntity({
+    const moveLeftSettingIcon = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-icon',
+        elementParent: moveLeftSetting,
         entityId: 'settings-menu-key-move-left-setting-icon',
-        htmlAbsolute: false,
-        htmlClass: 'setting-icon',
-        htmlParent: entitySettingKeyMoveLeftSetting,
     });
-    entitySettingKeyMoveLeftSettingIcon.innerText = '⬅';
+    moveLeftSettingIcon.innerText = '⬅';
 
-    createEntity({
+    createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-value',
+        elementParent: moveLeftSetting,
         entityId: 'settings-menu-key-move-left-setting-value',
-        htmlAbsolute: false,
-        htmlClass: 'setting-value',
-        htmlParent: entitySettingKeyMoveLeftSetting,
     });
 
     /* Move RIGHT */
-    const entitySettingKeyMoveRightSettingContainer = createEntity({
+    const moveRightContainer = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-container',
+        elementParent: settings,
         entityId: 'settings-menu-key-move-right-container',
-        htmlAbsolute: false,
-        htmlClass: 'setting-container',
-        htmlParent: entitySetting,
     });
 
-    const entitySettingKeyMoveRightSettingLabel = createEntity({
+    const moveRightLabel = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-label',
+        elementParent: moveRightContainer,
         entityId: 'settings-menu-key-move-right-label',
-        htmlAbsolute: false,
-        htmlClass: 'setting-label',
-        htmlParent: entitySettingKeyMoveRightSettingContainer,
     });
-    entitySettingKeyMoveRightSettingLabel.innerText = 'RIGHT: ';
+    moveRightLabel.innerText = 'RIGHT: ';
 
-    const entitySettingKeyMoveRightSetting = createEntity({
+    const moveRightSetting = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting',
+        elementParent: moveRightContainer,
         entityId: 'settings-menu-key-move-right-setting',
-        htmlAbsolute: false,
-        htmlClass: 'setting',
-        htmlParent: entitySettingKeyMoveRightSettingContainer,
     });
 
-    const entitySettingKeyMoveRightSettingIcon = createEntity({
+    const moveRightSettingIcon = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-icon',
+        elementParent: moveRightSetting,
         entityId: 'settings-menu-key-move-right-setting-icon',
-        htmlAbsolute: false,
-        htmlClass: 'setting-icon',
-        htmlParent: entitySettingKeyMoveRightSetting,
     });
-    entitySettingKeyMoveRightSettingIcon.innerText = '➡';
+    moveRightSettingIcon.innerText = '➡';
 
-    createEntity({
+    createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-value',
+        elementParent: moveRightSetting,
         entityId: 'settings-menu-key-move-right-setting-value',
-        htmlAbsolute: false,
-        htmlClass: 'setting-value',
-        htmlParent: entitySettingKeyMoveRightSetting,
     });
 
     /* Action ACT */
-    const entitySettingKeyActionActSettingContainer = createEntity({
+    const actContainer = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-container',
+        elementParent: settings,
         entityId: 'settings-menu-key-action-act-container',
-        htmlAbsolute: false,
-        htmlClass: 'setting-container',
-        htmlParent: entitySetting,
     });
 
-    const entitySettingKeyActionActSettingLabel = createEntity({
+    const actLabel = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-label',
+        elementParent: actContainer,
         entityId: 'settings-menu-key-action-act-label',
-        htmlAbsolute: false,
-        htmlClass: 'setting-label',
-        htmlParent: entitySettingKeyActionActSettingContainer,
     });
-    entitySettingKeyActionActSettingLabel.innerText = 'ACT: ';
+    actLabel.innerText = 'ACT: ';
 
-    const entitySettingKeyActionActSetting = createEntity({
+    const actSetting = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting',
+        elementParent: actContainer,
         entityId: 'settings-menu-key-action-act-setting',
-        htmlAbsolute: false,
-        htmlClass: 'setting',
-        htmlParent: entitySettingKeyActionActSettingContainer,
     });
 
-    const entitySettingKeyActionActSettingIcon = createEntity({
+    const actSettingIcon = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-icon',
+        elementParent: actSetting,
         entityId: 'settings-menu-key-action-act-setting-icon',
-        htmlAbsolute: false,
-        htmlClass: 'setting-icon',
-        htmlParent: entitySettingKeyActionActSetting,
     });
-    entitySettingKeyActionActSettingIcon.innerText = '🖐';
+    actSettingIcon.innerText = '🖐';
 
-    createEntity({
+    createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-value',
+        elementParent: actSetting,
         entityId: 'settings-menu-key-action-act-setting-value',
-        htmlAbsolute: false,
-        htmlClass: 'setting-value',
-        htmlParent: entitySettingKeyActionActSetting,
     });
 
     /* Action INVENTORY */
-    const entitySettingKeyActionInventorySettingContainer = createEntity({
+    const inventoryContainer = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-container',
+        elementParent: settings,
         entityId: 'settings-menu-key-action-inventory-container',
-        htmlAbsolute: false,
-        htmlClass: 'setting-container',
-        htmlParent: entitySetting,
     });
 
-    const entitySettingKeyActionInventorySettingLabel = createEntity({
+    const inventoryLabel = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-label',
+        elementParent: inventoryContainer,
         entityId: 'settings-menu-key-action-inventory-label',
-        htmlAbsolute: false,
-        htmlClass: 'setting-label',
-        htmlParent: entitySettingKeyActionInventorySettingContainer,
     });
-    entitySettingKeyActionInventorySettingLabel.innerText = 'INVENTORY: ';
+    inventoryLabel.innerText = 'INVENTORY: ';
 
-    const entitySettingKeyActionInventorySetting = createEntity({
+    const inventorySetting = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting',
+        elementParent: inventoryContainer,
         entityId: 'settings-menu-key-action-inventory-setting',
-        htmlAbsolute: false,
-        htmlClass: 'setting',
-        htmlParent: entitySettingKeyActionInventorySettingContainer,
     });
 
-    const entitySettingKeyActionInventorySettingIcon = createEntity({
+    const inventorySettingIcon = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-icon',
+        elementParent: inventorySetting,
         entityId: 'settings-menu-key-action-inventory-setting-icon',
-        htmlAbsolute: false,
-        htmlClass: 'setting-icon',
-        htmlParent: entitySettingKeyActionInventorySetting,
     });
-    entitySettingKeyActionInventorySettingIcon.innerText = '🎒';
+    inventorySettingIcon.innerText = '🎒';
 
-    createEntity({
+    createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-value',
+        elementParent: inventorySetting,
         entityId: 'settings-menu-key-action-inventory-setting-value',
-        htmlAbsolute: false,
-        htmlClass: 'setting-value',
-        htmlParent: entitySettingKeyActionInventorySetting,
+    });
+
+    /* Action TOOL */
+    const toolContainer = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-container',
+        elementParent: settings,
+        entityId: 'settings-menu-key-action-tool-container',
+    });
+
+    const toolLabel = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-label',
+        elementParent: toolContainer,
+        entityId: 'settings-menu-key-action-tool-label',
+    });
+    toolLabel.innerText = 'TOOL: ';
+
+    const toolSetting = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting',
+        elementParent: toolContainer,
+        entityId: 'settings-menu-key-action-tool-setting',
+    });
+
+    const toolSettingIcon = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-icon',
+        elementParent: toolSetting,
+        entityId: 'settings-menu-key-action-tool-setting-icon',
+    });
+    toolSettingIcon.innerText = '🎣';
+
+    createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-value',
+        elementParent: toolSetting,
+        entityId: 'settings-menu-key-action-tool-setting-value',
     });
 };
 
 export const displaySettingsMenu = () => {
-    const entitySettingsMenu = getEntity({ entityId: 'settings-menu' });
+    const settings = getElement({ elementId: 'settings-menu' });
 
-    entitySettingsMenu.style.display = (entitySettingsMenu.style.display === 'flex') ? 'none' : 'flex';
+    settings.style.display = (settings.style.display === 'flex') ? 'none' : 'flex';
 };
 
 export const updateSettingsMenu = ({ manager }: {
     manager: Manager,
 }) => {
-    const settingsContainerEntities = searchEntitiesByClassName({ className: 'setting-container' });
-    for (const container of settingsContainerEntities) {
+    const containers = searchElementsByClassName({ className: 'setting-container' });
+    for (const container of containers) {
         container.style.borderLeft = '5px solid rgb(180, 180, 180)';
     }
 
-    const settingsValueEntities = searchEntitiesByClassName({ className: 'setting-value' });
-    for (const value of settingsValueEntities) {
+    const values = searchElementsByClassName({ className: 'setting-value' });
+    for (const value of values) {
         const settingId = value.id.match(/settings-menu-(.+)-setting-value/)?.[1];
         if (!(settingId)) continue;
 
@@ -362,19 +410,19 @@ export const updateSettingsMenu = ({ manager }: {
                 settingPath = settingPath[key];
             }
 
-            value.innerText = settingPath;
+            value.innerText = settingPath.toUpperCase();
         }
     }
 
-    const selectedSetting = getSettingId({ settingName: SETTINGS[manager._selectedSetting] });
-    const selectedSettingContainerEntity = searchEntityById({ partialEntityId: selectedSetting });
-    selectedSettingContainerEntity.style.borderLeft = '5px solid rgb(255, 0, 0)';
+    const selectedSettingId = getSettingId({ settingName: SETTINGS[manager._selectedSetting] });
+    const selectedSetting = searchElementById({ partialElementId: selectedSettingId });
+    selectedSetting.style.borderLeft = '5px solid rgb(255, 0, 0)';
 };
 
 export const displaySettingsMenuEdit = () => {
-    const entitySettingsMenuEdit = getEntity({ entityId: 'settings-menu-edit' });
+    const settingsEdit = getElement({ elementId: 'settings-menu-edit' });
 
-    entitySettingsMenuEdit.style.display = (entitySettingsMenuEdit.style.display === 'flex') ? 'none' : 'flex';
+    settingsEdit.style.display = (settingsEdit.style.display === 'flex') ? 'none' : 'flex';
 };
 //#endregion
 //#endregion

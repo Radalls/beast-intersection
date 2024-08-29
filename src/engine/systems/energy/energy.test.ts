@@ -44,7 +44,9 @@ describe('Energy System', () => {
         });
 
         test('Should not use energy when current is not enough', () => {
-            expect(() => useEnergy({ amount: 3, entityId: playerEntityId })).toThrow();
+            const result = useEnergy({ amount: 3, entityId: playerEntityId });
+
+            expect(result).toBe(false);
             expect(playerEnergy._current).toBe(2);
         });
     });

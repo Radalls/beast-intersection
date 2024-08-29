@@ -1,4 +1,4 @@
-import { checkActivityId, endActivity, startActivity, winActivity } from './activity';
+import { canPlay, checkActivityId, endActivity, startActivity, winActivity } from './activity';
 
 import { ActivityBugData } from '@/engine/components/resource';
 import { clearCycle, setCycle } from '@/engine/cycle';
@@ -11,9 +11,22 @@ import { event } from '@/render/events';
 
 //#region SERVICES
 export const startActivityBug = ({ activityId }: { activityId: string }) => {
+    const activityResource = getComponent({ componentId: 'Resource', entityId: activityId });
+    const playerEntityId = getStore('playerId')
+        ?? error({ message: 'Store playerId is undefined', where: startActivityBug.name });
+
+    if (!(canPlay({ activity: activityResource._activityType, entityId: playerEntityId }))) {
+        event({
+            data: { audioName: 'activity_fail' },
+            entityId: playerEntityId,
+            type: EventTypes.AUDIO_PLAY,
+        });
+
+        return;
+    }
+
     startActivity({ activityId });
 
-    const activityResource = getComponent({ componentId: 'Resource', entityId: activityId });
     const activityBugData = activityResource.activityData as ActivityBugData;
     activityBugData._hp = activityBugData._maxHp;
     activityBugData._nbErrors = 0;

@@ -1,19 +1,19 @@
 import { TileMap, Tile } from '@/engine/components/tilemap';
-import { createTileMap, createTileMapTile, destroyEntity } from '@/render/templates';
+import { createTileMap, createTileMapTile, destroyElement } from '@/render/templates';
 
 //#region EVENTS
-export const onTileMapCreate = ({ tilemapEntityId, tilemap }: {
-    tilemap: TileMap,
-    tilemapEntityId: string
-}) => createTileMap({ tilemap, tilemapEntityId });
+export const onTileMapCreate = ({ tileMapEntityId, tileMap }: {
+    tileMap: TileMap,
+    tileMapEntityId: string
+}) => createTileMap({ tileMap, tileMapEntityId });
 
-export const onTileMapTileCreate = ({ tilemapEntityId, tile }: {
+export const onTileMapTileCreate = ({ tileMapEntityId, tile }: {
     tile: Tile,
-    tilemapEntityId: string
-}) => createTileMapTile({ tile, tilemapEntityId });
+    tileMapEntityId: string
+}) => createTileMapTile({ tile, tileMapEntityId });
 
-export const onTileMapTileDestroy = ({ tilemapEntityId, tile }: {
+export const onTileMapTileDestroy = ({ tileMapEntityId, tile }: {
     tile: Tile,
-    tilemapEntityId: string
-}) => destroyEntity({ entityId: `${tilemapEntityId}-tile-${tile.position._x}-${tile.position._y}` });
+    tileMapEntityId: string
+}) => destroyElement({ elementId: `${tileMapEntityId}-tile-${tile.position._x}-${tile.position._y}` });
 //#endregion

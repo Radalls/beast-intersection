@@ -1,4 +1,4 @@
-import { checkActivityId, endActivity, startActivity, winActivity } from './activity';
+import { canPlay, checkActivityId, endActivity, startActivity, winActivity } from './activity';
 
 import itemRecipes from '@/assets/items/item_recipes.json';
 import { ActivityCraftData, ActivityData } from '@/engine/components/resource';
@@ -7,7 +7,7 @@ import { EventTypes } from '@/engine/event';
 import { error } from '@/engine/services/error';
 import { getState, setState } from '@/engine/state';
 import { getStore } from '@/engine/store';
-import { removeItemFromInventory } from '@/engine/systems/inventory';
+import { playerHasSameActivityTool, removeItemFromInventory } from '@/engine/systems/inventory';
 import { randAudio } from '@/render/audio';
 import { event } from '@/render/events';
 
@@ -98,31 +98,64 @@ export const confirmActivityCraftRecipe = ({ activityId }: { activityId?: string
         throw error({ message: 'Activity Craft recipe index is invalid', where: confirmActivityCraftRecipe.name });
     }
 
-    const playerId = getStore('playerId')
+    const playerEntityId = getStore('playerId')
         ?? error({ message: 'Store playerId is undefined', where: confirmActivityCraftRecipe.name });
-    const playerInventory = getComponent({ componentId: 'Inventory', entityId: playerId });
-    const playerInventoryBeforeCraft = { ...playerInventory, slots: [...playerInventory.slots] };
 
-    let playerIsAbleToCraftRecipe = true;
+    if (itemRecipes[activityCraftData._currentRecipeIndex].tool) {
+        const playerHasTool = playerHasSameActivityTool({
+            activity: itemRecipes[activityCraftData._currentRecipeIndex].tool!,
+            playerEntityId: playerEntityId,
+        });
+
+        if (playerHasTool) {
+            event({
+                data: { audioName: 'activity_craft_recipe_fail' },
+                entityId: playerEntityId,
+                type: EventTypes.AUDIO_PLAY,
+            });
+
+            return;
+        }
+    }
+
+    if (!(canPlay({ entityId: playerEntityId, strict: false }))) {
+        event({
+            data: { audioName: 'activity_fail' },
+            entityId: playerEntityId,
+            type: EventTypes.AUDIO_PLAY,
+        });
+
+        return;
+    }
+
+    const playerInventory = getComponent({ componentId: 'Inventory', entityId: playerEntityId });
+    const playerInventoryBeforeCraft = {
+        ...playerInventory,
+        slots: [...playerInventory.slots],
+        tools: [...playerInventory.tools],
+    };
+
     for (const ingredient of itemRecipes[activityCraftData._currentRecipeIndex].ingredients) {
         const itemAmountRemoved = removeItemFromInventory({
-            entityId: playerId,
+            entityId: playerEntityId,
             itemAmount: ingredient.amount,
             itemName: ingredient.name,
         });
 
         if (!(itemAmountRemoved)) {
-            playerIsAbleToCraftRecipe = false;
-            throw error({
+            addComponent({ component: playerInventoryBeforeCraft, entityId: playerEntityId });
+
+            event({
+                data: { audioName: 'activity_craft_recipe_fail' },
+                entityId: playerEntityId,
+                type: EventTypes.AUDIO_PLAY,
+            });
+
+            error({
                 message: `Could not remove ${ingredient.amount} ${ingredient.name} from inventory`,
                 where: confirmActivityCraftRecipe.name,
             });
         }
-    }
-
-    if (!(playerIsAbleToCraftRecipe)) {
-        addComponent({ component: playerInventoryBeforeCraft, entityId: playerId });
-        return;
     }
 
     activityCraftData._currentRecipeId = itemRecipes[activityCraftData._currentRecipeIndex].id;
@@ -228,6 +261,11 @@ export const endActivityCraft = ({ activityId }: { activityId?: string | null })
         return;
     }
     else if (getState('isActivityCraftPlaying')) {
+        const playerEntityId = getStore('playerId')
+            ?? error({ message: 'Store playerId is undefined', where: confirmActivityCraftRecipe.name });
+
+        canPlay({ entityId: playerEntityId });
+
         setState('isActivityCraftPlaying', false);
 
         event({

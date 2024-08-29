@@ -19,6 +19,7 @@ import { EventTypes } from '@/engine/event';
 import { loadDialogData } from '@/engine/systems/dialog/dialog.data';
 import { event } from '@/render/events';
 
+//#region SERVICES
 export const addCollider = ({ entityId, points }: {
     entityId: string,
     points?: { x: number, y: number }[],
@@ -75,14 +76,17 @@ export const addEnergy = ({ entityId, current = 0, max = 10 }: {
     });
 };
 
-export const addInventory = ({ entityId, maxSlots = 20 }: {
+export const addInventory = ({ entityId, maxSlots = 20, maxTools = 3 }: {
     entityId: string,
     maxSlots?: number,
+    maxTools?: number,
 }) => {
     const inventory: Inventory = {
         _: 'Inventory',
         _maxSlots: maxSlots,
+        _maxTools: maxTools,
         slots: [],
+        tools: [],
     };
 
     addComponent({ component: inventory, entityId });
@@ -92,6 +96,22 @@ export const addInventory = ({ entityId, maxSlots = 20 }: {
             data: inventory,
             entityId,
             type: EventTypes.INVENTORY_CREATE,
+        });
+
+        event({
+            entityId,
+            type: EventTypes.INVENTORY_TOOL_ACTIVE_DISPLAY,
+        });
+
+        event({
+            data: inventory,
+            entityId,
+            type: EventTypes.INVENTORY_TOOL_ACTIVATE,
+        });
+        event({
+            data: inventory,
+            entityId,
+            type: EventTypes.INVENTORY_TOOL_UPDATE,
         });
     }
 };
@@ -109,6 +129,7 @@ export const addManager = ({ entityId }: {
                     _act: 'e',
                     _back: 'Escape',
                     _inventory: 'i',
+                    _tool: 't',
                 },
                 move: {
                     _down: 's',
@@ -335,3 +356,4 @@ export const addTrigger = ({ entityId, priority = 0, points }: {
 
     addComponent({ component: trigger, entityId });
 };
+//#endregion

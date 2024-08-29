@@ -5,16 +5,9 @@ import { startActivityBug, startActivityCraft, startActivityFish } from '@/engin
 import { error } from '@/engine/services/error';
 import { getStore } from '@/engine/store';
 import { destroyCollider } from '@/engine/systems/collider';
-import { useEnergy } from '@/engine/systems/energy';
 import { addItemToInventory } from '@/engine/systems/inventory';
 import { destroyTrigger } from '@/engine/systems/trigger';
 import { event } from '@/render/events';
-
-//#region CHECKS
-const canPlay = ({ entityId }: { entityId: string }) => {
-    return useEnergy({ amount: 1, entityId });
-};
-//#endregion
 
 //#region SYSTEMS
 export const useResource = ({ entityId, resourceEntityId }: {
@@ -40,9 +33,6 @@ export const useResource = ({ entityId, resourceEntityId }: {
         }
     }
     else {
-        canPlay({ entityId })
-            ?? error({ message: `Could not start activity for entity ${entityId}`, where: useResource.name });
-
         if (resource._activityType === ActivityTypes.BUG && resource.activityData) {
             startActivityBug({ activityId: resourceEntityId });
         }

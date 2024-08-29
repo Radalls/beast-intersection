@@ -16,7 +16,7 @@ import { closeSettings, confirmSetting, openSettings, selectSetting } from './se
 import { getState, setState } from './state';
 import { getStore } from './store';
 import { nextDialog, selectDialogOption, startDialog } from './systems/dialog';
-import { closePlayerInventory, openPlayerInventory } from './systems/inventory';
+import { activateInventoryTool, closePlayerInventory, openPlayerInventory } from './systems/inventory';
 import { useResource } from './systems/resource';
 import { updateTile } from './systems/tilemap';
 import { checkTrigger } from './systems/trigger';
@@ -68,6 +68,9 @@ export enum EventTypes {
     /* Inventory */
     INVENTORY_CREATE = 'INVENTORY_CREATE',
     INVENTORY_DISPLAY = 'INVENTORY_DISPLAY',
+    INVENTORY_TOOL_ACTIVATE = 'INVENTORY_TOOL_ACTIVATE',
+    INVENTORY_TOOL_ACTIVE_DISPLAY = 'INVENTORY_TOOL_ACTIVE_DISPLAY',
+    INVENTORY_TOOL_UPDATE = 'INVENTORY_TOOL_UPDATE',
     INVENTORY_UPDATE = 'INVENTORY_UPDATE',
     /* Menu */
     MENU_LOADING_OFF = 'MENU_LOADING_OFF',
@@ -121,6 +124,10 @@ export const onInputKeyDown = (inputKey: string) => {
             closePlayerInventory({ playerEntityId });
             return;
         }
+        else if (inputKey === manager.settings.keys.action._tool) {
+            activateInventoryTool({ entityId: playerEntityId });
+            return;
+        }
         else return;
     }
     else if (getState('isActivityRunning')) {
@@ -163,6 +170,10 @@ export const onInputKeyDown = (inputKey: string) => {
         }
         else if (inputKey === manager.settings.keys.action._inventory) {
             openPlayerInventory({ playerEntityId });
+            return;
+        }
+        else if (inputKey === manager.settings.keys.action._tool) {
+            activateInventoryTool({ entityId: playerEntityId });
             return;
         }
         else if (inputKey === manager.settings.keys.move._up) {

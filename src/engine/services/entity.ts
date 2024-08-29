@@ -17,6 +17,15 @@ import {
 import { createEntity, MANAGER_ENTITY_NAME, PLAYER_ENTITY_NAME, TILEMAP_ENTITY_NAME } from '@/engine/entities';
 import { generateTileMap, setTile } from '@/engine/systems/tilemap';
 
+//#region SERVICES
+export const createEntityTileMap = ({ tileMapName }: { tileMapName: string }) => {
+    const entityId = createEntity({ entityName: TILEMAP_ENTITY_NAME });
+
+    addTileMap({ entityId });
+
+    generateTileMap({ tileMapName });
+};
+
 export const createEntityManager = () => {
     const entityId = createEntity({ entityName: MANAGER_ENTITY_NAME });
 
@@ -50,12 +59,38 @@ export const createEntityPlayer = ({
     setTile({ entityId });
 };
 
-export const createEntityTileMap = ({ tileMapName }: { tileMapName: string }) => {
-    const entityId = createEntity({ entityName: TILEMAP_ENTITY_NAME });
+export const createEntityNpc = ({
+    entityName,
+    spriteHeight = 2,
+    spriteWidth = 1,
+    spritePath,
+    positionX,
+    positionY,
+}: {
+    entityName: string,
+    positionX: number,
+    positionY: number,
+    spriteHeight?: number,
+    spritePath: string,
+    spriteWidth?: number
+}) => {
+    const entityId = createEntity({ entityName });
 
-    addTileMap({ entityId });
+    addSprite({ entityId, height: spriteHeight, image: spritePath, width: spriteWidth });
+    addPosition({ entityId, x: positionX, y: positionY });
+    addDialog({ entityId });
+    addCollider({ entityId });
+    addTrigger({
+        entityId,
+        points: [
+            { x: -1, y: 0 },
+            { x: 0, y: -1 },
+            { x: 1, y: 0 },
+            { x: 0, y: 1 },
+        ],
+    });
 
-    generateTileMap({ tileMapName });
+    setTile({ entityId });
 };
 
 export const createEntityResourceItem = ({
@@ -193,40 +228,6 @@ export const createEntityResourceFish = ({
     setTile({ entityId });
 };
 
-export const createEntityNpc = ({
-    entityName,
-    spriteHeight = 2,
-    spriteWidth = 1,
-    spritePath,
-    positionX,
-    positionY,
-}: {
-    entityName: string,
-    positionX: number,
-    positionY: number,
-    spriteHeight?: number,
-    spritePath: string,
-    spriteWidth?: number
-}) => {
-    const entityId = createEntity({ entityName });
-
-    addSprite({ entityId, height: spriteHeight, image: spritePath, width: spriteWidth });
-    addPosition({ entityId, x: positionX, y: positionY });
-    addDialog({ entityId });
-    addCollider({ entityId });
-    addTrigger({
-        entityId,
-        points: [
-            { x: -1, y: 0 },
-            { x: 0, y: -1 },
-            { x: 1, y: 0 },
-            { x: 0, y: 1 },
-        ],
-    });
-
-    setTile({ entityId });
-};
-
 export const createEntityResourceCraft = ({
     entityName,
     spriteHeight = 1,
@@ -264,3 +265,4 @@ export const createEntityResourceCraft = ({
 
     setTile({ entityId });
 };
+//#endregion

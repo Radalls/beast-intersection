@@ -1,6 +1,13 @@
 import { findItemRule } from './inventory.data';
+import {
+    addInventorySlot,
+    createTool,
+    findInventorySlotsWithItem,
+    playerHasSameActivityTool,
+    removeInventorySlots,
+} from './inventory.utils';
 
-import { Inventory, Item } from '@/engine/components/inventory';
+import { Inventory, Item, Tool } from '@/engine/components/inventory';
 import { getComponent } from '@/engine/entities';
 import { EventTypes } from '@/engine/event';
 import { error } from '@/engine/services/error';
@@ -12,29 +19,7 @@ const invalidItemName = (itemName: string) => !(itemName) || itemName === '';
 const invalidItemAmount = (itemAmount: number) => itemAmount <= 0;
 const invalidItemSprite = (itemSprite: string) => !(itemSprite) || itemSprite === '';
 const slotAvailable = (inventory: Inventory) => inventory.slots.length < inventory._maxSlots;
-//#endregion
-
-//#region HELPERS
-const findSlotsWithItem = ({ inventory, itemName }: {
-    inventory: Inventory,
-    itemName: string,
-}) => inventory.slots?.filter((slot) => slot.item.info._name === itemName);
-
-const addSlot = ({ inventory, item, itemAmount, itemMaxAmount }: {
-    inventory: Inventory,
-    item: Item,
-    itemAmount: number,
-    itemMaxAmount: number,
-}) => inventory.slots.push({
-    _amount: itemAmount,
-    _maxAmount: itemMaxAmount,
-    item,
-});
-
-const removeSlots = ({ inventory, slotsToRemove }: {
-    inventory: Inventory,
-    slotsToRemove: number[],
-}) => inventory.slots = inventory.slots.filter((_, index) => !(slotsToRemove.includes(index)));
+const toolSlotUnavailable = (inventory: Inventory) => inventory.tools.length >= inventory._maxTools;
 //#endregion
 
 //#region ACTIONS
@@ -59,11 +44,16 @@ export const addItemToInventory = ({ entityId, item, itemAmount }: {
         error({ message: `Item ${item.info._name} is invalid`, where: addItemToInventory.name });
     }
 
+    const inventory = getComponent({ componentId: 'Inventory', entityId });
+
     const itemRule = findItemRule(item.info._name)
         ?? error({ message: `Item ${item.info._name} does not exist`, where: addItemToInventory.name });
 
-    const inventory = getComponent({ componentId: 'Inventory', entityId });
-    const slotsWithItem = findSlotsWithItem({ inventory, itemName: item.info._name });
+    if (itemRule.tool) {
+        return addToolToInventory({ entityId, tool: createTool({ activity: itemRule.tool, item }) });
+    }
+
+    const slotsWithItem = findInventorySlotsWithItem({ inventory, itemName: item.info._name });
     if (slotsWithItem.length > 0) {
         for (const slot of slotsWithItem) {
             if (slot._amount < slot._maxAmount) {
@@ -93,7 +83,7 @@ export const addItemToInventory = ({ entityId, item, itemAmount }: {
 
     if (slotAvailable(inventory)) {
         if (itemAmount <= itemRule.maxAmount) {
-            addSlot({
+            addInventorySlot({
                 inventory,
                 item,
                 itemAmount,
@@ -110,7 +100,7 @@ export const addItemToInventory = ({ entityId, item, itemAmount }: {
         }
 
         const itemAmountRemaining = itemAmount - itemRule.maxAmount;
-        addSlot({
+        addInventorySlot({
             inventory,
             item,
             itemAmount: itemRule.maxAmount,
@@ -146,14 +136,14 @@ export const removeItemFromInventory = ({ entityId, itemName, itemAmount }: {
     itemName: string
 }): boolean => {
     if (!(entityId)) entityId = getStore('playerId')
-        ?? error({ message: 'Store playerId is undefined', where: addItemToInventory.name });
+        ?? error({ message: 'Store playerId is undefined', where: removeItemFromInventory.name });
 
     if (invalidItemName(itemName) || invalidItemAmount(itemAmount)) {
-        error({ message: `Item ${itemName} is invalid`, where: addItemToInventory.name });
+        error({ message: `Item ${itemName} is invalid`, where: removeItemFromInventory.name });
     }
 
     const inventory = getComponent({ componentId: 'Inventory', entityId });
-    const slotsWithItem = findSlotsWithItem({ inventory, itemName });
+    const slotsWithItem = findInventorySlotsWithItem({ inventory, itemName });
     if (slotsWithItem.length === 0) {
         return false;
     }
@@ -181,7 +171,7 @@ export const removeItemFromInventory = ({ entityId, itemName, itemAmount }: {
         return false;
     }
 
-    removeSlots({ inventory, slotsToRemove });
+    removeInventorySlots({ inventory, slotsToRemove });
 
     event({
         data: inventory,
@@ -190,5 +180,107 @@ export const removeItemFromInventory = ({ entityId, itemName, itemAmount }: {
     });
 
     return true;
+};
+
+export const activateInventoryTool = ({ entityId }: {
+    entityId?: string | null,
+}) => {
+    if (!(entityId)) entityId = getStore('playerId')
+        ?? error({ message: 'Store playerId is undefined', where: activateInventoryTool.name });
+
+    const inventory = getComponent({ componentId: 'Inventory', entityId });
+
+    if (!(inventory.tools.length)) {
+        event({
+            data: { audioName: 'inventory_tool_empty' },
+            entityId,
+            type: EventTypes.AUDIO_PLAY,
+        });
+
+        error({
+            message: 'No tools in inventory',
+            where: activateInventoryTool.name,
+        });
+    }
+
+    const activeTool = inventory.tools.find((tool) => tool._active);
+    if (activeTool) {
+        const inactiveTool = (inventory.tools.indexOf(activeTool) !== inventory.tools.length - 1)
+            ? inventory.tools.find((tool) => tool._active === false)
+            : null;
+
+        if (inactiveTool) {
+            inactiveTool._active = true;
+            activeTool._active = false;
+
+            event({
+                data: { audioName: 'inventory_tool_active' },
+                entityId,
+                type: EventTypes.AUDIO_PLAY,
+            });
+        }
+        else {
+            activeTool._active = false;
+
+            event({
+                data: { audioName: 'inventory_tool_empty' },
+                entityId,
+                type: EventTypes.AUDIO_PLAY,
+            });
+        }
+    }
+    else {
+        inventory.tools[0]._active = true;
+
+        event({
+            data: { audioName: 'inventory_tool_active' },
+            entityId,
+            type: EventTypes.AUDIO_PLAY,
+        });
+    }
+
+    event({
+        data: inventory,
+        entityId,
+        type: EventTypes.INVENTORY_TOOL_ACTIVATE,
+    });
+};
+
+const addToolToInventory = ({ entityId, tool }: {
+    entityId: string,
+    tool: Tool
+}) => {
+    const inventory = getComponent({ componentId: 'Inventory', entityId });
+
+    if (toolSlotUnavailable(inventory)) {
+        error({
+            message: 'Inventory Tools are full',
+            where: addToolToInventory.name,
+        });
+
+        return { success: false };
+    }
+
+    if (playerHasSameActivityTool({ activity: tool._activity, playerEntityId: entityId })) {
+        error({
+            message: `Tool with activity ${tool._activity} already exists in inventory`,
+            where: addToolToInventory.name,
+        });
+
+        return { success: false };
+    }
+
+    inventory.tools.push({
+        _active: false,
+        tool,
+    });
+
+    event({
+        data: inventory,
+        entityId,
+        type: EventTypes.INVENTORY_TOOL_UPDATE,
+    });
+
+    return { success: true };
 };
 //#endregion

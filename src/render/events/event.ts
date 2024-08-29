@@ -20,9 +20,17 @@ import {
 import { onAudioPlay, onAudioStop } from './event.audio';
 import { onDialogEnd, onDialogNext, onDialogStart } from './event.dialog';
 import { onEnergyCreate, onEnergyDisplay, onEnergyUpdate } from './event.energy';
-import { onEntityInventoryCreate, onEntityInventoryDisplay, onEntityInventoryUpdate } from './event.inventory';
+import {
+    onInventoryCreate,
+    onInventoryDisplay,
+    onInventoryToolActivate,
+    onInventoryToolActiveDisplay,
+    onInventoryToolsUpdate,
+    onInventoryUpdate,
+} from './event.inventory';
 import { onLoadingDisplay, onSettingsMenuDisplay, onSettingsMenuDisplayEdit, onSettingsMenuUpdate } from './event.menu';
 import { onTileMapCreate, onTileMapTileCreate, onTileMapTileDestroy } from './event.tilemap';
+import { onEntityCreate, onEntityDestroy, onEntityPositionUpdate, onEntitySpriteCreate } from './event.utils';
 
 import { Component } from '@/engine/components/@component';
 import { Dialog } from '@/engine/components/dialog';
@@ -36,11 +44,10 @@ import { TileMap, Tile } from '@/engine/components/tilemap';
 import { onInputKeyDown as engineOnInputKeyDown, Event } from '@/engine/event';
 import { EventTypes } from '@/engine/event';
 import { error } from '@/engine/services/error';
-import { createEntity, destroyEntity, updatePosition, createSprite } from '@/render/templates';
-
-export const onInputKeyDown = (e: any) => engineOnInputKeyDown(e.key);
 
 //#region HELPERS
+export const onInputKeyDown = (e: any) => engineOnInputKeyDown(e.key);
+
 export const checkPositionData = (data: any): data is Position => data;
 export const checkSpriteData = (data: any): data is Sprite => data;
 export const checkInventoryData = (data: any): data is Inventory => data;
@@ -191,16 +198,31 @@ export const event = <T extends keyof Component>(event: Event<T>) => {
     }
     /* Inventory */
     else if (event.type === EventTypes.INVENTORY_CREATE && checkInventoryData(event.data)) {
-        onEntityInventoryCreate({
+        onInventoryCreate({
             entityId: event.entityId,
             inventory: event.data,
         });
     }
     else if (event.type === EventTypes.INVENTORY_DISPLAY) {
-        onEntityInventoryDisplay({ entityId: event.entityId });
+        onInventoryDisplay({ entityId: event.entityId });
     }
     else if (event.type === EventTypes.INVENTORY_UPDATE && checkInventoryData(event.data)) {
-        onEntityInventoryUpdate({
+        onInventoryUpdate({
+            entityId: event.entityId,
+            inventory: event.data,
+        });
+    }
+    else if (event.type === EventTypes.INVENTORY_TOOL_ACTIVATE && checkInventoryData(event.data)) {
+        onInventoryToolActivate({
+            entityId: event.entityId,
+            inventory: event.data,
+        });
+    }
+    else if (event.type === EventTypes.INVENTORY_TOOL_ACTIVE_DISPLAY) {
+        onInventoryToolActiveDisplay({ entityId: event.entityId });
+    }
+    else if (event.type === EventTypes.INVENTORY_TOOL_UPDATE && checkInventoryData(event.data)) {
+        onInventoryToolsUpdate({
             entityId: event.entityId,
             inventory: event.data,
         });
@@ -221,36 +243,22 @@ export const event = <T extends keyof Component>(event: Event<T>) => {
     /* Tilemap */
     else if (event.type === EventTypes.TILEMAP_CREATE && checkTileMapData(event.data)) {
         onTileMapCreate({
-            tilemap: event.data,
-            tilemapEntityId: event.entityId,
+            tileMap: event.data,
+            tileMapEntityId: event.entityId,
         });
     }
     else if (event.type === EventTypes.TILEMAP_TILE_CREATE && checkTileData(event.data)) {
         onTileMapTileCreate({
             tile: event.data,
-            tilemapEntityId: event.entityId,
+            tileMapEntityId: event.entityId,
         });
     }
     else if (event.type === EventTypes.TILEMAP_TILE_DESTROY && checkTileData(event.data)) {
         onTileMapTileDestroy({
             tile: event.data,
-            tilemapEntityId: event.entityId,
+            tileMapEntityId: event.entityId,
         });
     }
     else error({ message: `Unknown Event type: ${event.type}`, where: 'event' });
 };
-
-const onEntityCreate = ({ entityId }: { entityId: string }) => createEntity({ entityId });
-
-const onEntityDestroy = ({ entityId }: { entityId: string }) => destroyEntity({ entityId });
-
-const onEntityPositionUpdate = ({ entityId, position }: {
-    entityId: string,
-    position: Position,
-}) => updatePosition({ entityId, position });
-
-const onEntitySpriteCreate = ({ entityId, sprite }: {
-    entityId: string,
-    sprite: Sprite,
-}) => createSprite({ entityId, sprite });
 //#endregion
