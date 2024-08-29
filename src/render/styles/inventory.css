@@ -23,3 +23,40 @@
     bottom: 0px;
     right: 0px;
 }
+
+.inventory-tools {
+    align-items: center;
+    background-color: rgb(0, 0, 0);
+    display: none;
+    gap: 4px;
+    justify-content: center;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+}
+
+.inventory-tools-slot {
+    background-color: rgb(245, 245, 245);
+    background-repeat: no-repeat;
+    background-size: cover;
+    border: solid 4px rgb(0, 0, 0);
+    height: 64px;
+    width: 64px;
+}
+
+.inventory-tool-active {
+    align-items: center;
+    background-color: rgb(245, 245, 245);
+    background-repeat: no-repeat;
+    background-size: cover;
+    border: solid 4px rgb(0, 0, 0);
+    border-radius: 4px;
+    bottom: 32px;
+    display: none;
+    height: 64px;
+    justify-content: center;
+    padding: 4px;
+    right: 64px;
+    width: 64px;
+    z-index: 100;
+}

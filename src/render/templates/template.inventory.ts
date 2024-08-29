@@ -1,83 +1,182 @@
-import { createEntity, destroyEntity } from './template';
-import { getEntity, getSpritePath, checkEntity } from './template.utils';
+import { createElement, destroyElement } from './template';
+import { getElement, getSpritePath, checkElement } from './template.utils';
 
 import { Inventory } from '@/engine/components/inventory';
+import { playerActiveTool } from '@/engine/systems/inventory';
 
 //#region CONSTANTS
 const INVENTORY_SLOT_SIZE = 64;
 const INVENTORY_SLOTS_PER_ROW = 7;
+const INVENTORY_TOOL_SLOT_SIZE = 64;
 //#endregion
 
 //#region TEMPLATES
 export const createInventory = ({ entityId, inventory }: {
     entityId: string,
-    inventory: Pick<Inventory, '_maxSlots'>,
+    inventory: Inventory,
 }) => {
-    const entityInventory = createEntity({
+    const inventoryElement = createElement({
+        elementClass: 'inventory',
+        elementId: `${entityId}-inventory`,
         entityId,
-        htmlClass: 'inventory',
-        htmlId: `${entityId}-inventory`,
     });
 
     const inventoryWidth = INVENTORY_SLOTS_PER_ROW * INVENTORY_SLOT_SIZE + (INVENTORY_SLOTS_PER_ROW - 1) * 2;
-    entityInventory.style.width = `${inventoryWidth}px`;
+    inventoryElement.style.width = `${inventoryWidth}px`;
     const inventoryHeight = (Math.ceil(inventory._maxSlots / INVENTORY_SLOTS_PER_ROW)) * INVENTORY_SLOT_SIZE;
-    entityInventory.style.height = `${inventoryHeight}px`;
+    inventoryElement.style.height = `${inventoryHeight}px`;
 
     for (let i = 0; i < inventory._maxSlots; i++) {
-        createEntity({
+        createElement({
+            elementAbsolute: false,
+            elementClass: 'inventory-slot',
+            elementId: `${entityId}-inventory-slot-${i}`,
+            elementParent: inventoryElement,
             entityId,
-            htmlAbsolute: false,
-            htmlClass: 'inventory-slot',
-            htmlId: `${entityId}-inventory-slot-${i}`,
-            htmlParent: entityInventory,
         });
     }
+
+    const entityInventoryTools = createElement({
+        elementClass: 'inventory-tools',
+        elementId: `${entityId}-inventory-tools`,
+        entityId,
+    });
+    const inventoryToolsWidth = (INVENTORY_TOOL_SLOT_SIZE * (inventory._maxTools + 1)) + INVENTORY_TOOL_SLOT_SIZE;
+    entityInventoryTools.style.width = `${inventoryToolsWidth}px`;
+    const inventoryToolsHeight = INVENTORY_TOOL_SLOT_SIZE * 1.25;
+    entityInventoryTools.style.height = `${inventoryToolsHeight}px`;
+    const inventoryToolsBottom = Number.parseFloat(getComputedStyle(inventoryElement).bottom)
+        + Number.parseFloat(getComputedStyle(inventoryElement).height) + 20;
+    entityInventoryTools.style.bottom = `${inventoryToolsBottom}px`;
+
+    for (let i = 0; i < inventory._maxTools + 1; i++) {
+        createElement({
+            elementAbsolute: false,
+            elementClass: 'inventory-tools-slot',
+            elementId: `${entityId}-inventory-tools-slot-${i}`,
+            elementParent: entityInventoryTools,
+            entityId,
+        });
+    }
+
+    createElement({
+        elementClass: 'inventory-tool-active',
+        elementId: `${entityId}-inventory-tool-active`,
+        entityId,
+    });
 };
 
 export const displayInventory = ({ entityId }: { entityId: string }) => {
-    const entityInventory = getEntity({ entityId: `${entityId}-inventory` });
+    const inventory = getElement({ elementId: `${entityId}-inventory` });
+    inventory.style.display = (inventory.style.display === 'flex') ? 'none' : 'flex';
 
-    entityInventory.style.display = (entityInventory.style.display === 'flex') ? 'none' : 'flex';
+    const inventoryTools = getElement({ elementId: `${entityId}-inventory-tools` });
+    inventoryTools.style.display = (inventoryTools.style.display === 'flex') ? 'none' : 'flex';
 };
 
 export const updateInventory = ({ entityId, inventory }: {
     entityId: string,
-    inventory: Pick<Inventory, 'slots'>,
+    inventory: Inventory,
 }) => {
     clearInventory({ entityId });
 
     for (const slot of inventory.slots) {
-        const entityInventorySlot = getEntity({
-            entityId: `${entityId}-inventory-slot-${inventory.slots.indexOf(slot)}`,
+        const inventorySlot = getElement({
+            elementId: `${entityId}-inventory-slot-${inventory.slots.indexOf(slot)}`,
         });
-        entityInventorySlot.style.backgroundImage = `url(${getSpritePath(slot.item.sprite._image)})`;
+        inventorySlot.style.backgroundImage = `url(${getSpritePath(slot.item.sprite._image)})`;
 
-        const entityInventorySlotAmount = checkEntity({
-            entityId: `${entityId}-inventory-slot-${inventory.slots.indexOf(slot)}-amount`,
+        const inventorySlotAmount = checkElement({
+            elementId: `${entityId}-inventory-slot-${inventory.slots.indexOf(slot)}-amount`,
         })
-            ? getEntity({ entityId: `${entityId}-inventory-slot-${inventory.slots.indexOf(slot)}-amount` })
-            : createEntity({
+            ? getElement({ elementId: `${entityId}-inventory-slot-${inventory.slots.indexOf(slot)}-amount` })
+            : createElement({
+                elementClass: 'inventory-slot-amount',
+                elementId: `${entityId}-inventory-slot-${inventory.slots.indexOf(slot)}-amount`,
+                elementParent: inventorySlot,
                 entityId,
-                htmlClass: 'inventory-slot-amount',
-                htmlId: `${entityId}-inventory-slot-${inventory.slots.indexOf(slot)}-amount`,
-                htmlParent: entityInventorySlot,
             });
 
-        entityInventorySlotAmount.textContent = `x${slot._amount.toString()}`;
+        inventorySlotAmount.textContent = `x${slot._amount.toString()}`;
     }
 };
 
+export const updateInventoryTools = ({ entityId, inventory }: {
+    entityId: string,
+    inventory: Inventory,
+}) => {
+    clearInventoryTools({ entityId });
+
+    const inventoryToolsFirstSlot = getElement({ elementId: `${entityId}-inventory-tools-slot-0` });
+    inventoryToolsFirstSlot.style.backgroundImage = `url(${getSpritePath('item_hand')})`;
+
+    for (const tool of inventory.tools) {
+        const inventoryToolSlotIndex = inventory.tools.indexOf(tool) + 1;
+        const inventoryToolSlot
+            = getElement({ elementId: `${entityId}-inventory-tools-slot-${inventoryToolSlotIndex}` });
+        inventoryToolSlot.style.backgroundImage = `url(${getSpritePath(tool.tool.item.sprite._image)})`;
+    }
+};
+
+export const activateInventoryTool = ({ entityId, inventory }: {
+    entityId: string,
+    inventory: Inventory,
+}) => {
+    clearInventoryToolsActive({ entityId });
+
+    const tool = playerActiveTool({ playerEntityId: entityId });
+
+    if (tool) {
+        const inventoryToolActiveSlotIndex = inventory.tools.indexOf(tool) + 1;
+        const inventoryToolActiveSlot
+            = getElement({ elementId: `${entityId}-inventory-tools-slot-${inventoryToolActiveSlotIndex}` });
+        inventoryToolActiveSlot.style.border = 'solid 4px red';
+    }
+    else {
+        const inventoryToolActiveSlot = getElement({ elementId: `${entityId}-inventory-tools-slot-0` });
+        inventoryToolActiveSlot.style.border = 'solid 4px red';
+    }
+
+    const inventoryToolActive = getElement({ elementId: `${entityId}-inventory-tool-active` });
+    inventoryToolActive.style.backgroundImage = (tool)
+        ? `url(${getSpritePath(tool.tool.item.sprite._image)})`
+        : `url(${getSpritePath('item_hand')})`;
+};
+
+export const displayInventoryToolActive = ({ entityId }: { entityId: string }) => {
+    const inventoryToolActive = getElement({ elementId: `${entityId}-inventory-tool-active` });
+
+    inventoryToolActive.style.display = (inventoryToolActive.style.display === 'flex') ? 'none' : 'flex';
+};
+
 const clearInventory = ({ entityId }: { entityId: string }) => {
-    const entityInventory = getEntity({ entityId: `${entityId}-inventory` });
+    const inventory = getElement({ elementId: `${entityId}-inventory` });
 
-    for (let i = 0; i < entityInventory.children.length; i++) {
-        const inventorySlotEntity = getEntity({ entityId: `${entityId}-inventory-slot-${i}` });
-        inventorySlotEntity.style.backgroundImage = '';
+    for (let i = 0; i < inventory.children.length; i++) {
+        const inventorySlot = getElement({ elementId: `${entityId}-inventory-slot-${i}` });
+        inventorySlot.style.backgroundImage = '';
 
-        if (checkEntity({ entityId: `${entityId}-inventory-slot-${i}-amount` })) {
-            destroyEntity({ entityId: `${entityId}-inventory-slot-${i}-amount` });
+        if (checkElement({ elementId: `${entityId}-inventory-slot-${i}-amount` })) {
+            destroyElement({ elementId: `${entityId}-inventory-slot-${i}-amount` });
         }
+    }
+};
+
+const clearInventoryTools = ({ entityId }: { entityId: string }) => {
+    const inventoryTools = getElement({ elementId: `${entityId}-inventory-tools` });
+
+    for (let i = 0; i < inventoryTools.children.length; i++) {
+        const inventoryToolSlot = getElement({ elementId: `${entityId}-inventory-tools-slot-${i}` });
+        inventoryToolSlot.style.backgroundImage = '';
+    }
+};
+
+const clearInventoryToolsActive = ({ entityId }: { entityId: string }) => {
+    const inventoryTools = getElement({ elementId: `${entityId}-inventory-tools` });
+
+    for (let i = 0; i < inventoryTools.children.length; i++) {
+        const inventoryToolSlot = getElement({ elementId: `${entityId}-inventory-tools-slot-${i}` });
+        inventoryToolSlot.style.border = 'solid 4px rgb(0, 0, 0)';
     }
 };
 //#endregion

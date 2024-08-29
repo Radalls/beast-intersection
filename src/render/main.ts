@@ -26,6 +26,7 @@ const initAudios = () => {
     createAudio({ audioName: 'activity_dialog' });
     createAudio({ audioName: 'activity_dialog_select' });
     createAudio({ audioName: 'activity_pickup' });
+    createAudio({ audioName: 'activity_fail' });
     /* BUG */
     createAudio({ audioName: 'activity_bug_start' });
     createAudio({ audioName: 'activity_bug_win' });
@@ -43,6 +44,7 @@ const initAudios = () => {
     createAudio({ audioName: 'activity_craft_win' });
     createAudio({ audioName: 'activity_craft_recipe_select' });
     createAudio({ audioName: 'activity_craft_recipe_confirm' });
+    createAudio({ audioName: 'activity_craft_recipe_fail' });
     createAudio({ audioName: 'activity_craft_play1' });
     createAudio({ audioName: 'activity_craft_play2' });
     createAudio({ audioName: 'activity_craft_play3' });
@@ -51,9 +53,12 @@ const initAudios = () => {
     createAudio({ audioName: 'activity_craft_play6' });
     /* BGM */
     createAudio({ audioName: 'bgm_map1' });
+    /* INVENTORY */
+    createAudio({ audioName: 'inventory_open' });
+    createAudio({ audioName: 'inventory_close' });
+    createAudio({ audioName: 'inventory_tool_active' });
+    createAudio({ audioName: 'inventory_tool_empty' });
     /* MENUS */
-    createAudio({ audioName: 'menu_inventory_open' });
-    createAudio({ audioName: 'menu_inventory_close' });
     createAudio({ audioName: 'menu_settings_open' });
     createAudio({ audioName: 'menu_settings_close' });
     createAudio({ audioName: 'menu_settings_step' });

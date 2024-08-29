@@ -18,6 +18,7 @@ type ManagerSettingsActionKeys = {
     _act: string,
     _back: string,
     _inventory: string,
+    _tool: string,
 };
 
 type ManagerSettingsMoveKeys = {

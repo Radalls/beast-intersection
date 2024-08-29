@@ -21,7 +21,9 @@ describe('Resource System', () => {
     const playerInventory: Inventory = {
         _: 'Inventory',
         _maxSlots: 3,
+        _maxTools: 3,
         slots: [],
+        tools: [],
     };
     const playerEnergy: Energy = {
         _: 'Energy',

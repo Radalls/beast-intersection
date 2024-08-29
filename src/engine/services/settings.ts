@@ -15,11 +15,13 @@ export const SETTINGS = [
     'keyMoveRight',
     'keyActionAct',
     'keyActionInventory',
+    'keyActionTool',
 ];
 
 export const SETTINGS_KEYS_PATHS: { [key: string]: { path: string[] } } = {
     keyActionAct: { path: ['keys', 'action', '_act'] },
     keyActionInventory: { path: ['keys', 'action', '_inventory'] },
+    keyActionTool: { path: ['keys', 'action', '_tool'] },
     keyMoveDown: { path: ['keys', 'move', '_down'] },
     keyMoveLeft: { path: ['keys', 'move', '_left'] },
     keyMoveRight: { path: ['keys', 'move', '_right'] },
@@ -61,6 +63,10 @@ export const openSettings = ({ managerEntityId }: { managerEntityId?: string | n
         entityId: playerEntityId,
         type: EventTypes.ENERGY_DISPLAY,
     });
+    event({
+        entityId: playerEntityId,
+        type: EventTypes.INVENTORY_TOOL_ACTIVE_DISPLAY,
+    });
 
     event({
         data: manager,
@@ -92,6 +98,10 @@ export const closeSettings = ({ managerEntityId }: { managerEntityId?: string | 
     event({
         entityId: playerEntityId,
         type: EventTypes.ENERGY_DISPLAY,
+    });
+    event({
+        entityId: playerEntityId,
+        type: EventTypes.INVENTORY_TOOL_ACTIVE_DISPLAY,
     });
 
     event({

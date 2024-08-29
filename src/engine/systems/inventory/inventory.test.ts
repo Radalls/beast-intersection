@@ -11,7 +11,9 @@ describe('Inventory system', () => {
     const inventory: Inventory = {
         _: 'Inventory',
         _maxSlots: 2,
+        _maxTools: 2,
         slots: [],
+        tools: [],
     };
     const item1: Item = {
         info: { _name: 'item1' },

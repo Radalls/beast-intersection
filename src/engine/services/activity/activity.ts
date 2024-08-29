@@ -4,8 +4,24 @@ import { EventTypes } from '@/engine/event';
 import { error } from '@/engine/services/error';
 import { setState } from '@/engine/state';
 import { clearStore, getStore, setStore } from '@/engine/store';
+import { checkEnergy, useEnergy } from '@/engine/systems/energy';
+import { playerHasActivityToolActive } from '@/engine/systems/inventory';
 import { destroyResource, getResourceItem } from '@/engine/systems/resource';
 import { event } from '@/render/events';
+
+//#region CHECKS
+export const canPlay = ({ activity, entityId, strict = true }: {
+    activity?: string,
+    entityId: string,
+    strict?: boolean,
+}) => {
+    return (activity && strict)
+        ? playerHasActivityToolActive({ activity, playerEntityId: entityId }) && useEnergy({ amount: 1, entityId })
+        : (!(activity) && strict)
+            ? useEnergy({ amount: 1, entityId })
+            : checkEnergy({ amount: 1, entityId });
+};
+//#endregion
 
 //#region HELPERS
 export const checkActivityId = ({ activityId }: { activityId: string | null | undefined }) => {

@@ -98,8 +98,11 @@
 }
 
 .setting-value {
+    align-items: center;
     color: rgb(245, 245, 245);
+    display: flex;
     font-size: 24px;
     height: 32px;
+    justify-content: center;
     width: 32px;
 }

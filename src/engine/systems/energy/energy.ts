@@ -5,6 +5,18 @@ import { getStore } from '@/engine/store';
 import { event } from '@/render/events';
 
 //#region SYSTEMS
+export const checkEnergy = ({ amount, entityId }: {
+    amount: number,
+    entityId?: string | null,
+}) => {
+    if (!(entityId)) entityId = getStore('playerId')
+        ?? error({ message: 'Store playerId is undefined', where: checkEnergy.name });
+
+    const energy = getComponent({ componentId: 'Energy', entityId });
+
+    return energy._current >= amount;
+};
+
 export const useEnergy = ({ amount, entityId }: {
     amount: number,
     entityId?: string | null,
@@ -26,7 +38,9 @@ export const useEnergy = ({ amount, entityId }: {
         return true;
     }
     else {
-        throw error({ message: `Entity ${entityId} does not have ${amount} energy`, where: useEnergy.name });
+        // error({ message: `Entity ${entityId} does not have ${amount} energy`, where: useEnergy.name });
+
+        return false;
     }
 };
 
@@ -51,7 +65,9 @@ export const gainEnergy = ({ amount, entityId }: {
         return true;
     }
     else {
-        throw error({ message: `Entity ${entityId} has max energy`, where: useEnergy.name });
+        error({ message: `Entity ${entityId} has max energy`, where: useEnergy.name });
+
+        return false;
     }
 };
 //#endregion

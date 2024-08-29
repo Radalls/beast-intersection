@@ -1,5 +1,7 @@
 [
     { "id": 1, "name": "Wood2", "ingredients": [{ "name": "Wood1", "amount": 3 }] },
     { "id": 2, "name": "Rock2", "ingredients": [{ "name": "Rock1", "amount": 2 }] },
-    { "id": 3, "name": "Campfire", "ingredients": [{ "name": "Wood2", "amount": 1 }, { "name": "Rock2", "amount": 1 }] }
+    { "id": 3, "name": "Campfire", "ingredients": [{ "name": "Wood2", "amount": 1 }, { "name": "Rock2", "amount": 1 }] },
+    { "id": 4, "name": "FishRod1", "ingredients": [{ "name": "Wood1", "amount": 1 }, { "name": "Rock1", "amount": 1 }], "tool": "FISH" },
+    { "id": 5, "name": "BugNet1", "ingredients": [{ "name": "Wood1", "amount": 1 }, { "name": "Rock1", "amount": 1 }], "tool": "BUG" }
 ]

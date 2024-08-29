@@ -1,5 +1,5 @@
-import { createEntity, TILE_PIXEL_SIZE } from './template';
-import { getEntity, getSpritePath } from './template.utils';
+import { createElement, TILE_PIXEL_SIZE } from './template';
+import { getElement, getSpritePath } from './template.utils';
 
 import { TileMap, Tile } from '@/engine/components/tilemap';
 
@@ -7,33 +7,33 @@ import { TileMap, Tile } from '@/engine/components/tilemap';
 //#endregion
 
 //#region TEMPLATES
-export const createTileMap = ({ tilemapEntityId, tilemap }: {
-    tilemap: Pick<TileMap, '_height' | '_width'>,
-    tilemapEntityId: string
+export const createTileMap = ({ tileMapEntityId, tileMap }: {
+    tileMap: TileMap,
+    tileMapEntityId: string
 }) => {
-    const tilemapEntity = getEntity({ entityId: tilemapEntityId });
+    const tileMapElement = getElement({ elementId: tileMapEntityId });
 
-    tilemapEntity.style.width = `${tilemap._width * TILE_PIXEL_SIZE}px`;
-    tilemapEntity.style.height = `${tilemap._height * TILE_PIXEL_SIZE}px`;
-    tilemapEntity.style.top = `${TILE_PIXEL_SIZE}px`;
-    tilemapEntity.style.left = `${TILE_PIXEL_SIZE}px`;
+    tileMapElement.style.width = `${tileMap._width * TILE_PIXEL_SIZE}px`;
+    tileMapElement.style.height = `${tileMap._height * TILE_PIXEL_SIZE}px`;
+    tileMapElement.style.top = `${TILE_PIXEL_SIZE}px`;
+    tileMapElement.style.left = `${TILE_PIXEL_SIZE}px`;
 };
 
-export const createTileMapTile = ({ tilemapEntityId, tile }: {
-    tile: Pick<Tile, 'position' | 'sprite'>,
-    tilemapEntityId: string
+export const createTileMapTile = ({ tileMapEntityId, tile }: {
+    tile: Tile,
+    tileMapEntityId: string
 }) => {
-    const tilemapEntity = getEntity({ entityId: tilemapEntityId });
+    const tileMapElement = getElement({ elementId: tileMapEntityId });
 
-    const tileEntity = createEntity({
-        entityId: tilemapEntityId,
-        htmlClass: 'tile',
-        htmlId: `${tilemapEntityId}-tile-${tile.position._x}-${tile.position._y}`,
-        htmlParent: tilemapEntity,
+    const tileElement = createElement({
+        elementClass: 'tile',
+        elementId: `${tileMapEntityId}-tile-${tile.position._x}-${tile.position._y}`,
+        elementParent: tileMapElement,
+        entityId: tileMapEntityId,
     });
 
-    tileEntity.style.left = `${tile.position._x * TILE_PIXEL_SIZE}px`;
-    tileEntity.style.top = `${tile.position._y * TILE_PIXEL_SIZE}px`;
-    tileEntity.style.backgroundImage = `url(${getSpritePath(tile.sprite._image)})`;
+    tileElement.style.left = `${tile.position._x * TILE_PIXEL_SIZE}px`;
+    tileElement.style.top = `${tile.position._y * TILE_PIXEL_SIZE}px`;
+    tileElement.style.backgroundImage = `url(${getSpritePath(tile.sprite._image)})`;
 };
 //#endregion
