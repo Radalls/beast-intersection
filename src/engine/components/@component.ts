@@ -6,6 +6,7 @@ import { Manager } from './manager';
 import { Position } from './position';
 import { Resource } from './resource';
 import { Sprite } from './sprite';
+import { State } from './state';
 import { TileMap } from './tilemap';
 import { Trigger } from './trigger';
 
@@ -18,6 +19,7 @@ export type Component = {
     'Position': Position;
     'Resource': Resource;
     'Sprite': Sprite;
+    'State': State;
     'TileMap': TileMap;
     'Trigger': Trigger;
 };

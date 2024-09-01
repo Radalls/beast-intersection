@@ -34,17 +34,9 @@ export type TileMapData = {
 export type EntityData = {
     data?: any,
     name: string,
+    priority?: number,
     type: string
 };
-
-export enum EntityDataTypes {
-    NPC = 'Npc',
-    PLAYER = 'Player',
-    RESOURCE_BUG = 'ResourceBug',
-    RESOURCE_CRAFT = 'ResourceCraft',
-    RESOURCE_FISH = 'ResourceFish',
-    RESOURCE_ITEM = 'ResourceItem'
-}
 //#endregion
 
 //#region DATA

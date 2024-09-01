@@ -1,8 +1,9 @@
-import { EntityDataTypes, loadTileMapData, loadTileMapEntityData, TileMapData } from './tilemap.data';
+import { loadTileMapData, loadTileMapEntityData, TileMapData } from './tilemap.data';
 import { findTileByPosition, findTileByEntityId } from './tilemap.utils';
 
-import { Tile, TileExit, TileMap } from '@/engine/components/tilemap';
-import { checkComponent, destroyAllEntities, getComponent } from '@/engine/entities';
+import { Tile, TileExit } from '@/engine/components/tilemap';
+import { checkComponent, destroyAllEntities, findEntityByName, getComponent } from '@/engine/entities';
+import { EntityTypes } from '@/engine/entities';
 import { EventTypes } from '@/engine/event';
 import {
     createEntityNpc,
@@ -16,6 +17,7 @@ import { setState } from '@/engine/state';
 import { getStore } from '@/engine/store';
 import { checkCollider, setCollider } from '@/engine/systems/collider';
 import { updatePosition } from '@/engine/systems/position';
+import { setEntityActive } from '@/engine/systems/state';
 import { setTrigger } from '@/engine/systems/trigger';
 import { randAudio } from '@/render/audio';
 import { event } from '@/render/events';
@@ -92,7 +94,7 @@ export const generateTileMap = ({ tileMapEntityId, tileMapName }: {
         type: EventTypes.TILEMAP_CREATE,
     });
 
-    generateTileMapTiles({ tileMap, tileMapData, tileMapEntityId });
+    generateTileMapTiles({ tileMapData, tileMapEntityId });
     generateTileMapEntities({ tileMapData });
 
     setState('isGameLoading', false);
@@ -164,13 +166,14 @@ export const updateTile = ({ tileMapEntityId, entityId, targetX, targetY }: {
     soundTile({ entityId });
 };
 
-const generateTileMapTiles = ({ tileMapEntityId, tileMap, tileMapData }: {
-    tileMap: TileMap,
+const generateTileMapTiles = ({ tileMapEntityId, tileMapData }: {
     tileMapData: TileMapData,
     tileMapEntityId?: string | null
 }) => {
     if (!(tileMapEntityId)) tileMapEntityId = getStore('tilemapId')
         ?? error({ message: 'Store tilemapId is undefined', where: generateTileMap.name });
+
+    const tileMap = getComponent({ componentId: 'TileMap', entityId: tileMapEntityId });
 
     for (const tile of tileMapData.tiles) {
         const newTile: Tile = {
@@ -207,7 +210,13 @@ const generateTileMapTiles = ({ tileMapEntityId, tileMap, tileMapData }: {
     }
 };
 
-const generateTileMapEntities = ({ tileMapData }: { tileMapData: TileMapData }) => {
+const generateTileMapEntities = ({ tileMapEntityId, tileMapData }: {
+    tileMapData: TileMapData,
+    tileMapEntityId?: string | null,
+}) => {
+    if (!(tileMapEntityId)) tileMapEntityId = getStore('tilemapId')
+        ?? error({ message: 'Store tilemapId is undefined', where: generateTileMap.name });
+
     for (const entity of tileMapData.entities) {
         const entityData = loadTileMapEntityData({ entityName: entity.name, entityType: entity.type })
             ?? error({
@@ -215,15 +224,24 @@ const generateTileMapEntities = ({ tileMapData }: { tileMapData: TileMapData }) 
                 where: generateTileMapEntities.name,
             });
 
-        if (entity.type === EntityDataTypes.NPC) {
-            createEntityNpc({
-                entityName: entity.name,
-                positionX: entity.x,
-                positionY: entity.y,
-                spritePath: `npc_${entity.name.toLowerCase()}`,
-            });
+        if (entity.type === EntityTypes.NPC) {
+            const { entity: npcEntity, entityId: npcEntityId } = findEntityByName({ entityName: entity.name });
+
+            if (npcEntity && npcEntityId) {
+                setEntityActive({ entityId: npcEntityId, value: true });
+                setTile({ entityId: npcEntityId, tileMapEntityId });
+            }
+            else {
+                createEntityNpc({
+                    entityName: entity.name,
+                    positionX: entity.x,
+                    positionY: entity.y,
+                    spritePath: `npc_${entity.name.toLowerCase()}`,
+                    triggerPriority: entityData.priority,
+                });
+            }
         }
-        else if (entity.type === EntityDataTypes.RESOURCE_ITEM) {
+        else if (entity.type === EntityTypes.RESOURCE_ITEM) {
             createEntityResourceItem({
                 entityName: entity.name,
                 positionX: entity.x,
@@ -231,9 +249,10 @@ const generateTileMapEntities = ({ tileMapData }: { tileMapData: TileMapData }) 
                 resourceIsTemporary: entityData.data.isTemporary,
                 resoureceItemName: entityData.name,
                 spritePath: `resource_${entity.name.toLowerCase()}`,
+                triggerPriority: entityData.priority,
             });
         }
-        else if (entity.type === EntityDataTypes.RESOURCE_BUG) {
+        else if (entity.type === EntityTypes.RESOURCE_BUG) {
             createEntityResourceBug({
                 entityName: entity.name,
                 positionX: entity.x,
@@ -244,9 +263,10 @@ const generateTileMapEntities = ({ tileMapData }: { tileMapData: TileMapData }) 
                 resourceIsTemporary: entityData.data.isTemporary,
                 resoureceItemName: entityData.name,
                 spritePath: `resource_${entity.name.toLowerCase()}`,
+                triggerPriority: entityData.priority,
             });
         }
-        else if (entity.type === EntityDataTypes.RESOURCE_FISH) {
+        else if (entity.type === EntityTypes.RESOURCE_FISH) {
             createEntityResourceFish({
                 entityName: entity.name,
                 positionX: entity.x,
@@ -260,14 +280,16 @@ const generateTileMapEntities = ({ tileMapData }: { tileMapData: TileMapData }) 
                 resourceIsTemporary: entityData.data.isTemporary,
                 resoureceItemName: entityData.name,
                 spritePath: `resource_${entity.name.toLowerCase()}`,
+                triggerPriority: entityData.priority,
             });
         }
-        else if (entity.type === EntityDataTypes.RESOURCE_CRAFT) {
+        else if (entity.type === EntityTypes.RESOURCE_CRAFT) {
             createEntityResourceCraft({
                 entityName: entity.name,
                 positionX: entity.x,
                 positionY: entity.y,
                 spritePath: `resource_${entity.name.toLowerCase()}`,
+                triggerPriority: entityData.priority,
             });
         }
     }

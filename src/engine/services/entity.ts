@@ -12,6 +12,7 @@ import {
     addResourceCraft,
     addManager,
     addEnergy,
+    addState,
 } from './component';
 
 import { createEntity, MANAGER_ENTITY_NAME, PLAYER_ENTITY_NAME, TILEMAP_ENTITY_NAME } from '@/engine/entities';
@@ -66,16 +67,19 @@ export const createEntityNpc = ({
     spritePath,
     positionX,
     positionY,
+    triggerPriority = 0,
 }: {
     entityName: string,
     positionX: number,
     positionY: number,
     spriteHeight?: number,
     spritePath: string,
-    spriteWidth?: number
+    spriteWidth?: number,
+    triggerPriority?: number,
 }) => {
     const entityId = createEntity({ entityName });
 
+    addState({ entityId });
     addSprite({ entityId, height: spriteHeight, image: spritePath, width: spriteWidth });
     addPosition({ entityId, x: positionX, y: positionY });
     addDialog({ entityId });
@@ -88,6 +92,7 @@ export const createEntityNpc = ({
             { x: 1, y: 0 },
             { x: 0, y: 1 },
         ],
+        priority: triggerPriority,
     });
 
     setTile({ entityId });
@@ -100,6 +105,7 @@ export const createEntityResourceItem = ({
     spritePath,
     positionX,
     positionY,
+    triggerPriority = 0,
     resourceIsTemporary = false,
     resoureceItemName,
 }: {
@@ -110,7 +116,8 @@ export const createEntityResourceItem = ({
     resoureceItemName: string,
     spriteHeight?: number,
     spritePath: string,
-    spriteWidth?: number
+    spriteWidth?: number,
+    triggerPriority?: number,
 }) => {
     const entityId = createEntity({ entityName });
 
@@ -121,7 +128,7 @@ export const createEntityResourceItem = ({
         isTemporary: resourceIsTemporary,
         itemName: resoureceItemName,
     });
-    addTrigger({ entityId });
+    addTrigger({ entityId, priority: triggerPriority });
 
     setTile({ entityId });
 };
@@ -133,6 +140,7 @@ export const createEntityResourceBug = ({
     spritePath,
     positionX,
     positionY,
+    triggerPriority = 0,
     resourceIsTemporary = false,
     resourceActivityBugMaxHp,
     resourceActivityBugMaxNbErrors,
@@ -149,7 +157,8 @@ export const createEntityResourceBug = ({
     resoureceItemName: string,
     spriteHeight?: number,
     spritePath: string,
-    spriteWidth?: number
+    spriteWidth?: number,
+    triggerPriority?: number,
 }) => {
     const entityId = createEntity({ entityName });
 
@@ -163,7 +172,7 @@ export const createEntityResourceBug = ({
         maxNbErrors: resourceActivityBugMaxNbErrors,
         symbolInterval: resourceActivityBugSymbolInterval,
     });
-    addTrigger({ entityId });
+    addTrigger({ entityId, priority: triggerPriority });
 
     setTile({ entityId });
 };
@@ -175,6 +184,7 @@ export const createEntityResourceFish = ({
     spritePath,
     positionX,
     positionY,
+    triggerPriority = 0,
     resourceIsTemporary = false,
     resourceActivityFishDamage,
     resourceActivityFishMaxHp,
@@ -197,7 +207,8 @@ export const createEntityResourceFish = ({
     resoureceItemName: string,
     spriteHeight?: number,
     spritePath: string,
-    spriteWidth?: number
+    spriteWidth?: number,
+    triggerPriority?: number,
 }) => {
     const entityId = createEntity({ entityName });
 
@@ -223,6 +234,7 @@ export const createEntityResourceFish = ({
             { x: 1, y: 0 },
             { x: 0, y: 1 },
         ],
+        priority: triggerPriority,
     });
 
     setTile({ entityId });
@@ -235,6 +247,7 @@ export const createEntityResourceCraft = ({
     spritePath,
     positionX,
     positionY,
+    triggerPriority = 0,
     resourceIsTemporary = false,
     resourceMaxNbErrors = 0,
 }: {
@@ -245,7 +258,8 @@ export const createEntityResourceCraft = ({
     resourceMaxNbErrors?: number,
     spriteHeight?: number,
     spritePath: string,
-    spriteWidth?: number
+    spriteWidth?: number,
+    triggerPriority?: number,
 }) => {
     const entityId = createEntity({ entityName });
 
@@ -261,6 +275,7 @@ export const createEntityResourceCraft = ({
             { x: 1, y: 0 },
             { x: 0, y: 1 },
         ],
+        priority: triggerPriority,
     });
 
     setTile({ entityId });

@@ -1,10 +1,11 @@
-import { Entity } from './entity';
+import { Entity, EntityTypes } from './entity';
 import { generateEntityId, getEntity } from './entity.utils';
 
 import { Component } from '@/engine/components/@component';
 import { EventTypes } from '@/engine/event';
 import { error } from '@/engine/services/error';
 import { setStore } from '@/engine/store';
+import { setEntityActive } from '@/engine/systems/state';
 import { event } from '@/render/events';
 
 export const entities: Record<string, Entity> = {};
@@ -17,9 +18,9 @@ export const MANAGER_ENTITY_NAME = 'Manager';
 
 //#region SERVICES
 export const createEntity = ({ entityName }: { entityName: string }) => {
-    const entityId = generateEntityId(entityName);
+    const entityId = generateEntityId({ entityName });
 
-    const existingEntity = getEntity(entityId);
+    const existingEntity = getEntity({ entityId });
     if (existingEntity) error({ message: `Entity ${entityId} already exists`, where: createEntity.name });
 
     entities[entityId] = {} as Entity;
@@ -46,7 +47,7 @@ export const addComponent = <T extends keyof Component>({ entityId, component }:
     component: Component[T],
     entityId: string
 }) => {
-    const entity = getEntity(entityId)
+    const entity = getEntity({ entityId })
         ?? error({ message: `Entity ${entityId} does not exist`, where: addComponent.name });
 
     // @ts-expect-error - Component[T] is not assignable to type 'undefined'
@@ -57,7 +58,7 @@ export const getComponent = <T extends keyof Component>({ entityId, componentId 
     componentId: T,
     entityId: string
 }): Component[T] => {
-    const entity = getEntity(entityId)
+    const entity = getEntity({ entityId })
         ?? error({ message: `Entity ${entityId} does not exist`, where: getComponent.name });
 
     const component = entity[componentId]
@@ -88,6 +89,16 @@ export const destroyAllEntities = () => {
             || entityId.includes(TILEMAP_ENTITY_NAME)
             || entityId.includes(MANAGER_ENTITY_NAME)
         ) return;
+
+        if (entityId.includes(EntityTypes.NPC)) {
+            const state = getComponent({ componentId: 'State', entityId });
+
+            if (state._active) {
+                setEntityActive({ entityId, value: false });
+            }
+
+            return;
+        }
 
         destroyEntity({ entityId });
     });

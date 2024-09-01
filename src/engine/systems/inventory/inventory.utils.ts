@@ -7,6 +7,10 @@ import { setState } from '@/engine/state';
 import { getStore } from '@/engine/store';
 import { event } from '@/render/events';
 
+//#region CHECKS
+const toolSlotUnavailable = (inventory: Inventory) => inventory.tools.length >= inventory._maxTools;
+//#endregion
+
 //#region UTILS
 export const findInventorySlotsWithItem = ({ inventory, itemName }: {
     inventory: Inventory,
@@ -39,6 +43,44 @@ export const createTool = ({ item, activity }: {
     };
 
     return tool;
+};
+
+export const addToolToInventory = ({ entityId, tool }: {
+    entityId: string,
+    tool: Tool
+}) => {
+    const inventory = getComponent({ componentId: 'Inventory', entityId });
+
+    if (toolSlotUnavailable(inventory)) {
+        error({
+            message: 'Inventory Tools are full',
+            where: addToolToInventory.name,
+        });
+
+        return { success: false };
+    }
+
+    if (playerHasSameActivityTool({ activity: tool._activity, playerEntityId: entityId })) {
+        error({
+            message: `Tool with activity ${tool._activity} already exists in inventory`,
+            where: addToolToInventory.name,
+        });
+
+        return { success: false };
+    }
+
+    inventory.tools.push({
+        _active: false,
+        tool,
+    });
+
+    event({
+        data: inventory,
+        entityId,
+        type: EventTypes.INVENTORY_TOOL_UPDATE,
+    });
+
+    return { success: true };
 };
 
 export const openPlayerInventory = ({ playerEntityId }: {

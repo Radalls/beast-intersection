@@ -1,5 +1,4 @@
 import { Component } from './components/@component';
-import { AudioData } from './components/manager';
 import { ActivityData } from './components/resource';
 import { Tile } from './components/tilemap';
 import { checkComponent, getComponent } from './entities';
@@ -20,6 +19,8 @@ import { activateInventoryTool, closePlayerInventory, openPlayerInventory } from
 import { useResource } from './systems/resource';
 import { updateTile } from './systems/tilemap';
 import { checkTrigger } from './systems/trigger';
+
+import { AudioData } from '@/render/audio';
 
 export type Event<K extends keyof Component = keyof Component> = {
     data?: EventData<K>,
@@ -63,6 +64,7 @@ export enum EventTypes {
     /* Entity */
     ENTITY_CREATE = 'ENTITY_CREATE',
     ENTITY_DESTROY = 'ENTITY_DESTROY',
+    ENTITY_DISPLAY = 'ENTITY_DISPLAY',
     ENTITY_POSITION_UPDATE = 'ENTITY_POSITION_UPDATE',
     ENTITY_SPRITE_CREATE = 'ENTITY_SPRITE_CREATE',
     /* Inventory */
@@ -78,6 +80,11 @@ export enum EventTypes {
     MENU_SETTINGS_DISPLAY = 'MENU_SETTINGS_DISPLAY',
     MENU_SETTINGS_DISPLAY_EDIT = 'MENU_SETTINGS_DISPLAY_EDIT',
     MENU_SETTINGS_UPDATE = 'MENU_SETTINGS_UPDATE',
+    /* Quest */
+    QUEST_COMPLETE = 'QUEST_COMPLETE',
+    QUEST_DISPLAY = 'QUEST_DISPLAY',
+    QUEST_END = 'QUEST_END',
+    QUEST_START = 'QUEST_START',
     /* Tilemap */
     TILEMAP_CREATE = 'TILEMAP_CREATE',
     TILEMAP_TILE_CREATE = 'TILEMAP_TILE_CREATE',

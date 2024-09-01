@@ -1,0 +1,41 @@
+.quests {
+    align-items: center;
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    height: 50%;
+    left: 0;
+    padding: 16px;
+    top: 0;
+    width: 33%;
+    z-index: 100;
+}
+
+.quest {
+    align-items: center;
+    background-color: rgb(245, 245, 245);
+    border: solid 2px rgb(0, 0, 0);
+    display: flex;
+    gap: 8px;
+    justify-content: space-between;
+    padding: 8px 16px;
+}
+
+.quest-complete {
+    background-size: cover;
+    display: none;
+    height: 32px;
+    width: 32px;
+}
+
+.quest-item {
+    color: rgb(0, 0, 0);
+    font-size: 16px;
+    width: 100%;
+}
+
+.quest-talk {
+    color: rgb(0, 0, 0);
+    font-size: 16px;
+    width: 100%;
+}
