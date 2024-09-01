@@ -1,6 +1,12 @@
 import { error } from '@/engine/services/error';
 
 //#region CONSTANTS
+export type AudioData = {
+    audioName: string,
+    loop?: boolean,
+    volume?: number,
+};
+
 const audioFiles: Record<string, { default: string }>
     = import.meta.glob('../../src/assets/audio/**/*.mp3', { eager: true });
 

@@ -5,4 +5,5 @@ export * from './event.dialog';
 export * from './event.energy';
 export * from './event.inventory';
 export * from './event.menu';
+export * from './event.quest';
 export * from './event.tilemap';

@@ -69,6 +69,10 @@ export const openSettings = ({ managerEntityId }: { managerEntityId?: string | n
     });
 
     event({
+        entityId: managerEntityId,
+        type: EventTypes.QUEST_DISPLAY,
+    });
+    event({
         data: manager,
         entityId: managerEntityId,
         type: EventTypes.MENU_SETTINGS_DISPLAY,
@@ -78,6 +82,7 @@ export const openSettings = ({ managerEntityId }: { managerEntityId?: string | n
         entityId: managerEntityId,
         type: EventTypes.MENU_SETTINGS_UPDATE,
     });
+
     event({
         data: { audioName: 'menu_settings_open' },
         entityId: managerEntityId,
@@ -105,6 +110,10 @@ export const closeSettings = ({ managerEntityId }: { managerEntityId?: string | 
     });
 
     event({
+        entityId: managerEntityId,
+        type: EventTypes.QUEST_DISPLAY,
+    });
+    event({
         data: manager,
         entityId: managerEntityId,
         type: EventTypes.MENU_SETTINGS_DISPLAY,
@@ -125,7 +134,7 @@ export const confirmSetting = ({ managerEntityId, editKey }: {
 
     const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
 
-    if (SETTINGS[manager._selectedSetting] === 'audio') {
+    if (SETTINGS[manager._selectedSetting] === SETTINGS[0]) {
         editSettingAudio({ managerEntityId });
     }
     else if (SETTINGS[manager._selectedSetting]) {

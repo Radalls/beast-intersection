@@ -1,6 +1,10 @@
+import { Quest } from '@/engine/services/quest';
+
 export type Manager = {
     _: 'Manager',
+    _selectedQuest: number,
     _selectedSetting: number,
+    quests: Quest[],
     settings: ManagerSettings,
 };
 
@@ -26,10 +30,4 @@ type ManagerSettingsMoveKeys = {
     _left: string,
     _right: string,
     _up: string,
-};
-
-export type AudioData = {
-    audioName: string,
-    loop?: boolean,
-    volume?: number,
 };

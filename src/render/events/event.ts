@@ -28,22 +28,36 @@ import {
     onInventoryToolsUpdate,
     onInventoryUpdate,
 } from './event.inventory';
-import { onLoadingDisplay, onSettingsMenuDisplay, onSettingsMenuDisplayEdit, onSettingsMenuUpdate } from './event.menu';
+import {
+    onLoadingDisplay,
+    onSettingsMenuDisplay,
+    onSettingsMenuDisplayEdit,
+    onSettingsMenuUpdate,
+} from './event.menu';
+import { onQuestComplete, onQuestEnd, onQuestsDisplay, onQuestStart } from './event.quest';
 import { onTileMapCreate, onTileMapTileCreate, onTileMapTileDestroy } from './event.tilemap';
-import { onEntityCreate, onEntityDestroy, onEntityPositionUpdate, onEntitySpriteCreate } from './event.utils';
+import {
+    onEntityCreate,
+    onEntityDestroy,
+    onEntityDisplay,
+    onEntityPositionUpdate,
+    onEntitySpriteCreate,
+} from './event.utils';
 
 import { Component } from '@/engine/components/@component';
 import { Dialog } from '@/engine/components/dialog';
 import { Energy } from '@/engine/components/energy';
 import { Inventory } from '@/engine/components/inventory';
-import { AudioData, Manager } from '@/engine/components/manager';
+import { Manager } from '@/engine/components/manager';
 import { Position } from '@/engine/components/position';
 import { Resource, ActivityBugData, ActivityFishData, ActivityCraftData } from '@/engine/components/resource';
 import { Sprite } from '@/engine/components/sprite';
+import { State } from '@/engine/components/state';
 import { TileMap, Tile } from '@/engine/components/tilemap';
 import { onInputKeyDown as engineOnInputKeyDown, Event } from '@/engine/event';
 import { EventTypes } from '@/engine/event';
 import { error } from '@/engine/services/error';
+import { AudioData } from '@/render/audio';
 
 //#region HELPERS
 export const onInputKeyDown = (e: any) => engineOnInputKeyDown(e.key);
@@ -61,6 +75,7 @@ export const checkDialogData = (data: any): data is Dialog => data;
 export const checkManagerData = (data: any): data is Manager => data;
 export const checkAudioData = (data: any): data is AudioData => data;
 export const checkEnergyData = (data: any): data is Energy => data;
+export const checkStateData = (data: any): data is State => data;
 //#endregion
 
 //#region EVENTS
@@ -184,6 +199,12 @@ export const event = <T extends keyof Component>(event: Event<T>) => {
     else if (event.type === EventTypes.ENTITY_DESTROY) {
         onEntityDestroy({ entityId: event.entityId });
     }
+    else if (event.type === EventTypes.ENTITY_DISPLAY && checkStateData(event.data)) {
+        onEntityDisplay({
+            entityId: event.entityId,
+            state: event.data,
+        });
+    }
     else if (event.type === EventTypes.ENTITY_POSITION_UPDATE && checkPositionData(event.data)) {
         onEntityPositionUpdate({
             entityId: event.entityId,
@@ -239,6 +260,19 @@ export const event = <T extends keyof Component>(event: Event<T>) => {
     }
     else if (event.type === EventTypes.MENU_SETTINGS_DISPLAY_EDIT) {
         onSettingsMenuDisplayEdit();
+    }
+    /* Quest */
+    else if (event.type === EventTypes.QUEST_COMPLETE && checkManagerData(event.data)) {
+        onQuestComplete({ manager: event.data });
+    }
+    else if (event.type === EventTypes.QUEST_DISPLAY) {
+        onQuestsDisplay();
+    }
+    else if (event.type === EventTypes.QUEST_END && checkManagerData(event.data)) {
+        onQuestEnd({ manager: event.data });
+    }
+    else if (event.type === EventTypes.QUEST_START && checkManagerData(event.data)) {
+        onQuestStart({ manager: event.data });
     }
     /* Tilemap */
     else if (event.type === EventTypes.TILEMAP_CREATE && checkTileMapData(event.data)) {

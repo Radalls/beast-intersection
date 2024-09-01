@@ -6,11 +6,11 @@ import { SETTINGS, SETTINGS_KEYS_PATHS } from '@/engine/services/settings';
 
 //#region HELPERS
 const getSettingId = ({ settingName }: { settingName: string }) => {
-    return settingName.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+    return settingName.charAt(0).toUpperCase() + settingName.slice(1);
 };
 
 const getSettingName = ({ settingId }: { settingId: string }) => {
-    return settingId.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+    return settingId.charAt(0).toLowerCase() + settingId.slice(1);
 };
 //#endregion
 
@@ -19,14 +19,16 @@ const getSettingName = ({ settingId }: { settingId: string }) => {
 export const createLoadingMenu = () => {
     const loading = createElement({
         elementClass: 'loading',
-        entityId: 'LoadingMenu',
+        elementId: 'LoadingMenu',
+        entityId: '',
     });
 
     createElement({
         elementAbsolute: false,
         elementClass: 'loader',
+        elementId: 'LoadingLoader',
         elementParent: loading,
-        entityId: 'LoadingLoader',
+        entityId: '',
     });
 };
 
@@ -37,9 +39,11 @@ export const displayLoadingMenu = ({ display }: { display: boolean }) => {
         entityLoading.style.display = 'flex';
     }
     else {
-        setTimeout(() => {
-            entityLoading.style.display = 'none';
-        }, 100);
+        // setTimeout(() => {
+        //     entityLoading.style.display = 'none';
+        // }, 100);
+
+        entityLoading.style.display = 'none';
     }
 };
 //#endregion
@@ -48,12 +52,14 @@ export const displayLoadingMenu = ({ display }: { display: boolean }) => {
 export const createSettingsMenu = () => {
     const settings = createElement({
         elementClass: 'settings',
-        entityId: 'settings-menu',
+        elementId: 'SettingsMenu',
+        entityId: '',
     });
 
     const edit = createElement({
         elementClass: 'settings-edit',
-        entityId: 'settings-menu-edit',
+        elementId: 'SettingsMenuEdit',
+        entityId: '',
     });
     edit.innerText = 'ENTER NEW KEY';
 
@@ -61,8 +67,9 @@ export const createSettingsMenu = () => {
     const generalSettings = createElement({
         elementAbsolute: false,
         elementClass: 'setting-header',
+        elementId: 'SettingsMenuGeneral',
         elementParent: settings,
-        entityId: 'settings-menu-general',
+        entityId: '',
     });
     generalSettings.innerText = 'GENERAL';
 
@@ -70,46 +77,52 @@ export const createSettingsMenu = () => {
     const audioContainer = createElement({
         elementAbsolute: false,
         elementClass: 'setting-container',
+        elementId: 'SettingsMenuAudioContainer',
         elementParent: settings,
-        entityId: 'settings-menu-audio-container',
+        entityId: '',
     });
 
     const audioLabel = createElement({
         elementAbsolute: false,
         elementClass: 'setting-label',
+        elementId: 'SettingsMenuAudioLabel',
         elementParent: audioContainer,
-        entityId: 'settings-menu-audio-label',
+        entityId: '',
     });
     audioLabel.innerText = 'AUDIO: ';
 
     const audioSetting = createElement({
         elementAbsolute: false,
         elementClass: 'setting',
+        elementId: 'SettingsMenuAudioSetting',
         elementParent: audioContainer,
-        entityId: 'settings-menu-audio-setting',
+        entityId: '',
     });
 
     const audioSettingIcon = createElement({
         elementAbsolute: false,
         elementClass: 'setting-icon',
+        elementId: 'SettingsMenuAudioSettingIcon',
         elementParent: audioSetting,
-        entityId: 'settings-menu-audio-setting-icon',
+        entityId: '',
     });
     audioSettingIcon.innerText = '🎵';
 
     createElement({
         elementAbsolute: false,
         elementClass: 'setting-value',
+        elementId: 'SettingsMenuAudioSettingValue',
         elementParent: audioSetting,
-        entityId: 'settings-menu-audio-setting-value',
+        entityId: '',
     });
 
     /* Keybinds */
     const keybindsSettings = createElement({
         elementAbsolute: false,
         elementClass: 'setting-header',
+        elementId: 'SettingsMenuKeybinds',
         elementParent: settings,
-        entityId: 'settings-menu-keybinds',
+        entityId: '',
     });
     keybindsSettings.innerText = 'KEYBINDS';
 
@@ -117,271 +130,306 @@ export const createSettingsMenu = () => {
     const moveUpContainer = createElement({
         elementAbsolute: false,
         elementClass: 'setting-container',
+        elementId: 'SettingsMenuKeyMoveUpContainer',
         elementParent: settings,
-        entityId: 'settings-menu-key-move-up-container',
+        entityId: '',
     });
 
     const moveUpLabel = createElement({
         elementAbsolute: false,
         elementClass: 'setting-label',
+        elementId: 'SettingsMenuKeyMoveUpLabel',
         elementParent: moveUpContainer,
-        entityId: 'settings-menu-key-move-up-label',
+        entityId: '',
     });
     moveUpLabel.innerText = 'UP: ';
 
     const moveUpSetting = createElement({
         elementAbsolute: false,
         elementClass: 'setting',
+        elementId: 'SettingsMenuKeyMoveUpSetting',
         elementParent: moveUpContainer,
-        entityId: 'settings-menu-key-move-up-setting',
+        entityId: '',
     });
 
     const moveUpSettingIcon = createElement({
         elementAbsolute: false,
         elementClass: 'setting-icon',
+        elementId: 'SettingsMenuKeyMoveUpSettingIcon',
         elementParent: moveUpSetting,
-        entityId: 'settings-menu-key-move-up-setting-icon',
+        entityId: '',
     });
     moveUpSettingIcon.innerText = '⬆';
 
     createElement({
         elementAbsolute: false,
         elementClass: 'setting-value',
+        elementId: 'SettingsMenuKeyMoveUpSettingValue',
         elementParent: moveUpSetting,
-        entityId: 'settings-menu-key-move-up-setting-value',
+        entityId: '',
     });
 
     /* Move DOWN */
     const moveDownContainer = createElement({
         elementAbsolute: false,
         elementClass: 'setting-container',
+        elementId: 'SettingsMenuKeyMoveDownContainer',
         elementParent: settings,
-        entityId: 'settings-menu-key-move-down-container',
+        entityId: '',
     });
 
     const moveDownLabel = createElement({
         elementAbsolute: false,
         elementClass: 'setting-label',
+        elementId: 'SettingsMenuKeyMoveDownLabel',
         elementParent: moveDownContainer,
-        entityId: 'settings-menu-key-move-down-label',
+        entityId: '',
     });
     moveDownLabel.innerText = 'DOWN: ';
 
     const moveDownSetting = createElement({
         elementAbsolute: false,
         elementClass: 'setting',
+        elementId: 'SettingsMenuKeyMoveDownSetting',
         elementParent: moveDownContainer,
-        entityId: 'settings-menu-key-move-down-setting',
+        entityId: '',
     });
 
     const moveDownSettingIcon = createElement({
         elementAbsolute: false,
         elementClass: 'setting-icon',
+        elementId: 'SettingsMenuKeyMoveDownSettingIcon',
         elementParent: moveDownSetting,
-        entityId: 'settings-menu-key-move-down-setting-icon',
+        entityId: '',
     });
     moveDownSettingIcon.innerText = '⬇';
 
     createElement({
         elementAbsolute: false,
         elementClass: 'setting-value',
+        elementId: 'SettingsMenuKeyMoveDownSettingValue',
         elementParent: moveDownSetting,
-        entityId: 'settings-menu-key-move-down-setting-value',
+        entityId: '',
     });
 
     /* Move LEFT */
     const moveLeftContainer = createElement({
         elementAbsolute: false,
         elementClass: 'setting-container',
+        elementId: 'SettingsMenuKeyMoveLeftContainer',
         elementParent: settings,
-        entityId: 'settings-menu-key-move-left-container',
+        entityId: '',
     });
 
     const moveLeftLabel = createElement({
         elementAbsolute: false,
         elementClass: 'setting-label',
+        elementId: 'SettingsMenuKeyMoveLeftLabel',
         elementParent: moveLeftContainer,
-        entityId: 'settings-menu-key-move-left-label',
+        entityId: '',
     });
     moveLeftLabel.innerText = 'LEFT: ';
 
     const moveLeftSetting = createElement({
         elementAbsolute: false,
         elementClass: 'setting',
+        elementId: 'SettingsMenuKeyMoveLeftSetting',
         elementParent: moveLeftContainer,
-        entityId: 'settings-menu-key-move-left-setting',
+        entityId: '',
     });
 
     const moveLeftSettingIcon = createElement({
         elementAbsolute: false,
         elementClass: 'setting-icon',
+        elementId: 'SettingsMenuKeyMoveLeftSettingIcon',
         elementParent: moveLeftSetting,
-        entityId: 'settings-menu-key-move-left-setting-icon',
+        entityId: '',
     });
     moveLeftSettingIcon.innerText = '⬅';
 
     createElement({
         elementAbsolute: false,
         elementClass: 'setting-value',
+        elementId: 'SettingsMenuKeyMoveLeftSettingValue',
         elementParent: moveLeftSetting,
-        entityId: 'settings-menu-key-move-left-setting-value',
+        entityId: '',
     });
 
     /* Move RIGHT */
     const moveRightContainer = createElement({
         elementAbsolute: false,
         elementClass: 'setting-container',
+        elementId: 'SettingsMenuKeyMoveRightContainer',
         elementParent: settings,
-        entityId: 'settings-menu-key-move-right-container',
+        entityId: '',
     });
 
     const moveRightLabel = createElement({
         elementAbsolute: false,
         elementClass: 'setting-label',
+        elementId: 'SettingsMenuKeyMoveRightLabel',
         elementParent: moveRightContainer,
-        entityId: 'settings-menu-key-move-right-label',
+        entityId: '',
     });
     moveRightLabel.innerText = 'RIGHT: ';
 
     const moveRightSetting = createElement({
         elementAbsolute: false,
         elementClass: 'setting',
+        elementId: 'SettingsMenuKeyMoveRightSetting',
         elementParent: moveRightContainer,
-        entityId: 'settings-menu-key-move-right-setting',
+        entityId: '',
     });
 
     const moveRightSettingIcon = createElement({
         elementAbsolute: false,
         elementClass: 'setting-icon',
+        elementId: 'SettingsMenuKeyMoveRightSettingIcon',
         elementParent: moveRightSetting,
-        entityId: 'settings-menu-key-move-right-setting-icon',
+        entityId: '',
     });
     moveRightSettingIcon.innerText = '➡';
 
     createElement({
         elementAbsolute: false,
         elementClass: 'setting-value',
+        elementId: 'SettingsMenuKeyMoveRightSettingValue',
         elementParent: moveRightSetting,
-        entityId: 'settings-menu-key-move-right-setting-value',
+        entityId: '',
     });
 
     /* Action ACT */
     const actContainer = createElement({
         elementAbsolute: false,
         elementClass: 'setting-container',
+        elementId: 'SettingsMenuKeyActionActContainer',
         elementParent: settings,
-        entityId: 'settings-menu-key-action-act-container',
+        entityId: '',
     });
 
     const actLabel = createElement({
         elementAbsolute: false,
         elementClass: 'setting-label',
+        elementId: 'SettingsMenuKeyActionActLabel',
         elementParent: actContainer,
-        entityId: 'settings-menu-key-action-act-label',
+        entityId: '',
     });
     actLabel.innerText = 'ACT: ';
 
     const actSetting = createElement({
         elementAbsolute: false,
         elementClass: 'setting',
+        elementId: 'SettingsMenuKeyActionActSetting',
         elementParent: actContainer,
-        entityId: 'settings-menu-key-action-act-setting',
+        entityId: '',
     });
 
     const actSettingIcon = createElement({
         elementAbsolute: false,
         elementClass: 'setting-icon',
+        elementId: 'SettingsMenuKeyActionActSettingIcon',
         elementParent: actSetting,
-        entityId: 'settings-menu-key-action-act-setting-icon',
+        entityId: '',
     });
     actSettingIcon.innerText = '🖐';
 
     createElement({
         elementAbsolute: false,
         elementClass: 'setting-value',
+        elementId: 'SettingsMenuKeyActionActSettingValue',
         elementParent: actSetting,
-        entityId: 'settings-menu-key-action-act-setting-value',
+        entityId: '',
     });
 
     /* Action INVENTORY */
     const inventoryContainer = createElement({
         elementAbsolute: false,
         elementClass: 'setting-container',
+        elementId: 'SettingsMenuKeyActionInventoryContainer',
         elementParent: settings,
-        entityId: 'settings-menu-key-action-inventory-container',
+        entityId: '',
     });
 
     const inventoryLabel = createElement({
         elementAbsolute: false,
         elementClass: 'setting-label',
+        elementId: 'SettingsMenuKeyActionInventoryLabel',
         elementParent: inventoryContainer,
-        entityId: 'settings-menu-key-action-inventory-label',
+        entityId: '',
     });
     inventoryLabel.innerText = 'INVENTORY: ';
 
     const inventorySetting = createElement({
         elementAbsolute: false,
         elementClass: 'setting',
+        elementId: 'SettingsMenuKeyActionInventorySetting',
         elementParent: inventoryContainer,
-        entityId: 'settings-menu-key-action-inventory-setting',
+        entityId: '',
     });
 
     const inventorySettingIcon = createElement({
         elementAbsolute: false,
         elementClass: 'setting-icon',
+        elementId: 'SettingsMenuKeyActionInventorySettingIcon',
         elementParent: inventorySetting,
-        entityId: 'settings-menu-key-action-inventory-setting-icon',
+        entityId: '',
     });
     inventorySettingIcon.innerText = '🎒';
 
     createElement({
         elementAbsolute: false,
         elementClass: 'setting-value',
+        elementId: 'SettingsMenuKeyActionInventorySettingValue',
         elementParent: inventorySetting,
-        entityId: 'settings-menu-key-action-inventory-setting-value',
+        entityId: '',
     });
 
     /* Action TOOL */
     const toolContainer = createElement({
         elementAbsolute: false,
         elementClass: 'setting-container',
+        elementId: 'SettingsMenuKeyActionToolContainer',
         elementParent: settings,
-        entityId: 'settings-menu-key-action-tool-container',
+        entityId: '',
     });
 
     const toolLabel = createElement({
         elementAbsolute: false,
         elementClass: 'setting-label',
+        elementId: 'SettingsMenuKeyActionToolLabel',
         elementParent: toolContainer,
-        entityId: 'settings-menu-key-action-tool-label',
+        entityId: '',
     });
     toolLabel.innerText = 'TOOL: ';
 
     const toolSetting = createElement({
         elementAbsolute: false,
         elementClass: 'setting',
+        elementId: 'SettingsMenuKeyActionToolSetting',
         elementParent: toolContainer,
-        entityId: 'settings-menu-key-action-tool-setting',
+        entityId: '',
     });
 
     const toolSettingIcon = createElement({
         elementAbsolute: false,
         elementClass: 'setting-icon',
+        elementId: 'SettingsMenuKeyActionToolSettingIcon',
         elementParent: toolSetting,
-        entityId: 'settings-menu-key-action-tool-setting-icon',
+        entityId: '',
     });
     toolSettingIcon.innerText = '🎣';
 
     createElement({
         elementAbsolute: false,
         elementClass: 'setting-value',
+        elementId: 'SettingsMenuKeyActionToolSettingValue',
         elementParent: toolSetting,
-        entityId: 'settings-menu-key-action-tool-setting-value',
+        entityId: '',
     });
 };
 
 export const displaySettingsMenu = () => {
-    const settings = getElement({ elementId: 'settings-menu' });
+    const settings = getElement({ elementId: 'SettingsMenu' });
 
     settings.style.display = (settings.style.display === 'flex') ? 'none' : 'flex';
 };
@@ -396,15 +444,15 @@ export const updateSettingsMenu = ({ manager }: {
 
     const values = searchElementsByClassName({ className: 'setting-value' });
     for (const value of values) {
-        const settingId = value.id.match(/settings-menu-(.+)-setting-value/)?.[1];
+        const settingId = value.id.match(/SettingsMenu(.+)SettingValue/)?.[1];
         if (!(settingId)) continue;
 
         const settingName = getSettingName({ settingId });
 
-        if (settingName === 'audio') {
+        if (settingName === SETTINGS[0]) {
             value.innerText = (manager.settings._audio) ? '🔊' : '🔇';
         }
-        else if ((SETTINGS_KEYS_PATHS[settingName])) {
+        else if (SETTINGS_KEYS_PATHS[settingName]) {
             let settingPath = manager.settings as any;
             for (const key of SETTINGS_KEYS_PATHS[settingName].path) {
                 settingPath = settingPath[key];
@@ -420,7 +468,7 @@ export const updateSettingsMenu = ({ manager }: {
 };
 
 export const displaySettingsMenuEdit = () => {
-    const settingsEdit = getElement({ elementId: 'settings-menu-edit' });
+    const settingsEdit = getElement({ elementId: 'SettingsMenuEdit' });
 
     settingsEdit.style.display = (settingsEdit.style.display === 'flex') ? 'none' : 'flex';
 };

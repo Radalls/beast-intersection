@@ -56,7 +56,7 @@ describe('Resource System', () => {
             });
 
             expect(playerInventory.slots).toHaveLength(1);
-            expect(getEntity(temporaryResourceEntityId)).toBeNull();
+            expect(getEntity({ entityId: temporaryResourceEntityId })).toBeNull();
         });
 
         test('Should use bug resource', () => {
@@ -72,7 +72,7 @@ describe('Resource System', () => {
                 resourceEntityId: bugResourceEntityId,
             });
 
-            expect(getEntity(bugResourceEntityId)).not.toBeNull();
+            expect(getEntity({ entityId: bugResourceEntityId })).not.toBeNull();
         });
     });
 
@@ -105,7 +105,7 @@ describe('Resource System', () => {
         test('Should destroy resource entity', () => {
             destroyResource({ resourceEntityId: resourceEntityId });
 
-            expect(getEntity(resourceEntityId)).toBeNull();
+            expect(getEntity({ entityId: resourceEntityId })).toBeNull();
         });
     });
 });

@@ -1,4 +1,4 @@
-import { getCycle, runCycle } from './cycle';
+import { getCycle, runCheck, runCycle } from './cycle';
 import { createEntityManager, createEntityPlayer, createEntityTileMap } from './services/entity';
 import { setState } from './state';
 
@@ -8,10 +8,13 @@ export const main = () => {
     setInterval(() => {
         runCycle();
     }, getCycle('deltaTime') * 1000);
+    setInterval(() => {
+        runCheck();
+    }, getCycle('checkTime') * 1000);
 
     createEntityManager();
 
-    createEntityTileMap({ tileMapName: 'map1' });
+    createEntityTileMap({ tileMapName: 'map_0-0' });
 
     createEntityPlayer({
         positionX: 3,

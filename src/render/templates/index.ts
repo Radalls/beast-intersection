@@ -4,5 +4,6 @@ export * from './template.dialog';
 export * from './template.energy';
 export * from './template.inventory';
 export * from './template.menu';
+export * from './template.quest';
 export * from './template.tilemap';
 export * from './template.utils';

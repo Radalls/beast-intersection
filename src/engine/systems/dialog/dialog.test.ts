@@ -2,6 +2,7 @@ import { loadDialogData } from './__mocks__/dialog.data';
 import { endDialog, nextDialog, selectDialogOption, startDialog } from './dialog';
 
 import { Dialog } from '@/engine/components/dialog';
+import { State } from '@/engine/components/state';
 import { addComponent, createEntity } from '@/engine/entities';
 
 describe('Dialog system', () => {
@@ -10,10 +11,19 @@ describe('Dialog system', () => {
         _: 'Dialog',
         texts: [],
     };
+    const state: State = {
+        _: 'State',
+        _active: true,
+        _talk: false,
+    };
 
     beforeAll(() => {
         addComponent({
             component: dialog,
+            entityId,
+        });
+        addComponent({
+            component: state,
             entityId,
         });
 
@@ -21,7 +31,7 @@ describe('Dialog system', () => {
     });
 
     beforeEach(() => {
-        dialog._currentId = undefined;
+        dialog._currentTextId = undefined;
         dialog._currentOptionIndex = undefined;
         dialog._currentValue = undefined;
         dialog._currentOptionsValues = undefined;
@@ -35,7 +45,7 @@ describe('Dialog system', () => {
         test('Should set dialog data at start', () => {
             startDialog({ entityId });
 
-            expect(dialog._currentId).toBe(1);
+            expect(dialog._currentTextId).toBe(1);
             expect(dialog._currentOptionIndex).toBeUndefined();
             expect(dialog._currentValue).toBe('text1');
             expect(dialog._currentOptionsValues).toBeUndefined();
@@ -48,31 +58,31 @@ describe('Dialog system', () => {
         });
 
         test('Should set next dialog text without options', () => {
-            dialog._currentId = 1;
+            dialog._currentTextId = 1;
             nextDialog({ entityId });
 
-            expect(dialog._currentId).toBe(2);
+            expect(dialog._currentTextId).toBe(2);
             expect(dialog._currentOptionIndex).toBeUndefined();
             expect(dialog._currentValue).toBe('text2');
             expect(dialog._currentOptionsValues).toBeUndefined();
         });
 
         test('Should set next dialog text with options', () => {
-            dialog._currentId = 2;
+            dialog._currentTextId = 2;
             nextDialog({ entityId });
 
-            expect(dialog._currentId).toBe(3);
+            expect(dialog._currentTextId).toBe(3);
             expect(dialog._currentOptionIndex).toBe(0);
             expect(dialog._currentValue).toBe('text3');
             expect(dialog._currentOptionsValues).toEqual(['text4', 'text5']);
         });
 
         test('Should set next dialog text with options and select option', () => {
-            dialog._currentId = 3;
+            dialog._currentTextId = 3;
             dialog._currentOptionIndex = 0;
             nextDialog({ entityId });
 
-            expect(dialog._currentId).toBe(6);
+            expect(dialog._currentTextId).toBe(6);
             expect(dialog._currentOptionIndex).toBe(0);
             expect(dialog._currentValue).toBe('text6');
             expect(dialog._currentOptionsValues).toEqual(['text1', 'text2', 'text3']);
@@ -85,7 +95,7 @@ describe('Dialog system', () => {
         });
 
         test('Should select previous dialog option', () => {
-            dialog._currentId = 6;
+            dialog._currentTextId = 6;
             dialog._currentOptionIndex = 1;
             selectDialogOption({ entityId, offset: -1 });
 
@@ -93,7 +103,7 @@ describe('Dialog system', () => {
         });
 
         test('Should select next dialog option', () => {
-            dialog._currentId = 6;
+            dialog._currentTextId = 6;
             dialog._currentOptionIndex = 1;
             selectDialogOption({ entityId, offset: 1 });
 
@@ -101,7 +111,7 @@ describe('Dialog system', () => {
         });
 
         test('Should remain on first dialog option', () => {
-            dialog._currentId = 6;
+            dialog._currentTextId = 6;
             dialog._currentOptionIndex = 0;
             selectDialogOption({ entityId, offset: -1 });
 
@@ -109,7 +119,7 @@ describe('Dialog system', () => {
         });
 
         test('Should remain on last dialog option', () => {
-            dialog._currentId = 6;
+            dialog._currentTextId = 6;
             dialog._currentOptionIndex = 2;
             selectDialogOption({ entityId, offset: 1 });
 
@@ -123,10 +133,10 @@ describe('Dialog system', () => {
         });
 
         test('Should end dialog', () => {
-            dialog._currentId = 6;
+            dialog._currentTextId = 6;
             endDialog({ entityId });
 
-            expect(dialog._currentId).toBeUndefined();
+            expect(dialog._currentTextId).toBeUndefined();
             expect(dialog._currentOptionIndex).toBeUndefined();
             expect(dialog._currentValue).toBeUndefined();
             expect(dialog._currentOptionsValues).toBeUndefined();

@@ -8,6 +8,7 @@
             "maxHp": 100,
             "frenzyDuration": 3,
             "frenzyInterval": 9
-        }
+        },
+        "priority": 1
     }
 ]

@@ -2,6 +2,7 @@ import { getElement, getSpritePath } from './template.utils';
 
 import { Position } from '@/engine/components/position';
 import { Sprite } from '@/engine/components/sprite';
+import { getRawEntityId } from '@/engine/entities';
 import { app } from '@/render/main';
 
 //#region CONSTANTS
@@ -19,7 +20,7 @@ export const createElement = ({ entityId, elementId, elementClass, elementParent
     const element = document.createElement('div');
 
     element.setAttribute('id', elementId ?? entityId);
-    element.setAttribute('class', elementClass ?? entityId.toLowerCase());
+    element.setAttribute('class', elementClass ?? getRawEntityId({ entityId }).toLowerCase());
 
     element.style.position = elementAbsolute ? 'absolute' : 'relative';
 

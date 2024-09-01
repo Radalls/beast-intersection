@@ -1,13 +1,13 @@
 import { findItemRule } from './inventory.data';
 import {
     addInventorySlot,
+    addToolToInventory,
     createTool,
     findInventorySlotsWithItem,
-    playerHasSameActivityTool,
     removeInventorySlots,
 } from './inventory.utils';
 
-import { Inventory, Item, Tool } from '@/engine/components/inventory';
+import { Inventory, Item } from '@/engine/components/inventory';
 import { getComponent } from '@/engine/entities';
 import { EventTypes } from '@/engine/event';
 import { error } from '@/engine/services/error';
@@ -19,7 +19,7 @@ const invalidItemName = (itemName: string) => !(itemName) || itemName === '';
 const invalidItemAmount = (itemAmount: number) => itemAmount <= 0;
 const invalidItemSprite = (itemSprite: string) => !(itemSprite) || itemSprite === '';
 const slotAvailable = (inventory: Inventory) => inventory.slots.length < inventory._maxSlots;
-const toolSlotUnavailable = (inventory: Inventory) => inventory.tools.length >= inventory._maxTools;
+
 //#endregion
 
 //#region ACTIONS
@@ -246,41 +246,28 @@ export const activateInventoryTool = ({ entityId }: {
     });
 };
 
-const addToolToInventory = ({ entityId, tool }: {
-    entityId: string,
-    tool: Tool
+export const checkInventory = ({ entityId, items }: {
+    entityId?: string | null,
+    items: { amount: number, name: string }[],
 }) => {
+    if (!(entityId)) entityId = getStore('playerId')
+        ?? error({ message: 'Store playerId is undefined', where: activateInventoryTool.name });
+
     const inventory = getComponent({ componentId: 'Inventory', entityId });
 
-    if (toolSlotUnavailable(inventory)) {
-        error({
-            message: 'Inventory Tools are full',
-            where: addToolToInventory.name,
-        });
-
-        return { success: false };
+    for (const item of items) {
+        const slotsWithItem = findInventorySlotsWithItem({ inventory, itemName: item.name });
+        if (slotsWithItem.length === 0) {
+            return false;
+        }
+        else {
+            const itemAmountInInventory = slotsWithItem.reduce((acc, slot) => acc + slot._amount, 0);
+            if (itemAmountInInventory < item.amount) {
+                return false;
+            }
+        }
     }
 
-    if (playerHasSameActivityTool({ activity: tool._activity, playerEntityId: entityId })) {
-        error({
-            message: `Tool with activity ${tool._activity} already exists in inventory`,
-            where: addToolToInventory.name,
-        });
-
-        return { success: false };
-    }
-
-    inventory.tools.push({
-        _active: false,
-        tool,
-    });
-
-    event({
-        data: inventory,
-        entityId,
-        type: EventTypes.INVENTORY_TOOL_UPDATE,
-    });
-
-    return { success: true };
+    return true;
 };
 //#endregion

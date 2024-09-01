@@ -14,6 +14,7 @@ const state = {
     isInputCooldown: false,
     isPlayerDialogOpen: false,
     isPlayerInventoryOpen: false,
+    isQuestActive: false,
     isSettingAudioAllowed: false,
     isSettingEditOpen: false,
 };

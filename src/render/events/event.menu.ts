@@ -11,11 +11,7 @@ export const onLoadingDisplay = ({ display }: { display: boolean }) => displayLo
 
 export const onSettingsMenuDisplay = () => displaySettingsMenu();
 
-export const onSettingsMenuUpdate = ({ manager }: {
-    manager: Manager,
-}) => {
-    updateSettingsMenu({ manager });
-};
+export const onSettingsMenuUpdate = ({ manager }: { manager: Manager }) => updateSettingsMenu({ manager });
 
 export const onSettingsMenuDisplayEdit = () => displaySettingsMenuEdit();
 //#endregion

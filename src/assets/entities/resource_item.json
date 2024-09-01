@@ -4,13 +4,15 @@
         "name": "Wood1",
         "data": {
             "isTemporary": true
-        }
+        },
+        "priority": 2
     },
     {
         "type": "ResourceItem",
         "name": "Rock1",
         "data": {
             "isTemporary": true
-        }
+        },
+        "priority": 2
     }
 ]

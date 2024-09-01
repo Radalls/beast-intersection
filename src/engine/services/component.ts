@@ -12,6 +12,7 @@ import {
     Resource,
 } from '@/engine/components/resource';
 import { Sprite } from '@/engine/components/sprite';
+import { State } from '@/engine/components/state';
 import { TileMap } from '@/engine/components/tilemap';
 import { Trigger } from '@/engine/components/trigger';
 import { addComponent, isPlayer } from '@/engine/entities';
@@ -91,7 +92,7 @@ export const addInventory = ({ entityId, maxSlots = 20, maxTools = 3 }: {
 
     addComponent({ component: inventory, entityId });
 
-    if (isPlayer(entityId)) {
+    if (isPlayer({ entityId })) {
         event({
             data: inventory,
             entityId,
@@ -121,7 +122,9 @@ export const addManager = ({ entityId }: {
 }) => {
     const manager: Manager = {
         _: 'Manager',
+        _selectedQuest: 0,
         _selectedSetting: 0,
+        quests: [],
         settings: {
             _audio: false,
             keys: {
@@ -142,6 +145,11 @@ export const addManager = ({ entityId }: {
     };
 
     addComponent({ component: manager, entityId });
+
+    event({
+        entityId,
+        type: EventTypes.QUEST_DISPLAY,
+    });
 };
 
 export const addPosition = ({ entityId, x = 0, y = 0 }: {
@@ -326,6 +334,16 @@ export const addSprite = ({ entityId, height = 1, image, width = 1 }: {
         entityId,
         type: EventTypes.ENTITY_SPRITE_CREATE,
     });
+};
+
+export const addState = ({ entityId }: { entityId: string }) => {
+    const state: State = {
+        _: 'State',
+        _active: true,
+        _talk: false,
+    };
+
+    addComponent({ component: state, entityId });
 };
 
 export const addTileMap = ({ entityId }: {

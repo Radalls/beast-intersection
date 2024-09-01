@@ -1,6 +1,6 @@
 import { createAudio } from './audio';
 import { onInputKeyDown } from './events';
-import { createLoadingMenu, createSettingsMenu } from './templates';
+import { createLoadingMenu, createQuestsMenu, createSettingsMenu } from './templates';
 
 //#region CONSTANTS
 export const app = document.getElementById('app')!;
@@ -19,6 +19,7 @@ const initEvents = () => {
 const initMenus = () => {
     createLoadingMenu();
     createSettingsMenu();
+    createQuestsMenu();
 };
 
 const initAudios = () => {
