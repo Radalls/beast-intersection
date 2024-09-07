@@ -1,3 +1,4 @@
+
 import {
     addSprite,
     addPosition,
@@ -15,7 +16,12 @@ import {
     addState,
 } from './component';
 
+import { Energy } from '@/engine/components/energy';
+import { Inventory } from '@/engine/components/inventory';
+import { Manager } from '@/engine/components/manager';
+import { Position } from '@/engine/components/position';
 import { createEntity, MANAGER_ENTITY_NAME, PLAYER_ENTITY_NAME, TILEMAP_ENTITY_NAME } from '@/engine/entities';
+import { getStore } from '@/engine/store';
 import { generateTileMap, setTile } from '@/engine/systems/tilemap';
 
 //#region SERVICES
@@ -27,25 +33,31 @@ export const createEntityTileMap = ({ tileMapName }: { tileMapName: string }) =>
     generateTileMap({ tileMapName });
 };
 
-export const createEntityManager = () => {
-    const entityId = createEntity({ entityName: MANAGER_ENTITY_NAME });
+export const createEntityManager = ({ savedManager }: { savedManager?: Manager }) => {
+    const entityId = getStore('managerId') ?? createEntity({ entityName: MANAGER_ENTITY_NAME });
 
-    addManager({ entityId });
+    addManager({ entityId, savedManager });
 };
 
 export const createEntityPlayer = ({
     spriteHeight = 2,
     spriteWidth = 1,
     spritePath,
-    positionX,
-    positionY,
+    positionX = 0,
+    positionY = 0,
     inventoryMaxSlots = 20,
     energyMax = 10,
+    savedPosition,
+    savedInventory,
+    savedEnergy,
 }: {
     energyMax?: number
     inventoryMaxSlots?: number,
-    positionX: number,
-    positionY: number,
+    positionX?: number,
+    positionY?: number,
+    savedEnergy?: Energy,
+    savedInventory?: Inventory,
+    savedPosition?: Position,
     spriteHeight?: number,
     spritePath: string,
     spriteWidth?: number,
@@ -53,9 +65,9 @@ export const createEntityPlayer = ({
     const entityId = createEntity({ entityName: PLAYER_ENTITY_NAME });
 
     addSprite({ entityId, height: spriteHeight, image: spritePath, width: spriteWidth });
-    addPosition({ entityId, x: positionX, y: positionY });
-    addInventory({ entityId, maxSlots: inventoryMaxSlots });
-    addEnergy({ current: energyMax, entityId, max: energyMax });
+    addPosition({ entityId, savedPosition, x: positionX, y: positionY });
+    addInventory({ entityId, maxSlots: inventoryMaxSlots, savedInventory });
+    addEnergy({ current: energyMax, entityId, max: energyMax, savedEnergy });
 
     setTile({ entityId });
 };

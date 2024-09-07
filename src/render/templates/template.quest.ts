@@ -11,19 +11,19 @@ const QUEST_ITEM_HEIGHT = 23;
 export const createQuestsMenu = () => {
     createElement({
         elementClass: 'quests',
-        elementId: 'QuestsMenu',
+        elementId: 'PlayerQuestsMenu',
         entityId: '',
     });
 };
 
 export const displayQuests = () => {
-    const quests = getElement({ elementId: 'QuestsMenu' });
+    const quests = getElement({ elementId: 'PlayerQuestsMenu' });
 
     quests.style.display = (quests.style.display === 'block') ? 'none' : 'block';
 };
 
 export const createQuest = ({ manager }: { manager: Manager }) => {
-    const quests = getElement({ elementId: 'QuestsMenu' });
+    const quests = getElement({ elementId: 'PlayerQuestsMenu' });
     const questData = manager.quests[manager._selectedQuest];
 
     const quest = createElement({

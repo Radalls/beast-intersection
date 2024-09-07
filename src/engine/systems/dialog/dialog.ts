@@ -123,7 +123,7 @@ export const nextDialog = ({ entityId }: { entityId: string }) => {
     }
 
     if (isDialogTextDialogNext(dialogCurrentText)) {
-        dialogCurrentText._nextDialog && loadDialogData({ entityId, index: dialogCurrentText._nextDialog });
+        dialogCurrentText._nextDialog && loadDialogData({ dialogId: dialogCurrentText._nextDialog, entityId });
     }
 
     if (isDialogTextEnd(dialogCurrentText)) {

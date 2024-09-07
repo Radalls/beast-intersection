@@ -1,6 +1,6 @@
 export type Dialog = {
     _: 'Dialog';
-    _currentId?: number;
+    _currentId?: string;
     _currentOptionIndex?: number;
     _currentOptionsValues?: DialogText['_value'][];
     _currentTextId?: DialogText['_id'];
@@ -11,7 +11,7 @@ export type Dialog = {
 export type DialogText = {
     _id: number;
     _next?: DialogText['_id'];
-    _nextDialog?: number;
+    _nextDialog?: string;
     _options: DialogText['_id'][];
     _questEnd?: string;
     _questStart?: string;

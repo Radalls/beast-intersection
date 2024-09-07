@@ -1,18 +1,18 @@
-[
-    [
+{
+    "quest1_start": [
         { "id": 1, "value": "Veux tu commencer la quête ? 🤠", "next": null, "options": [2, 3] },
         { "id": 2, "value": "Oui !", "next": 4, "options": [] },
         { "id": 3, "value": "Non...", "next": 5, "options": [] },
-        { "id": 4, "value": "Génial !", "next": null, "options": [], "nextDialog": 1, "questStart": "quest1" },
+        { "id": 4, "value": "Génial !", "next": null, "options": [], "nextDialog": "quest1_pending", "questStart": "quest1" },
         { "id": 5, "value": "Reviens me voir plus tard quand tu seras prêt.", "next": null, "options": [] }
     ],
-    [
+    "quest1_pending": [
         { "id": 1, "value": "Tu as terminé la quête ?", "next": null, "options": [] }
     ],
-    [
-        { "id": 1, "value": "Félicitations ! 🎉🎊", "next": null, "options": [], "nextDialog": 3, "questEnd": "quest1" }
+    "quest1_complete": [
+        { "id": 1, "value": "Félicitations ! 🎉🎊", "next": null, "options": [], "nextDialog": "quest1_end", "questEnd": "quest1" }
     ],
-    [
+    "quest1_end": [
         { "id": 1, "value": "J'ai mal dormi... 😴", "next": 2, "options": [] },
         { "id": 2, "value": "Pourtant on dit que dormir au sol, c'est bon pour le dos 🥱", "next": 3, "options": [] },
         { "id": 3, "value": "J'ai vraiment besoin d'un café... 😵", "next": 4, "options": [] },
@@ -29,4 +29,4 @@
         { "id": 14, "value": "C'est normal, t'es vieux (*drops mic*)", "next": null, "options": [] },
         { "id": 15, "value": "Une pomme ? Non merci j'ai déjà pris mon petit déjeuner 👴", "next": null, "options": [] }
     ]
-]
+}

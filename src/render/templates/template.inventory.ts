@@ -1,4 +1,4 @@
-import { createElement, destroyElement } from './template';
+import { createElement } from './template';
 import { getElement, getSpritePath, checkElement } from './template.utils';
 
 import { Inventory } from '@/engine/components/inventory';
@@ -157,7 +157,8 @@ const clearInventory = ({ entityId }: { entityId: string }) => {
         inventorySlot.style.backgroundImage = '';
 
         if (checkElement({ elementId: `${entityId}-inventory-slot-${i}-amount` })) {
-            destroyElement({ elementId: `${entityId}-inventory-slot-${i}-amount` });
+            const inventorySlotAmount = getElement({ elementId: `${entityId}-inventory-slot-${i}-amount` });
+            inventorySlotAmount.textContent = '';
         }
     }
 };

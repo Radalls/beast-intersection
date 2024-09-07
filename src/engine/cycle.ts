@@ -36,17 +36,31 @@ export const clearCheck = (key: keyof typeof check) => check[key] = () => false;
 //#endregion
 
 //#region CYCLE
-export const runCycle = () => {
+export const startCycle = () => {
+    setInterval(() => {
+        runCycle();
+    }, getCycle('deltaTime') * 1000);
+    setInterval(() => {
+        runCheck();
+    }, getCycle('checkTime') * 1000);
+};
+
+export const stopCycle = () => {
+    clearInterval(getCycle('deltaTime'));
+    clearInterval(getCycle('checkTime'));
+};
+
+const runCycle = () => {
+    if (getState('isInputCooldown')) {
+        const inputTickIntervalProgress = cycle.elapsedTimeSinceInputTick / cycle.inputTickInterval;
+        if (inputTickIntervalProgress >= 1) {
+            clearCycle('elapsedTimeSinceInputTick');
+            setState('isInputCooldown', false);
+        }
+    }
+
     if (getState('isGameRunning')) {
         cycle.elapsedTimeSinceInputTick += cycle.deltaTime;
-
-        if (getState('isInputCooldown')) {
-            const inputTickIntervalProgress = cycle.elapsedTimeSinceInputTick / cycle.inputTickInterval;
-            if (inputTickIntervalProgress >= 1) {
-                clearCycle('elapsedTimeSinceInputTick');
-                setState('isInputCooldown', false);
-            }
-        }
 
         if (getState('isActivityRunning')) {
             if (getState('isActivityWin') && cycle.activityWinTickInterval > 0) {
@@ -112,7 +126,7 @@ export const runCycle = () => {
     }
 };
 
-export const runCheck = () => {
+const runCheck = () => {
     if (getState('isGameRunning')) {
         if (getState('isQuestActive')) {
             const questCheckResult = getCheck('questCheck');

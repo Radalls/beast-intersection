@@ -2,9 +2,11 @@ import { Quest } from '@/engine/services/quest';
 
 export type Manager = {
     _: 'Manager',
+    _selectedLaunchOption: number,
     _selectedQuest: number,
     _selectedSetting: number,
     quests: Quest[],
+    questsDone: Quest[],
     settings: ManagerSettings,
 };
 
@@ -22,6 +24,8 @@ type ManagerSettingsActionKeys = {
     _act: string,
     _back: string,
     _inventory: string,
+    _quit: string,
+    _save: string,
     _tool: string,
 };
 

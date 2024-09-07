@@ -4,5 +4,5 @@
     { "_id": 3, "_value": "text3", "_next": null, "_options": [4, 5] },
     { "_id": 4, "_value": "text4", "_next": 6, "_options": [] },
     { "_id": 5, "_value": "text5", "_next": 6, "_options": [] },
-    { "_id": 6, "_value": "text6", "_next": null, "_options": [1, 2, 3] }
+    { "_id": 6, "_value": "text6", "_next": null, "_options": [1, 2, 3], "_nextDialog": "nextDialog" }
 ]

@@ -29,6 +29,8 @@ import {
     onInventoryUpdate,
 } from './event.inventory';
 import {
+    onLaunchMenuDisplay,
+    onLaunchMenuUpdate,
     onLoadingDisplay,
     onSettingsMenuDisplay,
     onSettingsMenuDisplayEdit,
@@ -58,6 +60,7 @@ import { onInputKeyDown as engineOnInputKeyDown, Event } from '@/engine/event';
 import { EventTypes } from '@/engine/event';
 import { error } from '@/engine/services/error';
 import { AudioData } from '@/render/audio';
+import { run } from '@/render/main';
 
 //#region HELPERS
 export const onInputKeyDown = (e: any) => engineOnInputKeyDown(e.key);
@@ -248,9 +251,19 @@ export const event = <T extends keyof Component>(event: Event<T>) => {
             inventory: event.data,
         });
     }
+    /* Main */
+    else if (event.type === EventTypes.MAIN_RUN) {
+        run();
+    }
     /* Menu */
     else if (event.type === EventTypes.MENU_LOADING_ON || event.type === EventTypes.MENU_LOADING_OFF) {
         onLoadingDisplay({ display: event.type === EventTypes.MENU_LOADING_ON });
+    }
+    else if (event.type === EventTypes.MENU_LAUNCH_DISPLAY) {
+        onLaunchMenuDisplay();
+    }
+    else if (event.type === EventTypes.MENU_LAUNCH_UPDATE && checkManagerData(event.data)) {
+        onLaunchMenuUpdate({ manager: event.data });
     }
     else if (event.type === EventTypes.MENU_SETTINGS_DISPLAY) {
         onSettingsMenuDisplay();

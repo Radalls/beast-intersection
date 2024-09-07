@@ -22,7 +22,7 @@ const slotAvailable = (inventory: Inventory) => inventory.slots.length < invento
 
 //#endregion
 
-//#region ACTIONS
+//#region SYSTEMS
 /**
  * Adds an item to an inventory.
  * @param entityId needs to have an inventory

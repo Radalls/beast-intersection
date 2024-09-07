@@ -8,6 +8,7 @@ const state = {
     isActivityFishRunning: false,
     isActivityRunning: false,
     isActivityWin: false,
+    isGameLaunching: false,
     isGameLoading: false,
     isGamePaused: false,
     isGameRunning: false,

@@ -30,6 +30,37 @@
     }
 }
 
+/* LAUNCH MENU */
+.launch {
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.995);
+    display: none;
+    flex-direction: column;
+    gap: 16px;
+    height: 100%;
+    justify-content: center;
+    width: 100%;
+}
+
+.launch-title {
+    color: rgb(245, 245, 245);
+    font-size: 64px;
+}
+
+.launch-option {
+    align-items: center;
+    background-color: rgb(245, 245, 245);
+    border: 5px solid rgb(180, 180, 180);
+    border-radius: 20px;
+    color: rgb(0, 0, 0);
+    display: flex;
+    font-size: 26px;
+    height: 64px;
+    justify-content: center;
+    padding: 8px;
+    width: 256px;
+}
+
 /* SETTINGS MENU */
 .settings {
     align-items: center;
@@ -58,6 +89,27 @@
     z-index: 101;
 }
 
+.settings-system {
+    align-items: left;
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    height: 50%;
+    left: 0;
+    padding: 16px;
+    top: 0;
+    width: 33%;
+    z-index: 100;
+}
+
+.setting-system-container {
+    align-items: center;
+    display: flex;
+    gap: 16px;
+    justify-content: space-between;
+    width: 33%;
+}
+
 .setting-header {
     border-bottom: 2px solid rgb(245, 245, 245);
     font-size: 22px;
@@ -72,7 +124,7 @@
     gap: 16px;
     justify-content: space-between;
     padding-left: 8px;
-    width: 33%;
+    width: 50%;
 }
 
 .setting-label {
@@ -84,7 +136,7 @@
     align-items: center;
     display: flex;
     gap: 8px;
-    justify-content: center;
+    width: 196px;
 }
 
 .setting-icon {
@@ -104,5 +156,6 @@
     font-size: 24px;
     height: 32px;
     justify-content: center;
-    width: 32px;
+    max-width: 256;
+    min-width: 32px;
 }
