@@ -5,9 +5,9 @@ import { createQuest, QuestData } from '@/engine/services/quest';
 import { getStore } from '@/engine/store';
 
 const dialogFiles: Record<string, { default: { [dialogId: string]: DialogTextData[] } }>
-    = import.meta.glob('../../../assets/dialogs/*.json', { eager: true });
+    = import.meta.glob('/src/assets/dialogs/*.json', { eager: true });
 const questFiles: Record<string, { default: QuestData }>
-    = import.meta.glob('../../../assets/quests/*.json', { eager: true });
+    = import.meta.glob('/src/assets/quests/*.json', { eager: true });
 
 //#region TYPES
 export type DialogTextData = {
@@ -27,7 +27,7 @@ export const loadDialogData = ({ entityId, dialogId }: {
     entityId: string,
 }) => {
     const entityDialog = getComponent({ componentId: 'Dialog', entityId });
-    const dialogPath = `../../../assets/dialogs/${getRawEntityId({ entityId }).toLowerCase()}.json`;
+    const dialogPath = `/src/assets/dialogs/${getRawEntityId({ entityId }).toLowerCase()}.json`;
     const dialogData = dialogFiles[dialogPath].default
         ?? error({ message: `DialogData for ${entityId} not found`, where: loadDialogData.name });
 
@@ -51,7 +51,7 @@ export const loadDialogData = ({ entityId, dialogId }: {
 };
 
 export const loadQuestData = ({ questName }: { questName: string }) => {
-    const questPath = `../../../assets/quests/${questName.toLowerCase()}.json`;
+    const questPath = `/src/assets/quests/${questName.toLowerCase()}.json`;
     const questData = questFiles[questPath].default
         ?? error({ message: `QuestData for ${questName} not found`, where: loadQuestData.name });
 

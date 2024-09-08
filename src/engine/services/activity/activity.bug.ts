@@ -17,7 +17,7 @@ export const startActivityBug = ({ activityId }: { activityId: string }) => {
 
     if (!(canPlay({ activity: activityResource._activityType, entityId: playerEntityId }))) {
         event({
-            data: { audioName: 'activity_fail' },
+            data: { audioName: 'main_fail' },
             entityId: playerEntityId,
             type: EventTypes.AUDIO_PLAY,
         });
@@ -91,7 +91,7 @@ export const playActivityBug = ({ activityId, symbol }: {
         setState('isActivityBugCooldown', true);
 
         event({
-            data: { audioName: 'activity_bug_symbol_found' },
+            data: { audioName: 'main_success' },
             entityId: activityId,
             type: EventTypes.AUDIO_PLAY,
         });
@@ -103,7 +103,7 @@ export const playActivityBug = ({ activityId, symbol }: {
         setState('isActivityBugCooldown', true);
 
         event({
-            data: { audioName: 'activity_bug_symbol_error' },
+            data: { audioName: 'main_fail' },
             entityId: activityId,
             type: EventTypes.AUDIO_PLAY,
         });

@@ -18,7 +18,7 @@ export const startActivityFish = ({ activityId }: { activityId: string }) => {
 
     if (!(canPlay({ activity: activityResource._activityType, entityId: playerEntityId }))) {
         event({
-            data: { audioName: 'activity_fail' },
+            data: { audioName: 'main_fail' },
             entityId: playerEntityId,
             type: EventTypes.AUDIO_PLAY,
         });

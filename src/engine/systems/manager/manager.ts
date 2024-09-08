@@ -37,7 +37,7 @@ export const selectLaunchOption = ({ managerEntityId, offset }: {
         type: EventTypes.MENU_LAUNCH_UPDATE,
     });
     event({
-        data: { audioName: 'menu_launch_select' },
+        data: { audioName: 'main_select' },
         entityId: managerEntityId,
         type: EventTypes.AUDIO_PLAY,
     });
@@ -265,7 +265,7 @@ export const confirmSetting = ({ managerEntityId, editKey }: {
         type: EventTypes.MENU_SETTINGS_UPDATE,
     });
     event({
-        data: { audioName: 'menu_settings_confirm' },
+        data: { audioName: 'main_confirm' },
         entityId: managerEntityId,
         type: EventTypes.AUDIO_PLAY,
     });
@@ -296,7 +296,7 @@ export const selectSetting = ({ managerEntityId, offset }: {
         type: EventTypes.MENU_SETTINGS_UPDATE,
     });
     event({
-        data: { audioName: 'menu_settings_select' },
+        data: { audioName: 'main_select' },
         entityId: managerEntityId,
         type: EventTypes.AUDIO_PLAY,
     });

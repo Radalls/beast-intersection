@@ -1,6 +1,7 @@
+import itemRecipes from '../../../assets/items/item_recipes.json';
+
 import { canPlay, checkActivityId, endActivity, startActivity, winActivity } from './activity';
 
-import itemRecipes from '@/assets/items/item_recipes.json';
 import { ActivityCraftData, ActivityData } from '@/engine/components/resource';
 import { addComponent, getComponent } from '@/engine/entities';
 import { EventTypes } from '@/engine/event';
@@ -79,7 +80,7 @@ export const selectActivityCraftRecipe = ({ activityId, offset }: { activityId?:
         type: EventTypes.ACTIVITY_CRAFT_SELECT_UPDATE,
     });
     event({
-        data: { audioName: 'activity_craft_recipe_select' },
+        data: { audioName: 'main_select' },
         entityId: activityId,
         type: EventTypes.AUDIO_PLAY,
     });
@@ -109,7 +110,7 @@ export const confirmActivityCraftRecipe = ({ activityId }: { activityId?: string
 
         if (playerHasTool) {
             event({
-                data: { audioName: 'activity_craft_recipe_fail' },
+                data: { audioName: 'main_fail' },
                 entityId: playerEntityId,
                 type: EventTypes.AUDIO_PLAY,
             });
@@ -120,7 +121,7 @@ export const confirmActivityCraftRecipe = ({ activityId }: { activityId?: string
 
     if (!(canPlay({ entityId: playerEntityId, strict: false }))) {
         event({
-            data: { audioName: 'activity_fail' },
+            data: { audioName: 'main_fail' },
             entityId: playerEntityId,
             type: EventTypes.AUDIO_PLAY,
         });
@@ -146,7 +147,7 @@ export const confirmActivityCraftRecipe = ({ activityId }: { activityId?: string
             addComponent({ component: playerInventoryBeforeCraft, entityId: playerEntityId });
 
             event({
-                data: { audioName: 'activity_craft_recipe_fail' },
+                data: { audioName: 'main_fail' },
                 entityId: playerEntityId,
                 type: EventTypes.AUDIO_PLAY,
             });
@@ -177,7 +178,7 @@ export const confirmActivityCraftRecipe = ({ activityId }: { activityId?: string
         type: EventTypes.ACTIVITY_CRAFT_PLAY_START,
     });
     event({
-        data: { audioName: 'activity_craft_recipe_confirm' },
+        data: { audioName: 'main_confirm' },
         entityId: activityId,
         type: EventTypes.AUDIO_PLAY,
     });

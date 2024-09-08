@@ -1,9 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
 
-import { Component } from '../components/@component';
-import { error } from '../services/error';
-
 import { entities, PLAYER_ENTITY_NAME } from './entity.manager';
+
+import { Component } from '@/engine/components/@component';
+import { error } from '@/engine/services/error';
 
 //#region UTILS
 export const getEntity = ({ entityId }: { entityId: string }) => entities[entityId] ? entities[entityId] : null;
