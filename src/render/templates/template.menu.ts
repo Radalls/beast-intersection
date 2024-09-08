@@ -1,8 +1,8 @@
 import { createElement } from './template';
-import { getElement, searchElementsByClassName, searchElementById } from './template.utils';
+import { getElement, searchElementsByClassName, searchElementById as searchElementsById } from './template.utils';
 
 import { Manager } from '@/engine/components/manager';
-import { SETTINGS, SETTINGS_KEYS_PATHS } from '@/engine/services/settings';
+import { SETTINGS, SETTINGS_KEYS_PATHS } from '@/engine/systems/manager';
 
 //#region HELPERS
 const getSettingId = ({ settingName }: { settingName: string }) => {
@@ -48,6 +48,64 @@ export const displayLoadingMenu = ({ display }: { display: boolean }) => {
 };
 //#endregion
 
+//#region LAUNCH MENU
+export const createLaunchMenu = () => {
+    const launch = createElement({
+        elementClass: 'launch',
+        elementId: 'LaunchMenu',
+        entityId: '',
+    });
+
+    const launchTitle = createElement({
+        elementAbsolute: false,
+        elementClass: 'launch-title',
+        elementId: 'LaunchMenuTitle',
+        elementParent: launch,
+        entityId: '',
+    });
+    launchTitle.innerText = 'BEAST INTERSECTION';
+
+    const launchStart = createElement({
+        elementAbsolute: false,
+        elementClass: 'launch-option',
+        elementId: 'LaunchMenuStart',
+        elementParent: launch,
+        entityId: '',
+    });
+    launchStart.innerText = 'START';
+
+    const launchLoad = createElement({
+        elementAbsolute: false,
+        elementClass: 'launch-option',
+        elementId: 'LaunchMenuLoad',
+        elementParent: launch,
+        entityId: '',
+    });
+    launchLoad.innerText = 'LOAD';
+};
+
+export const displayLaunchMenu = () => {
+    const launch = getElement({ elementId: 'LaunchMenu' });
+
+    launch.style.display = (launch.style.display === 'flex') ? 'none' : 'flex';
+};
+
+export const updateLaunchMenu = ({ manager }: { manager: Manager }) => {
+    const launchStart = getElement({ elementId: 'LaunchMenuStart' });
+    launchStart.style.border = '5px solid rgb(180, 180, 180)';
+
+    const launchLoad = getElement({ elementId: 'LaunchMenuLoad' });
+    launchLoad.style.border = '5px solid rgb(180, 180, 180)';
+
+    if (manager._selectedLaunchOption) {
+        launchLoad.style.border = '5px solid rgb(255, 0, 0)';
+    }
+    else {
+        launchStart.style.border = '5px solid rgb(255, 0, 0)';
+    }
+};
+//#endregion
+
 //#region SETTINGS MENU
 export const createSettingsMenu = () => {
     const settings = createElement({
@@ -62,6 +120,118 @@ export const createSettingsMenu = () => {
         entityId: '',
     });
     edit.innerText = 'ENTER NEW KEY';
+
+    /* System */
+    const systemSettings = createElement({
+        elementClass: 'settings-system',
+        elementId: 'SettingsMenuSystem',
+        entityId: '',
+    });
+
+    /* Back */
+    const backContainer = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-system-container',
+        elementId: 'SettingsMenuBackContainer',
+        elementParent: systemSettings,
+        entityId: '',
+    });
+
+    const backSetting = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting',
+        elementId: 'SettingsMenuBackSetting',
+        elementParent: backContainer,
+        entityId: '',
+    });
+
+    const backSettingIcon = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-icon',
+        elementId: 'SettingsMenuBackSettingIcon',
+        elementParent: backSetting,
+        entityId: '',
+    });
+    backSettingIcon.innerText = '❌';
+
+    const backSettingValue = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-value',
+        elementId: 'SettingsMenuBackSettingValue',
+        elementParent: backSetting,
+        entityId: '',
+    });
+    backSettingValue.innerText = 'ESC';
+
+    /* Quit */
+    const quitContainer = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-system-container',
+        elementId: 'SettingsMenuQuitContainer',
+        elementParent: systemSettings,
+        entityId: '',
+    });
+
+    const quitSetting = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting',
+        elementId: 'SettingsMenuQuitSetting',
+        elementParent: quitContainer,
+        entityId: '',
+    });
+
+    const quitSettingIcon = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-icon',
+        elementId: 'SettingsMenuQuitSettingIcon',
+        elementParent: quitSetting,
+        entityId: '',
+    });
+    quitSettingIcon.innerText = '🏠';
+
+    const quitSettingValue = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-value',
+        elementId: 'SettingsMenuQuitSettingValue',
+        elementParent: quitSetting,
+        entityId: '',
+    });
+    quitSettingValue.innerText = 'CTRL';
+
+    /* Save */
+    const saveContainer = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-system-container',
+        elementId: 'SettingsMenuSaveContainer',
+        elementParent: systemSettings,
+        entityId: '',
+    });
+
+    const saveSetting = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting',
+        elementId: 'SettingsMenuSaveSetting',
+        elementParent: saveContainer,
+        entityId: '',
+    });
+
+    const saveSettingIcon = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-icon',
+        elementId: 'SettingsMenuSaveSettingIcon',
+        elementParent: saveSetting,
+        entityId: '',
+    });
+    saveSettingIcon.innerText = '💾';
+
+    const saveSettingValue = createElement({
+        elementAbsolute: false,
+        elementClass: 'setting-value',
+        elementId: 'SettingsMenuSaveSettingValue',
+        elementParent: saveSetting,
+        entityId: '',
+    });
+    saveSettingValue.innerText = 'ALT';
 
     /* General */
     const generalSettings = createElement({
@@ -430,13 +600,13 @@ export const createSettingsMenu = () => {
 
 export const displaySettingsMenu = () => {
     const settings = getElement({ elementId: 'SettingsMenu' });
+    const systemSettings = getElement({ elementId: 'SettingsMenuSystem' });
 
     settings.style.display = (settings.style.display === 'flex') ? 'none' : 'flex';
+    systemSettings.style.display = (systemSettings.style.display === 'flex') ? 'none' : 'flex';
 };
 
-export const updateSettingsMenu = ({ manager }: {
-    manager: Manager,
-}) => {
+export const updateSettingsMenu = ({ manager }: { manager: Manager }) => {
     const containers = searchElementsByClassName({ className: 'setting-container' });
     for (const container of containers) {
         container.style.borderLeft = '5px solid rgb(180, 180, 180)';
@@ -463,7 +633,7 @@ export const updateSettingsMenu = ({ manager }: {
     }
 
     const selectedSettingId = getSettingId({ settingName: SETTINGS[manager._selectedSetting] });
-    const selectedSetting = searchElementById({ partialElementId: selectedSettingId });
+    const [selectedSetting] = searchElementsById({ partialElementId: selectedSettingId });
     selectedSetting.style.borderLeft = '5px solid rgb(255, 0, 0)';
 };
 

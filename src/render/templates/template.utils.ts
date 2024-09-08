@@ -24,7 +24,7 @@ export const checkElement = ({ elementId }: { elementId: string }) => {
 };
 
 export const searchElementById = ({ partialElementId }: { partialElementId: string }) => {
-    return document.querySelectorAll(`[id*="${partialElementId}"]`)[0] as HTMLElement
+    return [...document.querySelectorAll(`[id*="${partialElementId}"]`)] as HTMLElement[]
         ?? error({ message: `Element ${partialElementId} does not exist`, where: searchElementById.name });
 };
 

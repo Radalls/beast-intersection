@@ -110,29 +110,28 @@ describe('TileMap System', () => {
             expect(typeof updateTile).toBe('function');
         });
 
-        test('Should throw if parameters are invalid', () => {
-            expect(() => updateTile({
-                entityId: playerEntityId,
-                targetX: -5,
-                targetY: 0,
-                tileMapEntityId,
-            })).toThrow();
+        // test('Should throw if parameters are invalid', () => {
+        //     expect(() => updateTile({
+        //         entityId: playerEntityId,
+        //         targetX: -5,
+        //         targetY: 0,
+        //         tileMapEntityId,
+        //     })).toThrow();
 
-            expect(() => updateTile({
-                entityId: playerEntityId,
-                targetX: 0,
-                targetY: -5,
-                tileMapEntityId,
-            })).toThrow();
-        });
+        //     expect(() => updateTile({
+        //         entityId: playerEntityId,
+        //         targetX: 0,
+        //         targetY: -5,
+        //         tileMapEntityId,
+        //     })).toThrow();
+        // });
 
         test('Should throw if target tile is solid', () => {
             tileMap.tiles[1]._solid = true;
 
             expect(() => updateTile({
                 entityId: playerEntityId,
-                targetX: 1,
-                targetY: 0,
+                target: 'up',
                 tileMapEntityId,
             })).toThrow();
 
@@ -144,8 +143,7 @@ describe('TileMap System', () => {
 
             expect(() => updateTile({
                 entityId: playerEntityId,
-                targetX: 1,
-                targetY: 0,
+                target: 'up',
                 tileMapEntityId,
             })).toThrow();
 
@@ -155,8 +153,7 @@ describe('TileMap System', () => {
         test('Should update tile', () => {
             updateTile({
                 entityId: playerEntityId,
-                targetX: playerPosition._x + 1,
-                targetY: playerPosition._y,
+                target: 'right',
                 tileMapEntityId,
             });
 

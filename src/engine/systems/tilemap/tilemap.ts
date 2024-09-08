@@ -1,5 +1,5 @@
 import { loadTileMapData, loadTileMapEntityData, TileMapData } from './tilemap.data';
-import { findTileByPosition, findTileByEntityId } from './tilemap.utils';
+import { findTileByPosition, findTileByEntityId, getTargetXY } from './tilemap.utils';
 
 import { Tile, TileExit } from '@/engine/components/tilemap';
 import { checkComponent, destroyAllEntities, findEntityByName, getComponent } from '@/engine/entities';
@@ -71,8 +71,8 @@ export const generateTileMap = ({ tileMapEntityId, tileMapName }: {
     tileMapEntityId?: string | null
     tileMapName: string,
 }) => {
-    if (!(tileMapEntityId)) tileMapEntityId = getStore('tilemapId')
-        ?? error({ message: 'Store tilemapId is undefined', where: generateTileMap.name });
+    if (!(tileMapEntityId)) tileMapEntityId = getStore('tileMapId')
+        ?? error({ message: 'Store tileMapId is undefined', where: generateTileMap.name });
 
     setState('isGameLoading', true);
     event({
@@ -85,6 +85,7 @@ export const generateTileMap = ({ tileMapEntityId, tileMapName }: {
     const tileMapData = loadTileMapData({ tileMapName })
         ?? error({ message: `TileMapData for ${tileMapName} not found`, where: generateTileMap.name });
 
+    tileMap._name = tileMapData.name;
     tileMap._height = tileMapData.height;
     tileMap._width = tileMapData.width;
 
@@ -108,8 +109,8 @@ export const setTile = ({ tileMapEntityId, entityId }: {
     entityId: string,
     tileMapEntityId?: string | null
 }) => {
-    if (!(tileMapEntityId)) tileMapEntityId = getStore('tilemapId')
-        ?? error({ message: 'Store tilemapId is undefined', where: setTile.name });
+    if (!(tileMapEntityId)) tileMapEntityId = getStore('tileMapId')
+        ?? error({ message: 'Store tileMapId is undefined', where: setTile.name });
 
     const entityPosition = getComponent({ componentId: 'Position', entityId });
 
@@ -131,17 +132,23 @@ export const setTile = ({ tileMapEntityId, entityId }: {
     }
 };
 
-export const updateTile = ({ tileMapEntityId, entityId, targetX, targetY }: {
-    entityId: string,
-    targetX: number,
-    targetY: number,
+export const updateTile = ({ tileMapEntityId, entityId, target }: {
+    entityId?: string | null,
+    target: 'up' | 'down' | 'left' | 'right',
     tileMapEntityId?: string | null
 }) => {
-    if (!(tileMapEntityId)) tileMapEntityId = getStore('tilemapId')
-        ?? error({ message: 'Store tilemapId is undefined', where: updateTile.name });
+    if (!(tileMapEntityId)) tileMapEntityId = getStore('tileMapId')
+        ?? error({ message: 'Store tileMapId is undefined', where: updateTile.name });
+
+    if (!(entityId)) entityId = getStore('playerId')
+        ?? error({ message: 'Store playerId is undefined', where: updateTile.name });
+
+    const entityPosition = getComponent({ componentId: 'Position', entityId });
 
     const entityTile = findTileByEntityId({ entityId })
         ?? error({ message: `Tile for entity ${entityId} not found`, where: updateTile.name });
+
+    const { targetX, targetY } = getTargetXY({ target, x: entityPosition._x, y: entityPosition._y });
 
     if (entityTile.exits) {
         const isExit = exitTile({ entityId, targetX, targetY, tileMapEntityId });
@@ -170,8 +177,8 @@ const generateTileMapTiles = ({ tileMapEntityId, tileMapData }: {
     tileMapData: TileMapData,
     tileMapEntityId?: string | null
 }) => {
-    if (!(tileMapEntityId)) tileMapEntityId = getStore('tilemapId')
-        ?? error({ message: 'Store tilemapId is undefined', where: generateTileMap.name });
+    if (!(tileMapEntityId)) tileMapEntityId = getStore('tileMapId')
+        ?? error({ message: 'Store tileMapId is undefined', where: generateTileMap.name });
 
     const tileMap = getComponent({ componentId: 'TileMap', entityId: tileMapEntityId });
 
@@ -214,8 +221,8 @@ const generateTileMapEntities = ({ tileMapEntityId, tileMapData }: {
     tileMapData: TileMapData,
     tileMapEntityId?: string | null,
 }) => {
-    if (!(tileMapEntityId)) tileMapEntityId = getStore('tilemapId')
-        ?? error({ message: 'Store tilemapId is undefined', where: generateTileMap.name });
+    if (!(tileMapEntityId)) tileMapEntityId = getStore('tileMapId')
+        ?? error({ message: 'Store tileMapId is undefined', where: generateTileMap.name });
 
     for (const entity of tileMapData.entities) {
         const entityData = loadTileMapEntityData({ entityName: entity.name, entityType: entity.type })
@@ -301,8 +308,8 @@ const exitTile = ({ tileMapEntityId, entityId, targetX, targetY }: {
     targetY: number,
     tileMapEntityId?: string | null
 }) => {
-    if (!(tileMapEntityId)) tileMapEntityId = getStore('tilemapId')
-        ?? error({ message: 'Store tilemapId is undefined', where: exitTile.name });
+    if (!(tileMapEntityId)) tileMapEntityId = getStore('tileMapId')
+        ?? error({ message: 'Store tileMapId is undefined', where: exitTile.name });
 
     const entityTile = findTileByEntityId({ entityId })
         ?? error({ message: `Tile for entity ${entityId} not found`, where: exitTile.name });
@@ -326,8 +333,8 @@ const exitTile = ({ tileMapEntityId, entityId, targetX, targetY }: {
 const destroyTileMap = ({ tileMapEntityId }: {
     tileMapEntityId?: string | null
 }) => {
-    if (!(tileMapEntityId)) tileMapEntityId = getStore('tilemapId')
-        ?? error({ message: 'Store tilemapId is undefined', where: exitTile.name });
+    if (!(tileMapEntityId)) tileMapEntityId = getStore('tileMapId')
+        ?? error({ message: 'Store tileMapId is undefined', where: exitTile.name });
 
     const tileMap = getComponent({ componentId: 'TileMap', entityId: tileMapEntityId });
 
@@ -341,15 +348,15 @@ const destroyTileMap = ({ tileMapEntityId }: {
 
     tileMap.tiles = [];
 
-    destroyAllEntities();
+    destroyAllEntities({});
 };
 
 const soundTile = ({ tileMapEntityId, entityId }: {
     entityId: string,
     tileMapEntityId?: string | null,
 }) => {
-    if (!(tileMapEntityId)) tileMapEntityId = getStore('tilemapId')
-        ?? error({ message: 'Store tilemapId is undefined', where: updateTile.name });
+    if (!(tileMapEntityId)) tileMapEntityId = getStore('tileMapId')
+        ?? error({ message: 'Store tileMapId is undefined', where: updateTile.name });
 
     const entityTile = findTileByEntityId({ entityId })
         ?? error({ message: `Tile for entity ${entityId} not found`, where: updateTile.name });

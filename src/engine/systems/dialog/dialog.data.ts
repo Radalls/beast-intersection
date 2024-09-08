@@ -2,8 +2,9 @@ import { DialogText } from '@/engine/components/dialog';
 import { getComponent, getRawEntityId } from '@/engine/entities';
 import { error } from '@/engine/services/error';
 import { createQuest, QuestData } from '@/engine/services/quest';
+import { getStore } from '@/engine/store';
 
-const dialogFiles: Record<string, { default: DialogTextData[][] }>
+const dialogFiles: Record<string, { default: { [dialogId: string]: DialogTextData[] } }>
     = import.meta.glob('../../../assets/dialogs/*.json', { eager: true });
 const questFiles: Record<string, { default: QuestData }>
     = import.meta.glob('../../../assets/quests/*.json', { eager: true });
@@ -12,7 +13,7 @@ const questFiles: Record<string, { default: QuestData }>
 export type DialogTextData = {
     id: number,
     next?: number,
-    nextDialog?: number,
+    nextDialog?: string,
     options: number[],
     questEnd?: string,
     questStart?: string,
@@ -21,18 +22,20 @@ export type DialogTextData = {
 //#endregion
 
 //#region DATA
-export const loadDialogData = ({ entityId, index = 0 }: {
+export const loadDialogData = ({ entityId, dialogId }: {
+    dialogId?: string,
     entityId: string,
-    index?: number,
 }) => {
     const entityDialog = getComponent({ componentId: 'Dialog', entityId });
     const dialogPath = `../../../assets/dialogs/${getRawEntityId({ entityId }).toLowerCase()}.json`;
     const dialogData = dialogFiles[dialogPath].default
         ?? error({ message: `DialogData for ${entityId} not found`, where: loadDialogData.name });
 
-    entityDialog._currentId = index;
+    const questDialogId = getQuestDialogId();
 
-    entityDialog.texts = dialogData[index].map((dialogText: DialogTextData) => {
+    entityDialog._currentId = dialogId ?? questDialogId ?? Object.keys(dialogData)[0];
+
+    entityDialog.texts = dialogData[entityDialog._currentId].map((dialogText: DialogTextData) => {
         const text: DialogText = {
             _id: dialogText.id,
             _next: dialogText.next,
@@ -53,5 +56,25 @@ export const loadQuestData = ({ questName }: { questName: string }) => {
         ?? error({ message: `QuestData for ${questName} not found`, where: loadQuestData.name });
 
     createQuest({ questData });
+};
+
+const getQuestDialogId = () => {
+    const managerEntityId = getStore('managerId')
+        ?? error({ message: 'Store managerId is undefined', where: loadDialogData.name });
+
+    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
+
+    if (manager.quests.length) {
+        const questDialogId = (manager.quests[0].completed)
+            ? `${manager.quests[0].name}_complete`
+            : `${manager.quests[0].name}_pending`;
+
+        return questDialogId;
+    }
+    else if (manager.questsDone.length) {
+        const questDialogId = `${manager.questsDone[manager.questsDone.length - 1].name}_end`;
+
+        return questDialogId;
+    }
 };
 //#endregion

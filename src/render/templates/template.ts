@@ -1,8 +1,8 @@
-import { getElement, getSpritePath } from './template.utils';
+import { getElement, getSpritePath, searchElementById } from './template.utils';
 
 import { Position } from '@/engine/components/position';
 import { Sprite } from '@/engine/components/sprite';
-import { getRawEntityId } from '@/engine/entities';
+import { getRawEntityId, isPlayer } from '@/engine/entities';
 import { app } from '@/render/main';
 
 //#region CONSTANTS
@@ -37,6 +37,10 @@ export const destroyElement = ({ elementId }: { elementId: string }) => {
         element.removeChild(element.firstChild);
     }
 
+    if (isPlayer({ entityId: elementId })) {
+        searchElementById({ partialElementId: 'Player' }).map((el) => el.remove());
+    }
+
     element.remove();
 };
 
@@ -49,6 +53,7 @@ export const updatePosition = ({ elementId, position }: {
     element.style.left = `${position._x * TILE_PIXEL_SIZE + TILE_PIXEL_SIZE}px`;
     element.style.top = `${position._y * TILE_PIXEL_SIZE + TILE_PIXEL_SIZE
         - (((parseInt(element.style.height) / TILE_PIXEL_SIZE) - 1) * TILE_PIXEL_SIZE)}px`;
+
     element.style.zIndex = `${position._y}`;
 };
 

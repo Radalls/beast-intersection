@@ -47,12 +47,13 @@ export const addDialog = ({ entityId }: {
     loadDialogData({ entityId });
 };
 
-export const addEnergy = ({ entityId, current = 0, max = 10 }: {
+export const addEnergy = ({ entityId, current = 0, max = 10, savedEnergy }: {
     current?: number,
     entityId: string,
     max?: number,
+    savedEnergy?: Energy,
 }) => {
-    const energy: Energy = {
+    const energy: Energy = savedEnergy ?? {
         _: 'Energy',
         _current: current,
         _max: max,
@@ -77,12 +78,13 @@ export const addEnergy = ({ entityId, current = 0, max = 10 }: {
     });
 };
 
-export const addInventory = ({ entityId, maxSlots = 20, maxTools = 3 }: {
+export const addInventory = ({ entityId, maxSlots = 20, maxTools = 3, savedInventory }: {
     entityId: string,
     maxSlots?: number,
     maxTools?: number,
+    savedInventory?: Inventory,
 }) => {
-    const inventory: Inventory = {
+    const inventory: Inventory = savedInventory ?? {
         _: 'Inventory',
         _maxSlots: maxSlots,
         _maxTools: maxTools,
@@ -98,12 +100,15 @@ export const addInventory = ({ entityId, maxSlots = 20, maxTools = 3 }: {
             entityId,
             type: EventTypes.INVENTORY_CREATE,
         });
-
+        event({
+            data: inventory,
+            entityId,
+            type: EventTypes.INVENTORY_UPDATE,
+        });
         event({
             entityId,
             type: EventTypes.INVENTORY_TOOL_ACTIVE_DISPLAY,
         });
-
         event({
             data: inventory,
             entityId,
@@ -117,14 +122,17 @@ export const addInventory = ({ entityId, maxSlots = 20, maxTools = 3 }: {
     }
 };
 
-export const addManager = ({ entityId }: {
+export const addManager = ({ entityId, savedManager }: {
     entityId: string,
+    savedManager?: Manager,
 }) => {
-    const manager: Manager = {
+    const manager: Manager = savedManager ?? {
         _: 'Manager',
+        _selectedLaunchOption: 0,
         _selectedQuest: 0,
         _selectedSetting: 0,
         quests: [],
+        questsDone: [],
         settings: {
             _audio: false,
             keys: {
@@ -132,6 +140,8 @@ export const addManager = ({ entityId }: {
                     _act: 'e',
                     _back: 'Escape',
                     _inventory: 'i',
+                    _quit: 'Control',
+                    _save: 'Alt',
                     _tool: 't',
                 },
                 move: {
@@ -146,18 +156,27 @@ export const addManager = ({ entityId }: {
 
     addComponent({ component: manager, entityId });
 
-    event({
-        entityId,
-        type: EventTypes.QUEST_DISPLAY,
-    });
+    if (!(savedManager)) {
+        event({
+            data: manager,
+            entityId,
+            type: EventTypes.MENU_LAUNCH_DISPLAY,
+        });
+        event({
+            data: manager,
+            entityId,
+            type: EventTypes.MENU_LAUNCH_UPDATE,
+        });
+    }
 };
 
-export const addPosition = ({ entityId, x = 0, y = 0 }: {
+export const addPosition = ({ entityId, savedPosition, x = 0, y = 0 }: {
     entityId: string,
+    savedPosition?: Position,
     x?: number,
     y?: number,
 }) => {
-    const position: Position = {
+    const position: Position = savedPosition ?? {
         _: 'Position',
         _x: x,
         _y: y,

@@ -1,24 +1,41 @@
-import { getCycle, runCheck, runCycle } from './cycle';
+import { startCycle } from './cycle';
 import { createEntityManager, createEntityPlayer, createEntityTileMap } from './services/entity';
+import { initQuest } from './services/quest';
 import { setState } from './state';
+import { SaveData } from './systems/manager/manager.data';
 
 export const main = () => {
+    launch();
+};
+
+export const run = ({ saveData }: { saveData?: SaveData }) => {
     setState('isGameRunning', true);
 
-    setInterval(() => {
-        runCycle();
-    }, getCycle('deltaTime') * 1000);
-    setInterval(() => {
-        runCheck();
-    }, getCycle('checkTime') * 1000);
+    if (saveData?.manager) {
+        createEntityManager({ savedManager: saveData.manager });
+    }
 
-    createEntityManager();
-
-    createEntityTileMap({ tileMapName: 'map_0-0' });
+    createEntityTileMap({
+        tileMapName: (saveData?.tileMapName)
+            ? saveData.tileMapName
+            : 'map_0-0',
+    });
 
     createEntityPlayer({
         positionX: 3,
         positionY: 3,
+        savedEnergy: saveData?.playerEnergy,
+        savedInventory: saveData?.playerInventory,
+        savedPosition: saveData?.playerPosition,
         spritePath: 'player',
     });
+
+    startCycle();
+    initQuest();
+};
+
+const launch = () => {
+    setState('isGameLaunching', true);
+
+    createEntityManager({});
 };

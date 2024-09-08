@@ -1,4 +1,5 @@
 {
+    "name": "quest1",
     "items": [{ "name": "Campfire", "amount": 1 }],
     "talk": "Npc1"
 }

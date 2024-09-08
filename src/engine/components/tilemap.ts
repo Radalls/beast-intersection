@@ -4,6 +4,7 @@ import { Sprite } from './sprite';
 export type TileMap = {
     _: 'TileMap',
     _height: number,
+    _name?: string,
     _width: number,
     tiles: Tile[],
 };

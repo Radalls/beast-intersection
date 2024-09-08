@@ -29,7 +29,7 @@ export const createEntity = ({ entityName }: { entityName: string }) => {
         setStore('playerId', entityId);
     }
     else if (entityName === TILEMAP_ENTITY_NAME) {
-        setStore('tilemapId', entityId);
+        setStore('tileMapId', entityId);
     }
     else if (entityName === MANAGER_ENTITY_NAME) {
         setStore('managerId', entityId);
@@ -81,13 +81,20 @@ export const destroyEntity = ({ entityId }: {
     });
 };
 
-export const destroyAllEntities = () => {
+export const destroyAllEntities = ({ force }: { force?: boolean }) => {
     Object.keys(entities).forEach((entityId) => {
         if (!(entities[entityId])) return;
+
+        if (entityId.includes(MANAGER_ENTITY_NAME)) return;
+
+        if (force) {
+            destroyEntity({ entityId });
+            return;
+        }
+
         if (
             entityId.includes(PLAYER_ENTITY_NAME)
             || entityId.includes(TILEMAP_ENTITY_NAME)
-            || entityId.includes(MANAGER_ENTITY_NAME)
         ) return;
 
         if (entityId.includes(EntityTypes.NPC)) {
