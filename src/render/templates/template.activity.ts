@@ -1,7 +1,8 @@
+import itemRecipes from '../../assets/items/item_recipes.json';
+
 import { createElement, destroyElement } from './template';
 import { getElement, checkElement, getSpritePath } from './template.utils';
 
-import itemRecipes from '@/assets/items/item_recipes.json';
 import { Resource, ActivityBugData, ActivityFishData, ActivityCraftData } from '@/engine/components/resource';
 
 //#region CONSTANTS

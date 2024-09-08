@@ -1,6 +1,7 @@
+import itemRecipes from '../../../assets/items/item_recipes.json';
+
 import { canPlay, checkActivityId, endActivity, startActivity, winActivity } from './activity';
 
-import itemRecipes from '@/assets/items/item_recipes.json';
 import { ActivityCraftData, ActivityData } from '@/engine/components/resource';
 import { addComponent, getComponent } from '@/engine/entities';
 import { EventTypes } from '@/engine/event';

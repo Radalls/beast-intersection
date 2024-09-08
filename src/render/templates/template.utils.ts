@@ -2,13 +2,13 @@ import { error } from '@/engine/services/error';
 
 //#region CONSTANTS
 const spriteFiles: Record<string, { default: string }>
-    = import.meta.glob('../../assets/sprites/**/*.png', { eager: true });
+    = import.meta.glob('/src/assets/sprites/**/*.png', { eager: true });
 //#endregion
 
 //#region UTILS
 export const getSpritePath = (spriteName: string) => {
     const spriteKey = spriteName.replace(/^(.*?)(\/[^/]+)?(\.[^./]+)?$/, '$1').split('_')[0];
-    const spritePath = `../../assets/sprites/${spriteKey}/${spriteName}.png`;
+    const spritePath = `/src/assets/sprites/${spriteKey}/${spriteName}.png`;
 
     return spriteFiles[spritePath].default
         ?? error({ message: `Sprite ${spriteName} not found`, where: getSpritePath.name });
