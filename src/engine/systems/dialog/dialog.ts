@@ -89,7 +89,7 @@ export const startDialog = ({ entityId }: { entityId: string }) => {
         type: EventTypes.DIALOG_START,
     });
     event({
-        data: { audioName: 'activity_dialog' },
+        data: { audioName: 'main_select' },
         entityId,
         type: EventTypes.AUDIO_PLAY,
     });
@@ -145,7 +145,7 @@ export const nextDialog = ({ entityId }: { entityId: string }) => {
         type: EventTypes.DIALOG_UPDATE,
     });
     event({
-        data: { audioName: 'activity_dialog' },
+        data: { audioName: 'main_select' },
         entityId,
         type: EventTypes.AUDIO_PLAY,
     });
@@ -187,7 +187,7 @@ export const selectDialogOption = ({ entityId, offset }: { entityId: string, off
         type: EventTypes.DIALOG_UPDATE,
     });
     event({
-        data: { audioName: 'activity_dialog_select' },
+        data: { audioName: 'main_select' },
         entityId,
         type: EventTypes.AUDIO_PLAY,
     });

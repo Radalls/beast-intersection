@@ -29,15 +29,15 @@ export const randAudio = ({ nb }: { nb: number }) => {
 
 //#region SERVICES
 export const initAudios = () => {
+    /* MAIN */
+    createAudio({ audioName: 'main_confirm' });
+    createAudio({ audioName: 'main_fail' });
+    createAudio({ audioName: 'main_select' });
+    createAudio({ audioName: 'main_success' });
     /* ACTIVITIES */
-    createAudio({ audioName: 'activity_dialog' });
-    createAudio({ audioName: 'activity_dialog_select' });
-    createAudio({ audioName: 'activity_fail' });
     createAudio({ audioName: 'activity_pickup' });
     /* BUG */
     createAudio({ audioName: 'activity_bug_start' });
-    createAudio({ audioName: 'activity_bug_symbol_error' });
-    createAudio({ audioName: 'activity_bug_symbol_found' });
     createAudio({ audioName: 'activity_bug_win' });
     /* FISH */
     createAudio({ audioName: 'activity_fish_frenzy' });
@@ -54,9 +54,6 @@ export const initAudios = () => {
     createAudio({ audioName: 'activity_craft_play5' });
     createAudio({ audioName: 'activity_craft_play6' });
     createAudio({ audioName: 'activity_craft_start' });
-    createAudio({ audioName: 'activity_craft_recipe_confirm' });
-    createAudio({ audioName: 'activity_craft_recipe_fail' });
-    createAudio({ audioName: 'activity_craft_recipe_select' });
     createAudio({ audioName: 'activity_craft_win' });
     /* BGM */
     createAudio({ audioName: 'bgm_map1' });
@@ -67,13 +64,10 @@ export const initAudios = () => {
     createAudio({ audioName: 'inventory_tool_active' });
     createAudio({ audioName: 'inventory_tool_empty' });
     /* MENUS */
-    createAudio({ audioName: 'menu_launch_select' });
     createAudio({ audioName: 'menu_launch_start' });
     createAudio({ audioName: 'menu_settings_close' });
-    createAudio({ audioName: 'menu_settings_confirm' });
     createAudio({ audioName: 'menu_settings_open' });
     createAudio({ audioName: 'menu_settings_save' });
-    createAudio({ audioName: 'menu_settings_select' });
     /* STEPS */
     createAudio({ audioName: 'step_grass1' });
     createAudio({ audioName: 'step_grass2' });
