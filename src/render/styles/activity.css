@@ -17,9 +17,10 @@
     border-radius: 8px;
     bottom: 64px;
     display: flex;
+    font-size: 16px;
     justify-content: center;
     left: 32px;
-    padding: 8px;
+    padding: 16px;
     text-align: center;
     z-index: 100;
 }
@@ -32,13 +33,18 @@
     height: 128px;
     justify-content: center;
     text-align: center;
-    width: 384px;
 }
 
 .activity-bug-score {
     display: flex;
     flex-direction: column;
+    padding-left: 32px;
+    width: 128px
+}
+
+.activity-bug-score-label {
     font-size: 24px;
+    text-align: left;
 }
 
 .activity-bug-symbol {
@@ -51,6 +57,8 @@
 
 .activity-bug-symbol-value {
     font-weight: bold;
+    text-align: left;
+    width: 192px;
 }
 
 .activity-bug-symbol-found {
@@ -62,43 +70,55 @@
 .activity-fish {
     align-items: center;
     display: flex;
-    gap: 32px;
+    gap: 64px;
     height: 192px;
     justify-content: center;
     text-align: center;
-    width: 512px;
 }
 
 .activity-fish-hp-bars {
     display: flex;
     flex-direction: column;
     gap: 16px;
+    padding-left: 32px;
 }
 
 .activity-fish-hp {
+    align-items: center;
     display: flex;
     gap: 8px;
+    justify-content: center;
 }
 
 .activity-fish-hp-label {
     font-size: 24px;
-    width: 128px;
+    text-align: left;
+    width: 96px;
 }
 
 .activity-fish-rod-tension {
+    align-items: center;
     display: flex;
     gap: 8px;
+    justify-content: center;
 }
 
 .activity-fish-rod-tension-label {
     font-size: 24px;
-    width: 128px;
+    text-align: left;
+    width: 96px;
+}
+
+.activity-fish-key {
+    font-size: 32px;
+    width: 192px
 }
 
 .activity-fish-frenzy {
     align-items: center;
     display: flex;
     gap: 8px;
+    padding-right: 32px;
 }
 
 .activity-fish-frenzy-label {
@@ -115,6 +135,7 @@
 .activity-craft {
     align-items: center;
     display: flex;
+    gap: 32px;
     justify-content: center;
     padding: 16px;
     text-align: center;
@@ -160,4 +181,20 @@
     background-size: contain;
     height: 32px;
     width: 32px;
+}
+
+.activity-craft-progress {
+    align-items: center;
+    display: flex;
+    gap: 32px;
+    justify-content: center;
+}
+
+.activity-craft-progress-label {
+    font-size: 32px;
+}
+
+.activity-craft-key {
+    font-size: 32px;
+    width: 192px
 }

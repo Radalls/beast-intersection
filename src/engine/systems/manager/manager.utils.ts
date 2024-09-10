@@ -1,3 +1,5 @@
+import pkg from '../../../../package.json';
+
 import { getComponent } from '@/engine/entities';
 import { EventTypes } from '@/engine/event';
 import { error } from '@/engine/services/error';
@@ -10,6 +12,7 @@ import { event } from '@/render/events';
 export const LAUNCH_OPTIONS = [
     'start',
     'load',
+    'settings',
 ];
 //#endregion
 
@@ -127,5 +130,7 @@ export const editSettingKey = ({ editKey, managerEntityId }: {
         type: EventTypes.MENU_SETTINGS_DISPLAY_EDIT,
     });
 };
+
+export const getProjectVersion = () => pkg.version;
 //#endregion
 //#endregion

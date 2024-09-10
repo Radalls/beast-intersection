@@ -5,7 +5,7 @@ import { getState, setState } from './state';
 //#region TYPES
 const cycle = {
     activityBugTickInterval: 0,
-    activityFishTickInterval: 1 / 2,
+    activityFishTickInterval: 0,
     activityFishTickIntervalFrenzyOff: 0,
     activityFishTickIntervalFrenzyOn: 0,
     activityWinTickInterval: 0,
@@ -17,12 +17,14 @@ const cycle = {
     elapsedTimeSinceActivityFishInputTick: 0,
     elapsedTimeSinceActivityWinTick: 0,
     elapsedTimeSinceInputTick: 0,
-    inputTickInterval: 1 / 10,
+    inputTickInterval: 1 / 8,
 };
+let cycleInterval: NodeJS.Timeout;
 
 const check = {
     questCheck: () => false,
 };
+let checkInterval: NodeJS.Timeout;
 //#endregion
 
 //#region HELPERS
@@ -37,17 +39,31 @@ export const clearCheck = (key: keyof typeof check) => check[key] = () => false;
 
 //#region CYCLE
 export const startCycle = () => {
-    setInterval(() => {
+    cycleInterval = setInterval(() => {
         runCycle();
     }, getCycle('deltaTime') * 1000);
-    setInterval(() => {
+    checkInterval = setInterval(() => {
         runCheck();
     }, getCycle('checkTime') * 1000);
 };
 
 export const stopCycle = () => {
-    clearInterval(getCycle('deltaTime'));
-    clearInterval(getCycle('checkTime'));
+    clearInterval(cycleInterval);
+    clearInterval(checkInterval);
+
+    clearCycle('activityBugTickInterval');
+    clearCycle('activityFishTickInterval');
+    clearCycle('activityFishTickIntervalFrenzyOff');
+    clearCycle('activityFishTickIntervalFrenzyOn');
+    clearCycle('activityWinTickInterval');
+    clearCycle('elapsedTimeSinceInputTick');
+    clearCycle('elapsedTimeSinceActivityWinTick');
+    clearCycle('elapsedTimeSinceActivityBugTick');
+    clearCycle('elapsedTimeSinceActivityFishFrenzyOffTick');
+    clearCycle('elapsedTimeSinceActivityFishFrenzyOnTick');
+    clearCycle('elapsedTimeSinceActivityFishInputTick');
+
+    clearCheck('questCheck');
 };
 
 const runCycle = () => {

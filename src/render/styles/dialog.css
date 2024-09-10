@@ -5,7 +5,7 @@
     border-radius: 8px;
     bottom: 32px;
     display: flex;
-    height: fit-content;
+    height: 128px;
     left: 50%;
     padding: 16px;
     transform: translateX(-50%);
@@ -27,9 +27,10 @@
     padding: 16px;
     right: -8px;
     top: -128px;
-    width: fit-content;
+    width: 256px;
 }
 
 .dialog-text-option {
-    width: fit-content;
+    text-align: right;
+    width: 100%;
 }

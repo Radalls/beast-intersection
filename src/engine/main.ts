@@ -14,6 +14,9 @@ export const run = ({ saveData }: { saveData?: SaveData }) => {
     if (saveData?.manager) {
         createEntityManager({ savedManager: saveData.manager });
     }
+    else {
+        createEntityManager({});
+    }
 
     createEntityTileMap({
         tileMapName: (saveData?.tileMapName)
@@ -34,7 +37,7 @@ export const run = ({ saveData }: { saveData?: SaveData }) => {
     initQuest();
 };
 
-const launch = () => {
+export const launch = () => {
     setState('isGameLaunching', true);
 
     createEntityManager({});

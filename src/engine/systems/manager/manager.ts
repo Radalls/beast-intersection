@@ -1,13 +1,13 @@
 import { loadSave } from './manager.data';
-import { LAUNCH_OPTIONS, SETTINGS, editSettingAudio, editSettingKey } from './manager.utils';
+import { LAUNCH_OPTIONS, SETTINGS, editSettingAudio, editSettingKey, getProjectVersion } from './manager.utils';
 
 import { stopCycle } from '@/engine/cycle';
 import { destroyAllEntities, getComponent } from '@/engine/entities';
 import { EventTypes } from '@/engine/event';
-import { run } from '@/engine/main';
+import { launch, run } from '@/engine/main';
 import { error } from '@/engine/services/error';
 import { getState, setState } from '@/engine/state';
-import { getStore } from '@/engine/store';
+import { getStore, resetStore } from '@/engine/store';
 import { event } from '@/render/events';
 
 //#region SYSTEMS
@@ -59,10 +59,10 @@ export const confirmLaunchOption = ({ managerEntityId }: { managerEntityId?: str
 
         run({});
 
-        event({
-            entityId: managerEntityId,
-            type: EventTypes.MENU_LAUNCH_DISPLAY,
-        });
+        // event({
+        //     entityId: managerEntityId,
+        //     type: EventTypes.MENU_LAUNCH_DISPLAY,
+        // });
         event({
             entityId: managerEntityId,
             type: EventTypes.QUEST_DISPLAY,
@@ -87,9 +87,22 @@ export const confirmLaunchOption = ({ managerEntityId }: { managerEntityId?: str
         return;
     }
     else if (LAUNCH_OPTIONS[manager._selectedLaunchOption] === LAUNCH_OPTIONS[1]) {
-        setState('isGameLaunching', false);
-
         loadSave().then((saveData) => {
+            if (saveData.version !== getProjectVersion()) {
+                event({
+                    data: { audioName: 'main_fail' },
+                    entityId: managerEntityId,
+                    type: EventTypes.AUDIO_PLAY,
+                });
+
+                throw error({
+                    message: 'Invalid save, project version does not match',
+                    where: confirmLaunchOption.name,
+                });
+            }
+
+            setState('isGameLaunching', false);
+
             event({
                 entityId: managerEntityId,
                 type: EventTypes.MAIN_RUN,
@@ -121,9 +134,14 @@ export const confirmLaunchOption = ({ managerEntityId }: { managerEntityId?: str
                 entityId: managerEntityId,
                 type: EventTypes.AUDIO_STOP,
             });
+
+            return;
         });
 
         return;
+    }
+    else if (LAUNCH_OPTIONS[manager._selectedLaunchOption] === LAUNCH_OPTIONS[2]) {
+        openSettings({});
     }
 };
 
@@ -132,15 +150,14 @@ export const quitToLaunch = ({ managerEntityId }: { managerEntityId?: string | n
         ?? error({ message: 'Store managerId is undefined', where: openSettings.name });
 
     setState('isGameLaunching', true);
+
     closeSettings({});
 
     destroyAllEntities({ force: true });
     stopCycle();
+    resetStore();
 
-    event({
-        entityId: managerEntityId,
-        type: EventTypes.MENU_LAUNCH_DISPLAY,
-    });
+    launch();
 
     event({
         data: { audioName: 'bgm_map1' },
