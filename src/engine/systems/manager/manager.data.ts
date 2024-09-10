@@ -1,3 +1,5 @@
+import { getProjectVersion } from './manager.utils';
+
 import { Energy } from '@/engine/components/energy';
 import { Inventory } from '@/engine/components/inventory';
 import { Manager } from '@/engine/components/manager';
@@ -15,6 +17,7 @@ export type SaveData = {
     playerInventory: Inventory,
     playerPosition: Position,
     tileMapName: string,
+    version: string,
 };
 //#endregion
 
@@ -44,6 +47,7 @@ export const createSave = () => {
         playerInventory,
         playerPosition,
         tileMapName,
+        version: getProjectVersion(),
     };
 
     downloadSave({ saveData });
@@ -61,24 +65,44 @@ export const loadSave = (): Promise<SaveData> => {
         input.type = 'file';
         input.accept = '.json';
 
-        input.onchange = async (event) => {
+        const handleCancel = () => {
+            reject('File selection was canceled by the user.');
+            cleanup();
+        };
+
+        const cleanup = () => {
+            input.removeEventListener('change', handleFileSelect);
+            input.removeEventListener('focusout', handleCancel);
+            input.removeEventListener('blur', handleCancel);
+            input.remove();
+        };
+
+        const handleFileSelect = async (event: Event) => {
             const file = (event.target as HTMLInputElement).files?.[0];
-            if (!(file)) {
-                throw error({
-                    message: 'File is undefined',
+            cleanup();
+
+            if (!file) {
+                reject(error({
+                    message: 'No file was selected.',
                     where: loadSave.name,
-                });
+                }));
+
+                return;
             }
 
             try {
                 const fileContents = await file.text();
                 const saveData: SaveData = JSON.parse(fileContents);
                 resolve(saveData);
-            } catch (error) {
-                console.error('Failed to read or parse the file:', error);
-                reject(error);
+            } catch (err) {
+                console.error('Failed to read or parse the file:', err);
+                reject(err);
             }
         };
+
+        input.addEventListener('change', handleFileSelect);
+        input.addEventListener('focusout', handleCancel);
+        input.addEventListener('blur', handleCancel);
 
         input.click();
     });

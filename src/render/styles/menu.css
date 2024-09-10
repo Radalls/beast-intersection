@@ -45,6 +45,7 @@
 .launch-title {
     color: rgb(245, 245, 245);
     font-size: 64px;
+    margin-bottom: 64px;
 }
 
 .launch-option {
@@ -59,6 +60,55 @@
     justify-content: center;
     padding: 8px;
     width: 256px;
+}
+
+.launch-version {
+    bottom: 0;
+    color: rgb(245, 245, 245);
+    display: none;
+    font-size: 26px;
+    padding: 16px;
+    right: 0;
+}
+
+.launch-keys {
+    align-items: left;
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    height: 50%;
+    left: 0;
+    padding: 16px;
+    top: 0;
+    z-index: 100;
+}
+
+.launch-key {
+    align-items: center;
+    display: flex;
+    gap: 8px;
+    max-width: 256px;
+}
+
+.launch-key-icon {
+    align-items: center;
+    background-color: rgb(245, 245, 245);
+    color: rgb(0, 0, 0);
+    display: flex;
+    height: 32px;
+    justify-content: center;
+    width: 32px;
+}
+
+.launch-key-value {
+    align-items: center;
+    border: 1px solid rgb(245, 245, 245);
+    color: rgb(245, 245, 245);
+    display: flex;
+    font-size: 16px;
+    height: 32px;
+    justify-content: center;
+    width: 192px;
 }
 
 /* SETTINGS MENU */
@@ -98,16 +148,7 @@
     left: 0;
     padding: 16px;
     top: 0;
-    width: 33%;
     z-index: 100;
-}
-
-.setting-system-container {
-    align-items: center;
-    display: flex;
-    gap: 16px;
-    justify-content: space-between;
-    width: 33%;
 }
 
 .setting-header {
@@ -121,22 +162,22 @@
     align-items: center;
     border-left: 5px solid rgb(245, 245, 245);
     display: flex;
-    gap: 16px;
-    justify-content: space-between;
+    gap: 256px;
+    justify-content: center;
     padding-left: 8px;
-    width: 50%;
 }
 
 .setting-label {
     color: rgb(245, 245, 245);
     font-size: 16px;
+    width: 192px;
 }
 
 .setting {
     align-items: center;
     display: flex;
     gap: 8px;
-    width: 196px;
+    max-width: 256px;
 }
 
 .setting-icon {
@@ -151,11 +192,11 @@
 
 .setting-value {
     align-items: center;
+    border: 1px solid rgb(245, 245, 245);
     color: rgb(245, 245, 245);
     display: flex;
-    font-size: 24px;
+    font-size: 16px;
     height: 32px;
     justify-content: center;
-    max-width: 256;
-    min-width: 32px;
+    width: 192px;
 }

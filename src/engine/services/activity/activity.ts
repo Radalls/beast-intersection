@@ -34,7 +34,7 @@ export const checkActivityId = ({ activityId }: { activityId: string | null | un
 
 //#region SERVICES
 export const startActivity = ({ activityId }: { activityId: string }) => {
-    setCycle('activityWinTickInterval', 1);
+    setCycle('activityWinTickInterval', 2);
     setState('isActivityRunning', true);
     setStore('activityId', activityId);
 

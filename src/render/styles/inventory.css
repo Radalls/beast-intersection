@@ -21,7 +21,12 @@
 
 .inventory-slot-amount {
     bottom: 0px;
+    font-size: 12px;
+    height: 16px;
+    padding: 0px 0px 2px 0px;
     right: 0px;
+    text-align: center;
+    width: 16px
 }
 
 .inventory-tools {

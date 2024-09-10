@@ -35,6 +35,7 @@ export const startActivityFish = ({ activityId }: { activityId: string }) => {
 
     setState('isActivityFishRunning', true);
     setState('isActivityFishFrenzy', false);
+    setCycle('activityFishTickInterval', 1 / 2);
     setCycle('activityFishTickIntervalFrenzyOff', activityFishData._frenzyInterval);
     setCycle('activityFishTickIntervalFrenzyOn', activityFishData._frenzyDuration);
 
@@ -151,6 +152,7 @@ export const endActivityFish = ({ activityId }: { activityId?: string | null }) 
 
     setState('isActivityFishRunning', false);
     setState('isActivityFishFrenzy', false);
+    clearCycle('activityFishTickInterval');
     clearCycle('activityFishTickIntervalFrenzyOn');
     clearCycle('activityFishTickIntervalFrenzyOff');
 

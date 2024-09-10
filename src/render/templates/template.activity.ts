@@ -3,7 +3,16 @@ import itemRecipes from '../../assets/items/item_recipes.json';
 import { createElement, destroyElement } from './template';
 import { getElement, checkElement, getSpritePath } from './template.utils';
 
-import { Resource, ActivityBugData, ActivityFishData, ActivityCraftData } from '@/engine/components/resource';
+import {
+    Resource,
+    ActivityBugData,
+    ActivityFishData,
+    ActivityCraftData,
+    ActivityTypes,
+} from '@/engine/components/resource';
+import { getComponent } from '@/engine/entities';
+import { error } from '@/engine/services/error';
+import { getStore } from '@/engine/store';
 
 //#region CONSTANTS
 //#endregion
@@ -31,7 +40,9 @@ export const winActivity = ({ activityEntityId, resource }: {
         entityId: activityEntityId,
     });
 
-    activityWin.textContent = `You get ${resource.item?.info._name}!`;
+    activityWin.textContent = (resource._activityType === ActivityTypes.CRAFT)
+        ? `You crafted a ${resource.item?.info._name} !`
+        : `You caught a ${resource.item?.info._name} !`;
 };
 
 export const endActivity = ({ activityEntityId }: { activityEntityId: string }) => {
@@ -68,7 +79,7 @@ export const startActivityBug = ({ activityEntityId, activityBugData }: {
 
     createElement({
         elementAbsolute: false,
-        elementClass: 'activity-bug-score',
+        elementClass: 'activity-bug-score-label',
         elementId: `${activityEntityId}-activity-bug-score-hp`,
         elementParent: activityBugScore,
         entityId: activityEntityId,
@@ -76,7 +87,7 @@ export const startActivityBug = ({ activityEntityId, activityBugData }: {
 
     createElement({
         elementAbsolute: false,
-        elementClass: 'activity-bug-score',
+        elementClass: 'activity-bug-score-label',
         elementId: `${activityEntityId}-activity-bug-score-error`,
         elementParent: activityBugScore,
         entityId: activityEntityId,
@@ -114,13 +125,13 @@ export const updateActivityBug = ({ activityEntityId, activityBugData }: {
     activityEntityId: string
 }) => {
     const activityBugScoreHp = getElement({ elementId: `${activityEntityId}-activity-bug-score-hp` });
-    activityBugScoreHp.textContent = `HP: ${activityBugData._hp}`;
+    activityBugScoreHp.textContent = `🦋❤️: ${activityBugData._hp}`;
 
     const activityBugScoreError = getElement({ elementId: `${activityEntityId}-activity-bug-score-error` });
-    activityBugScoreError.textContent = `Errors: ${activityBugData._nbErrors}/${activityBugData._maxNbErrors}`;
+    activityBugScoreError.textContent = `❌: ${activityBugData._nbErrors}/${activityBugData._maxNbErrors}`;
 
     const activityBugSymbolValue = getElement({ elementId: `${activityEntityId}-activity-bug-symbol-value` });
-    activityBugSymbolValue.textContent = `Press: ${activityBugData._symbol ?? '...'}`;
+    activityBugSymbolValue.textContent = `Press: ${getActivityBugSymbol({ symbol: activityBugData._symbol }) ?? '...'}`;
 
     const activityBugSymbolFound = getElement({ elementId: `${activityEntityId}-activity-bug-symbol-found` });
     if (activityBugData._symbolFound === undefined) {
@@ -136,6 +147,28 @@ export const updateActivityBug = ({ activityEntityId, activityBugData }: {
 
 export const endActivityBug = ({ activityEntityId }: { activityEntityId: string }) => {
     destroyElement({ elementId: `${activityEntityId}-activity-bug` });
+};
+
+const getActivityBugSymbol = ({ symbol }: { symbol?: string }) => {
+    const managerEntityId = getStore('managerId')
+        ?? error({ message: 'Store managerId is undefined', where: getActivityBugSymbol.name });
+
+    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
+
+    if (symbol === manager.settings.keys.move._up) {
+        return '⬆';
+    }
+    else if (symbol === manager.settings.keys.move._down) {
+        return '⬇';
+    }
+    else if (symbol === manager.settings.keys.move._left) {
+        return '⬅';
+    }
+    else if (symbol === manager.settings.keys.move._right) {
+        return '➡';
+    }
+
+    return symbol;
 };
 //#endregion
 
@@ -177,7 +210,7 @@ export const startActivityFish = ({ activityEntityId, activityFishData }: {
         elementParent: activityFishHp,
         entityId: activityEntityId,
     });
-    activityFishHpLabel.textContent = 'Fish HP: ';
+    activityFishHpLabel.textContent = '🐟❤️: ';
 
     createElement({
         elementAbsolute: false,
@@ -202,7 +235,7 @@ export const startActivityFish = ({ activityEntityId, activityFishData }: {
         elementParent: activityFishRodTension,
         entityId: activityEntityId,
     });
-    activityFishRodTensionLabel.textContent = 'Rod Tension: ';
+    activityFishRodTensionLabel.textContent = '🎣💀: ';
 
     createElement({
         elementAbsolute: false,
@@ -211,6 +244,15 @@ export const startActivityFish = ({ activityEntityId, activityFishData }: {
         elementParent: activityFishRodTension,
         entityId: activityEntityId,
     });
+
+    const activityFishKey = createElement({
+        elementAbsolute: false,
+        elementClass: 'activity-fish-key',
+        elementId: `${activityEntityId}-activity-fish-key`,
+        elementParent: activityFish,
+        entityId: activityEntityId,
+    });
+    activityFishKey.textContent = 'Hold: 🖐';
 
     const activityFishFrenzy = createElement({
         elementAbsolute: false,
@@ -420,6 +462,15 @@ export const startPlayActivityCraft = ({ activityEntityId, activityCraftData }: 
         elementParent: activityCraftProgress,
         entityId: activityEntityId,
     });
+
+    const activityCraftKey = createElement({
+        elementAbsolute: false,
+        elementClass: 'activity-craft-key',
+        elementId: `${activityEntityId}-activity-craft-key`,
+        elementParent: activityCraft,
+        entityId: activityEntityId,
+    });
+    activityCraftKey.innerText = 'Press: 🖐';
 
     updatePlayActivityCraft({ activityCraftData, activityEntityId });
 };

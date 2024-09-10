@@ -2,7 +2,7 @@ import { createElement } from './template';
 import { getElement, searchElementsByClassName, searchElementById as searchElementsById } from './template.utils';
 
 import { Manager } from '@/engine/components/manager';
-import { SETTINGS, SETTINGS_KEYS_PATHS } from '@/engine/systems/manager';
+import { getProjectVersion, SETTINGS, SETTINGS_KEYS_PATHS } from '@/engine/systems/manager';
 
 //#region HELPERS
 const getSettingId = ({ settingName }: { settingName: string }) => {
@@ -65,6 +65,7 @@ export const createLaunchMenu = () => {
     });
     launchTitle.innerText = 'BEAST INTERSECTION';
 
+    /* Options */
     const launchStart = createElement({
         elementAbsolute: false,
         elementClass: 'launch-option',
@@ -82,27 +83,106 @@ export const createLaunchMenu = () => {
         entityId: '',
     });
     launchLoad.innerText = 'LOAD';
+
+    const launchSettings = createElement({
+        elementAbsolute: false,
+        elementClass: 'launch-option',
+        elementId: 'LaunchMenuSettings',
+        elementParent: launch,
+        entityId: '',
+    });
+    launchSettings.innerText = 'SETTINGS';
+
+    /* Version */
+    const launchVersion = createElement({
+        elementClass: 'launch-version',
+        elementId: 'LaunchMenuVersion',
+        entityId: '',
+    });
+    launchVersion.innerText = `v${getProjectVersion()}`;
+
+    // /* Keys */
+    // const launchKeys = createElement({
+    //     elementClass: 'launch-keys',
+    //     elementId: 'LaunchMenuKeys',
+    //     entityId: '',
+    // });
+
+    // /* Settings */
+    // const settingsKey = createElement({
+    //     elementAbsolute: false,
+    //     elementClass: 'launch-key',
+    //     elementId: 'LaunchMenuSettingKey',
+    //     elementParent: launchKeys,
+    //     entityId: '',
+    // });
+
+    // const settingsKeyIcon = createElement({
+    //     elementAbsolute: false,
+    //     elementClass: 'launch-key-icon',
+    //     elementId: 'LaunchMenuSettingKeyIcon',
+    //     elementParent: settingsKey,
+    //     entityId: '',
+    // });
+    // settingsKeyIcon.innerText = '⚙';
+
+    // const settingsKeyValue = createElement({
+    //     elementAbsolute: false,
+    //     elementClass: 'launch-key-value',
+    //     elementId: 'LaunchMenuSettingsKeyValue',
+    //     elementParent: settingsKey,
+    //     entityId: '',
+    // });
+    // settingsKeyValue.innerText = 'ESC';
+
+    // /* Act */
+    // const actKey = createElement({
+    //     elementAbsolute: false,
+    //     elementClass: 'launch-key',
+    //     elementId: 'LaunchMenuActKey',
+    //     elementParent: launchKeys,
+    //     entityId: '',
+    // });
+
+    // const actKeyIcon = createElement({
+    //     elementAbsolute: false,
+    //     elementClass: 'launch-key-icon',
+    //     elementId: 'LaunchMenuActKeyIcon',
+    //     elementParent: actKey,
+    //     entityId: '',
+    // });
+    // actKeyIcon.innerText = '🖐';
+
+    // createElement({
+    //     elementAbsolute: false,
+    //     elementClass: 'launch-key-value',
+    //     elementId: 'LaunchMenuActKeyValue',
+    //     elementParent: actKey,
+    //     entityId: '',
+    // });
 };
 
 export const displayLaunchMenu = () => {
     const launch = getElement({ elementId: 'LaunchMenu' });
-
     launch.style.display = (launch.style.display === 'flex') ? 'none' : 'flex';
+
+    const launchVersion = getElement({ elementId: 'LaunchMenuVersion' });
+    launchVersion.style.display = (launchVersion.style.display === 'flex') ? 'none' : 'flex';
+
+    // const launchKeys = getElement({ elementId: 'LaunchMenuKeys' });
+    // launchKeys.style.display = (launchKeys.style.display === 'flex') ? 'none' : 'flex';
 };
 
 export const updateLaunchMenu = ({ manager }: { manager: Manager }) => {
-    const launchStart = getElement({ elementId: 'LaunchMenuStart' });
-    launchStart.style.border = '5px solid rgb(180, 180, 180)';
-
-    const launchLoad = getElement({ elementId: 'LaunchMenuLoad' });
-    launchLoad.style.border = '5px solid rgb(180, 180, 180)';
-
-    if (manager._selectedLaunchOption) {
-        launchLoad.style.border = '5px solid rgb(255, 0, 0)';
+    const launchOptions = searchElementsByClassName({ className: 'launch-option' });
+    for (const launchOption of launchOptions) {
+        launchOption.style.border = '5px solid rgb(180, 180, 180)';
     }
-    else {
-        launchStart.style.border = '5px solid rgb(255, 0, 0)';
-    }
+
+    launchOptions[manager._selectedLaunchOption].style.border = '5px solid rgb(255, 0, 0)';
+
+    // const keyActValue = getElement({ elementId: 'LaunchMenuActKeyValue' });
+    // keyActValue.innerText = manager.settings.keys.action._act.toUpperCase();
 };
 //#endregion
 
@@ -129,19 +209,11 @@ export const createSettingsMenu = () => {
     });
 
     /* Back */
-    const backContainer = createElement({
-        elementAbsolute: false,
-        elementClass: 'setting-system-container',
-        elementId: 'SettingsMenuBackContainer',
-        elementParent: systemSettings,
-        entityId: '',
-    });
-
     const backSetting = createElement({
         elementAbsolute: false,
         elementClass: 'setting',
         elementId: 'SettingsMenuBackSetting',
-        elementParent: backContainer,
+        elementParent: systemSettings,
         entityId: '',
     });
 
@@ -164,19 +236,11 @@ export const createSettingsMenu = () => {
     backSettingValue.innerText = 'ESC';
 
     /* Quit */
-    const quitContainer = createElement({
-        elementAbsolute: false,
-        elementClass: 'setting-system-container',
-        elementId: 'SettingsMenuQuitContainer',
-        elementParent: systemSettings,
-        entityId: '',
-    });
-
     const quitSetting = createElement({
         elementAbsolute: false,
         elementClass: 'setting',
         elementId: 'SettingsMenuQuitSetting',
-        elementParent: quitContainer,
+        elementParent: systemSettings,
         entityId: '',
     });
 
@@ -196,22 +260,14 @@ export const createSettingsMenu = () => {
         elementParent: quitSetting,
         entityId: '',
     });
-    quitSettingValue.innerText = 'CTRL';
+    quitSettingValue.innerText = 'SHIFT';
 
     /* Save */
-    const saveContainer = createElement({
-        elementAbsolute: false,
-        elementClass: 'setting-system-container',
-        elementId: 'SettingsMenuSaveContainer',
-        elementParent: systemSettings,
-        entityId: '',
-    });
-
     const saveSetting = createElement({
         elementAbsolute: false,
         elementClass: 'setting',
         elementId: 'SettingsMenuSaveSetting',
-        elementParent: saveContainer,
+        elementParent: systemSettings,
         entityId: '',
     });
 
@@ -231,7 +287,7 @@ export const createSettingsMenu = () => {
         elementParent: saveSetting,
         entityId: '',
     });
-    saveSettingValue.innerText = 'ALT';
+    saveSettingValue.innerText = 'CTRL';
 
     /* General */
     const generalSettings = createElement({
@@ -458,7 +514,7 @@ export const createSettingsMenu = () => {
         elementParent: moveRightSetting,
         entityId: '',
     });
-    moveRightSettingIcon.innerText = '➡';
+    moveRightSettingIcon.innerText = '➡️';
 
     createElement({
         elementAbsolute: false,
@@ -484,7 +540,7 @@ export const createSettingsMenu = () => {
         elementParent: actContainer,
         entityId: '',
     });
-    actLabel.innerText = 'ACT: ';
+    actLabel.innerText = 'ACT/SELECT: ';
 
     const actSetting = createElement({
         elementAbsolute: false,
@@ -628,7 +684,9 @@ export const updateSettingsMenu = ({ manager }: { manager: Manager }) => {
                 settingPath = settingPath[key];
             }
 
-            value.innerText = settingPath.toUpperCase();
+            value.innerText = (settingPath !== ' ')
+                ? settingPath.toUpperCase()
+                : 'SPACE';
         }
     }
 
