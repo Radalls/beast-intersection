@@ -1,11 +1,12 @@
+import { startActivityBug, startActivityCraft, startActivityFish } from './activity';
+
 import { ActivityTypes } from '@/engine/components/resource';
 import { getComponent, checkComponent, destroyEntity } from '@/engine/entities';
-import { EventTypes } from '@/engine/event';
-import { startActivityBug, startActivityCraft, startActivityFish } from '@/engine/services/activity';
 import { error } from '@/engine/services/error';
-import { getStore } from '@/engine/store';
+import { EventTypes } from '@/engine/services/event';
+import { getStore } from '@/engine/services/store';
 import { destroyCollider } from '@/engine/systems/collider';
-import { addItemToInventory } from '@/engine/systems/inventory';
+import { addItemToInventory, playerInventoryFull } from '@/engine/systems/inventory';
 import { destroyTrigger } from '@/engine/systems/trigger';
 import { event } from '@/render/events';
 
@@ -20,13 +21,18 @@ export const useResource = ({ entityId, resourceEntityId }: {
     const resource = getComponent({ componentId: 'Resource', entityId: resourceEntityId });
 
     if (resource._activityType === ActivityTypes.ITEM) {
-        getResourceItem({ resourceEntityId });
+        const gotItem = getResourceItem({ resourceEntityId });
+        if (!(gotItem)) {
+            event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
+            event({ data: { message: 'Inventory is full' }, type: EventTypes.MAIN_ERROR });
 
-        event({
-            data: { audioName: 'activity_pickup' },
-            entityId,
-            type: EventTypes.AUDIO_PLAY,
-        });
+            throw error({
+                message: 'Player inventory is full',
+                where: useResource.name,
+            });
+        }
+
+        event({ data: { audioName: 'activity_pickup' }, type: EventTypes.AUDIO_PLAY });
 
         if (resource._isTemporary) {
             destroyResource({ resourceEntityId });
@@ -58,11 +64,24 @@ export const getResourceItem = ({ entityId, resourceEntityId }: {
         throw error({ message: `Resource ${resourceEntityId} does not have an item`, where: getResourceItem.name });
     }
 
+    if (playerInventoryFull({ item: resource.item })) {
+        event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
+
+        error({
+            message: 'Player inventory is full',
+            where: getResourceItem.name,
+        });
+
+        return false;
+    }
+
     addItemToInventory({
         entityId,
         item: resource.item,
         itemAmount: 1,
     });
+
+    return true;
 };
 
 export const destroyResource = ({ resourceEntityId }: {

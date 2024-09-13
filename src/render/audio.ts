@@ -37,6 +37,7 @@ export const initAudios = () => {
     /* ACTIVITIES */
     createAudio({ audioName: 'activity_pickup' });
     /* BUG */
+    createAudio({ audioName: 'activity_bug_select' });
     createAudio({ audioName: 'activity_bug_start' });
     createAudio({ audioName: 'activity_bug_win' });
     /* FISH */
@@ -68,6 +69,13 @@ export const initAudios = () => {
     createAudio({ audioName: 'menu_settings_close' });
     createAudio({ audioName: 'menu_settings_open' });
     createAudio({ audioName: 'menu_settings_save' });
+    /* SECRET */
+    createAudio({ audioName: 'secret_boss' });
+    createAudio({ audioName: 'secret_correct' });
+    createAudio({ audioName: 'secret_map' });
+    createAudio({ audioName: 'secret_menu' });
+    createAudio({ audioName: 'secret_start' });
+    createAudio({ audioName: 'secret_victory' });
     /* STEPS */
     createAudio({ audioName: 'step_grass1' });
     createAudio({ audioName: 'step_grass2' });

@@ -16,7 +16,7 @@ import { State } from '@/engine/components/state';
 import { TileMap } from '@/engine/components/tilemap';
 import { Trigger } from '@/engine/components/trigger';
 import { addComponent, isPlayer } from '@/engine/entities';
-import { EventTypes } from '@/engine/event';
+import { EventTypes } from '@/engine/services/event';
 import { loadDialogData } from '@/engine/systems/dialog/dialog.data';
 import { event } from '@/render/events';
 
@@ -61,24 +61,12 @@ export const addEnergy = ({ entityId, current = 0, max = 10, savedEnergy }: {
 
     addComponent({ component: energy, entityId });
 
-    event({
-        data: energy,
-        entityId,
-        type: EventTypes.ENERGY_CREATE,
-    });
-    event({
-        data: energy,
-        entityId,
-        type: EventTypes.ENERGY_UPDATE,
-    });
-    event({
-        data: energy,
-        entityId,
-        type: EventTypes.ENERGY_DISPLAY,
-    });
+    event({ entityId, type: EventTypes.ENERGY_CREATE });
+    event({ entityId, type: EventTypes.ENERGY_UPDATE });
+    event({ entityId, type: EventTypes.ENERGY_DISPLAY });
 };
 
-export const addInventory = ({ entityId, maxSlots = 20, maxTools = 3, savedInventory }: {
+export const addInventory = ({ entityId, maxSlots = 10, maxTools = 3, savedInventory }: {
     entityId: string,
     maxSlots?: number,
     maxTools?: number,
@@ -95,30 +83,11 @@ export const addInventory = ({ entityId, maxSlots = 20, maxTools = 3, savedInven
     addComponent({ component: inventory, entityId });
 
     if (isPlayer({ entityId })) {
-        event({
-            data: inventory,
-            entityId,
-            type: EventTypes.INVENTORY_CREATE,
-        });
-        event({
-            data: inventory,
-            entityId,
-            type: EventTypes.INVENTORY_UPDATE,
-        });
-        event({
-            entityId,
-            type: EventTypes.INVENTORY_TOOL_ACTIVE_DISPLAY,
-        });
-        event({
-            data: inventory,
-            entityId,
-            type: EventTypes.INVENTORY_TOOL_ACTIVATE,
-        });
-        event({
-            data: inventory,
-            entityId,
-            type: EventTypes.INVENTORY_TOOL_UPDATE,
-        });
+        event({ entityId, type: EventTypes.INVENTORY_CREATE });
+        event({ entityId, type: EventTypes.INVENTORY_UPDATE });
+        event({ entityId, type: EventTypes.INVENTORY_TOOL_ACTIVE_DISPLAY });
+        event({ entityId, type: EventTypes.INVENTORY_TOOL_ACTIVATE });
+        event({ entityId, type: EventTypes.INVENTORY_TOOL_UPDATE });
     }
 };
 
@@ -157,16 +126,8 @@ export const addManager = ({ entityId, savedManager }: {
     addComponent({ component: manager, entityId });
 
     if (!(savedManager)) {
-        event({
-            data: manager,
-            entityId,
-            type: EventTypes.MENU_LAUNCH_DISPLAY,
-        });
-        event({
-            data: manager,
-            entityId,
-            type: EventTypes.MENU_LAUNCH_UPDATE,
-        });
+        event({ type: EventTypes.MENU_LAUNCH_DISPLAY });
+        event({ type: EventTypes.MENU_LAUNCH_UPDATE });
     }
 };
 
@@ -184,11 +145,7 @@ export const addPosition = ({ entityId, savedPosition, x = 0, y = 0 }: {
 
     addComponent({ component: position, entityId });
 
-    event({
-        data: position,
-        entityId,
-        type: EventTypes.ENTITY_POSITION_UPDATE,
-    });
+    event({ entityId, type: EventTypes.ENTITY_POSITION_UPDATE });
 };
 
 export const addResourceBug = ({
@@ -348,11 +305,7 @@ export const addSprite = ({ entityId, height = 1, image, width = 1 }: {
 
     addComponent({ component: sprite, entityId });
 
-    event({
-        data: sprite,
-        entityId,
-        type: EventTypes.ENTITY_SPRITE_CREATE,
-    });
+    event({ entityId, type: EventTypes.ENTITY_SPRITE_CREATE });
 };
 
 export const addState = ({ entityId }: { entityId: string }) => {

@@ -1,16 +1,21 @@
 import { createElement, TILE_PIXEL_SIZE } from './template';
 import { getElement, getSpritePath } from './template.utils';
 
-import { TileMap, Tile } from '@/engine/components/tilemap';
+import { Tile } from '@/engine/components/tilemap';
+import { getComponent } from '@/engine/entities';
+import { error } from '@/engine/services/error';
+import { getStore } from '@/engine/services/store';
 
 //#region CONSTANTS
 //#endregion
 
 //#region TEMPLATES
-export const createTileMap = ({ tileMapEntityId, tileMap }: {
-    tileMap: TileMap,
-    tileMapEntityId: string
-}) => {
+export const createTileMap = () => {
+    const tileMapEntityId = getStore('tileMapId')
+        ?? error({ message: 'Store tileMapId is undefined', where: createTileMap.name });
+
+    const tileMap = getComponent({ componentId: 'TileMap', entityId: tileMapEntityId });
+
     const tileMapElement = getElement({ elementId: tileMapEntityId });
 
     tileMapElement.style.width = `${tileMap._width * TILE_PIXEL_SIZE}px`;
@@ -19,10 +24,10 @@ export const createTileMap = ({ tileMapEntityId, tileMap }: {
     tileMapElement.style.left = `${TILE_PIXEL_SIZE}px`;
 };
 
-export const createTileMapTile = ({ tileMapEntityId, tile }: {
-    tile: Tile,
-    tileMapEntityId: string
-}) => {
+export const createTileMapTile = ({ tile }: { tile: Tile }) => {
+    const tileMapEntityId = getStore('tileMapId')
+        ?? error({ message: 'Store tileMapId is undefined', where: createTileMapTile.name });
+
     const tileMapElement = getElement({ elementId: tileMapEntityId });
 
     const tileElement = createElement({
@@ -34,6 +39,6 @@ export const createTileMapTile = ({ tileMapEntityId, tile }: {
 
     tileElement.style.left = `${tile.position._x * TILE_PIXEL_SIZE}px`;
     tileElement.style.top = `${tile.position._y * TILE_PIXEL_SIZE}px`;
-    tileElement.style.backgroundImage = `url(${getSpritePath(tile.sprite._image)})`;
+    tileElement.style.backgroundImage = `url(${getSpritePath({ spriteName: tile.sprite._image })})`;
 };
 //#endregion

@@ -1,20 +1,19 @@
 import { createElement } from './template';
 import { getElement, getSpritePath, checkElement } from './template.utils';
 
-import { Inventory } from '@/engine/components/inventory';
+import { getComponent } from '@/engine/entities';
 import { playerActiveTool } from '@/engine/systems/inventory';
 
 //#region CONSTANTS
 const INVENTORY_SLOT_SIZE = 64;
-const INVENTORY_SLOTS_PER_ROW = 7;
+const INVENTORY_SLOTS_PER_ROW = 5;
 const INVENTORY_TOOL_SLOT_SIZE = 64;
 //#endregion
 
 //#region TEMPLATES
-export const createInventory = ({ entityId, inventory }: {
-    entityId: string,
-    inventory: Inventory,
-}) => {
+export const createInventory = ({ entityId }: { entityId: string }) => {
+    const inventory = getComponent({ componentId: 'Inventory', entityId });
+
     const inventoryElement = createElement({
         elementClass: 'inventory',
         elementId: `${entityId}-inventory`,
@@ -74,17 +73,16 @@ export const displayInventory = ({ entityId }: { entityId: string }) => {
     inventoryTools.style.display = (inventoryTools.style.display === 'flex') ? 'none' : 'flex';
 };
 
-export const updateInventory = ({ entityId, inventory }: {
-    entityId: string,
-    inventory: Inventory,
-}) => {
+export const updateInventory = ({ entityId }: { entityId: string }) => {
+    const inventory = getComponent({ componentId: 'Inventory', entityId });
+
     clearInventory({ entityId });
 
     for (const slot of inventory.slots) {
         const inventorySlot = getElement({
             elementId: `${entityId}-inventory-slot-${inventory.slots.indexOf(slot)}`,
         });
-        inventorySlot.style.backgroundImage = `url(${getSpritePath(slot.item.sprite._image)})`;
+        inventorySlot.style.backgroundImage = `url(${getSpritePath({ spriteName: slot.item.sprite._image })})`;
 
         const inventorySlotAmount = checkElement({
             elementId: `${entityId}-inventory-slot-${inventory.slots.indexOf(slot)}-amount`,
@@ -97,31 +95,29 @@ export const updateInventory = ({ entityId, inventory }: {
                 entityId,
             });
 
-        inventorySlotAmount.textContent = `x${slot._amount.toString()}`;
+        inventorySlotAmount.innerText = `x${slot._amount.toString()}`;
     }
 };
 
-export const updateInventoryTools = ({ entityId, inventory }: {
-    entityId: string,
-    inventory: Inventory,
-}) => {
+export const updateInventoryTools = ({ entityId }: { entityId: string }) => {
+    const inventory = getComponent({ componentId: 'Inventory', entityId });
+
     clearInventoryTools({ entityId });
 
     const inventoryToolsFirstSlot = getElement({ elementId: `${entityId}-inventory-tools-slot-0` });
-    inventoryToolsFirstSlot.style.backgroundImage = `url(${getSpritePath('item_hand')})`;
+    inventoryToolsFirstSlot.style.backgroundImage = `url(${getSpritePath({ spriteName: 'item_hand' })})`;
 
     for (const tool of inventory.tools) {
         const inventoryToolSlotIndex = inventory.tools.indexOf(tool) + 1;
         const inventoryToolSlot
             = getElement({ elementId: `${entityId}-inventory-tools-slot-${inventoryToolSlotIndex}` });
-        inventoryToolSlot.style.backgroundImage = `url(${getSpritePath(tool.tool.item.sprite._image)})`;
+        inventoryToolSlot.style.backgroundImage = `url(${getSpritePath({ spriteName: tool.tool.item.sprite._image })})`;
     }
 };
 
-export const activateInventoryTool = ({ entityId, inventory }: {
-    entityId: string,
-    inventory: Inventory,
-}) => {
+export const activateInventoryTool = ({ entityId }: { entityId: string }) => {
+    const inventory = getComponent({ componentId: 'Inventory', entityId });
+
     clearInventoryToolsActive({ entityId });
 
     const tool = playerActiveTool({ playerEntityId: entityId });
@@ -139,8 +135,8 @@ export const activateInventoryTool = ({ entityId, inventory }: {
 
     const inventoryToolActive = getElement({ elementId: `${entityId}-inventory-tool-active` });
     inventoryToolActive.style.backgroundImage = (tool)
-        ? `url(${getSpritePath(tool.tool.item.sprite._image)})`
-        : `url(${getSpritePath('item_hand')})`;
+        ? `url(${getSpritePath({ spriteName: tool.tool.item.sprite._image })})`
+        : `url(${getSpritePath({ spriteName: 'item_hand' })})`;
 };
 
 export const displayInventoryToolActive = ({ entityId }: { entityId: string }) => {
@@ -158,7 +154,7 @@ const clearInventory = ({ entityId }: { entityId: string }) => {
 
         if (checkElement({ elementId: `${entityId}-inventory-slot-${i}-amount` })) {
             const inventorySlotAmount = getElement({ elementId: `${entityId}-inventory-slot-${i}-amount` });
-            inventorySlotAmount.textContent = '';
+            inventorySlotAmount.innerText = '';
         }
     }
 };

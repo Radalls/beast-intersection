@@ -1,0 +1,30 @@
+const state = {
+    isActivityBugCooldown: false,
+    isActivityBugRunning: false,
+    isActivityCraftPlaying: false,
+    isActivityCraftRunning: false,
+    isActivityCraftSelecting: false,
+    isActivityFishFrenzy: false,
+    isActivityFishRunning: false,
+    isActivityLose: false,
+    isActivityRunning: false,
+    isActivityWin: false,
+    isGameLaunching: false,
+    isGameLoading: false,
+    isGamePaused: false,
+    isGameRunning: false,
+    isGameSecretPathUnlocked: false,
+    isGameSecretSaveRunning: false,
+    isGameSecretSaveUnlocked: false,
+    isGameSecretSaveWin: false,
+    isGameSecretUnlocked: false,
+    isInputCooldown: false,
+    isPlayerDialogOpen: false,
+    isPlayerInventoryOpen: false,
+    isQuestActive: false,
+    isSettingAudioAllowed: false,
+    isSettingEditOpen: false,
+};
+
+export const setState = (key: keyof typeof state, value: boolean) => state[key] = value;
+export const getState = (key: keyof typeof state) => state[key];

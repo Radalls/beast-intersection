@@ -1,3 +1,4 @@
+import { isSecretSaveUnlocked, createSecretSave, isSecretUnlocked, checkSecretSave } from './manager.secret';
 import { getProjectVersion } from './manager.utils';
 
 import { Energy } from '@/engine/components/energy';
@@ -5,10 +6,10 @@ import { Inventory } from '@/engine/components/inventory';
 import { Manager } from '@/engine/components/manager';
 import { Position } from '@/engine/components/position';
 import { getComponent } from '@/engine/entities';
-import { EventTypes } from '@/engine/event';
 import { error } from '@/engine/services/error';
-import { getStore } from '@/engine/store';
-import { event } from '@/render/events';
+import { EventTypes } from '@/engine/services/event';
+import { getStore } from '@/engine/services/store';
+import { event as renderEvent } from '@/render/events';
 
 //#region TYPES
 export type SaveData = {
@@ -23,6 +24,11 @@ export type SaveData = {
 
 //#region DATA
 export const createSave = () => {
+    if (isSecretSaveUnlocked()) {
+        createSecretSave();
+        return;
+    }
+
     const managerEntityId = getStore('managerId')
         ?? error({ message: 'Store managerId is undefined', where: createSave.name });
 
@@ -52,11 +58,7 @@ export const createSave = () => {
 
     downloadSave({ saveData });
 
-    event({
-        data: { audioName: 'menu_settings_save' },
-        entityId: managerEntityId,
-        type: EventTypes.AUDIO_PLAY,
-    });
+    renderEvent({ data: { audioName: 'menu_settings_save' }, type: EventTypes.AUDIO_PLAY });
 };
 
 export const loadSave = (): Promise<SaveData> => {
@@ -81,13 +83,51 @@ export const loadSave = (): Promise<SaveData> => {
             const file = (event.target as HTMLInputElement).files?.[0];
             cleanup();
 
-            if (!file) {
+            if (!(file)) {
                 reject(error({
                     message: 'No file was selected.',
                     where: loadSave.name,
                 }));
 
                 return;
+            }
+            if (isSecretUnlocked()) {
+                if (!(checkSecretSave({ saveName: file.name }))) {
+                    renderEvent({
+                        data: { audioName: 'secret_start' },
+                        type: EventTypes.AUDIO_PLAY,
+                    });
+                    renderEvent({
+                        data: { message: 'There is no secrets here...' },
+                        type: EventTypes.MAIN_ERROR,
+                    });
+
+                    reject(error({
+                        message: 'There is no secrets here...',
+                        where: loadSave.name,
+                    }));
+
+                    return;
+                }
+            }
+            if (!(isSecretSaveUnlocked())) {
+                if (checkSecretSave({ saveName: file.name })) {
+                    renderEvent({
+                        data: { audioName: 'secret_start' },
+                        type: EventTypes.AUDIO_PLAY,
+                    });
+                    renderEvent({
+                        data: { message: 'You are not worthy of this secret...' },
+                        type: EventTypes.MAIN_ERROR,
+                    });
+
+                    reject(error({
+                        message: 'You are not worthy of this secret...',
+                        where: loadSave.name,
+                    }));
+
+                    return;
+                }
             }
 
             try {
@@ -108,14 +148,14 @@ export const loadSave = (): Promise<SaveData> => {
     });
 };
 
-const downloadSave = ({ saveData }: { saveData: SaveData }) => {
+export const downloadSave = ({ saveData, saveName }: { saveData: SaveData, saveName?: string }) => {
     const jsonData = JSON.stringify(saveData, null, 2);
     const blob = new Blob([jsonData], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
 
     a.href = url;
-    a.download = `save_${Date.now()}.json`;
+    a.download = saveName ?? `save_${Date.now()}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

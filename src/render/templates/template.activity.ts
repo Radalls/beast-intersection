@@ -4,33 +4,52 @@ import { createElement, destroyElement } from './template';
 import { getElement, checkElement, getSpritePath } from './template.utils';
 
 import {
-    Resource,
     ActivityBugData,
-    ActivityFishData,
     ActivityCraftData,
+    ActivityFishData,
     ActivityTypes,
 } from '@/engine/components/resource';
 import { getComponent } from '@/engine/entities';
 import { error } from '@/engine/services/error';
-import { getStore } from '@/engine/store';
+import { getStore } from '@/engine/services/store';
 
 //#region CONSTANTS
 //#endregion
 
+//#region HELPERS
+const checkActivityBugData = (data: any): data is ActivityBugData => data;
+const checkActivityFishData = (data: any): data is ActivityFishData => data;
+const checkActivityCraftData = (data: any): data is ActivityCraftData => data;
+//#endregion
+
 //#region TEMPLATES
 //#region MAIN ACTIVITY
-export const startActivity = ({ activityEntityId }: { activityEntityId: string }) => {
-    createElement({
+export const startActivity = () => {
+    const activityEntityId = getStore('activityId')
+        ?? error({ message: 'Store activityId is undefined', where: startActivity.name });
+
+    const activity = createElement({
         elementClass: 'activity',
         elementId: `${activityEntityId}-activity`,
         entityId: activityEntityId,
     });
+
+    const activityCancel = createElement({
+        elementAbsolute: false,
+        elementClass: 'activity-cancel',
+        elementId: `${activityEntityId}-activity-cancel`,
+        elementParent: activity,
+        entityId: activityEntityId,
+    });
+    activityCancel.innerText = '❌';
 };
 
-export const winActivity = ({ activityEntityId, resource }: {
-    activityEntityId: string,
-    resource: Resource,
-}) => {
+export const winActivity = () => {
+    const activityEntityId = getStore('activityId')
+        ?? error({ message: 'Store activityId is undefined', where: winActivity.name });
+
+    const resource = getComponent({ componentId: 'Resource', entityId: activityEntityId });
+
     const activity = getElement({ elementId: `${activityEntityId}-activity` });
     activity.style.visibility = 'hidden';
 
@@ -40,14 +59,40 @@ export const winActivity = ({ activityEntityId, resource }: {
         entityId: activityEntityId,
     });
 
-    activityWin.textContent = (resource._activityType === ActivityTypes.CRAFT)
+    activityWin.innerText = (resource._activityType === ActivityTypes.CRAFT)
         ? `You crafted a ${resource.item?.info._name} !`
         : `You caught a ${resource.item?.info._name} !`;
 };
 
-export const endActivity = ({ activityEntityId }: { activityEntityId: string }) => {
+export const loseActivity = () => {
+    const activityEntityId = getStore('activityId')
+        ?? error({ message: 'Store activityId is undefined', where: loseActivity.name });
+
+    const resource = getComponent({ componentId: 'Resource', entityId: activityEntityId });
+
+    const activity = getElement({ elementId: `${activityEntityId}-activity` });
+    activity.style.visibility = 'hidden';
+
+    const activityWin = createElement({
+        elementClass: 'activity-win',
+        elementId: `${activityEntityId}-activity-win`,
+        entityId: activityEntityId,
+    });
+
+    activityWin.innerText = (resource._activityType === ActivityTypes.CRAFT)
+        ? 'I give up...'
+        : 'It got away... ';
+};
+
+export const endActivity = () => {
+    const activityEntityId = getStore('activityId')
+        ?? error({ message: 'Store activityId is undefined', where: endActivity.name });
+
     destroyElement({ elementId: `${activityEntityId}-activity` });
 
+    if (checkElement({ elementId: `${activityEntityId}-activity-cancel` })) {
+        destroyElement({ elementId: `${activityEntityId}-activity-cancel` });
+    }
     if (checkElement({ elementId: `${activityEntityId}-activity-win` })) {
         destroyElement({ elementId: `${activityEntityId}-activity-win` });
     }
@@ -55,17 +100,17 @@ export const endActivity = ({ activityEntityId }: { activityEntityId: string }) 
 //#endregion
 
 //#region ACTIVITY BUG
-export const startActivityBug = ({ activityEntityId, activityBugData }: {
-    activityBugData: ActivityBugData,
-    activityEntityId: string
-}) => {
-    const activity = getElement({ elementId: `${activityEntityId}-activity` });
+export const startActivityBug = () => {
+    const activityEntityId = getStore('activityId')
+        ?? error({ message: 'Store activityId is undefined', where: startActivityBug.name });
+
+    const activityElement = getElement({ elementId: `${activityEntityId}-activity` });
 
     const activityBug = createElement({
         elementAbsolute: false,
         elementClass: 'activity-bug',
         elementId: `${activityEntityId}-activity-bug`,
-        elementParent: activity,
+        elementParent: activityElement,
         entityId: activityEntityId,
     });
 
@@ -117,35 +162,50 @@ export const startActivityBug = ({ activityEntityId, activityBugData }: {
         entityId: activityEntityId,
     });
 
-    updateActivityBug({ activityBugData, activityEntityId });
+    updateActivityBug();
 };
 
-export const updateActivityBug = ({ activityEntityId, activityBugData }: {
-    activityBugData: ActivityBugData,
-    activityEntityId: string
-}) => {
+export const updateActivityBug = () => {
+    const activityEntityId = getStore('activityId')
+        ?? error({ message: 'Store activityId is undefined', where: updateActivityBug.name });
+
+    const resource = getComponent({ componentId: 'Resource', entityId: activityEntityId });
+    if (!(checkActivityBugData(resource.activityData))) {
+        throw error({
+            message: 'Activity bug data is not defined',
+            where: updateActivityBug.name,
+        });
+    }
+    const activityBugData = resource.activityData;
+
     const activityBugScoreHp = getElement({ elementId: `${activityEntityId}-activity-bug-score-hp` });
-    activityBugScoreHp.textContent = `🦋❤️: ${activityBugData._hp}`;
+    activityBugScoreHp.innerText = `🦋❤️ ${activityBugData._hp}`;
 
     const activityBugScoreError = getElement({ elementId: `${activityEntityId}-activity-bug-score-error` });
-    activityBugScoreError.textContent = `❌: ${activityBugData._nbErrors}/${activityBugData._maxNbErrors}`;
+    activityBugScoreError.innerText = `💔 ${activityBugData._nbErrors}/${activityBugData._maxNbErrors}`;
 
     const activityBugSymbolValue = getElement({ elementId: `${activityEntityId}-activity-bug-symbol-value` });
-    activityBugSymbolValue.textContent = `Press: ${getActivityBugSymbol({ symbol: activityBugData._symbol }) ?? '...'}`;
+    activityBugSymbolValue.innerText = `Press ${getActivityBugSymbol({ symbol: activityBugData._symbol }) ?? '...'}`;
 
     const activityBugSymbolFound = getElement({ elementId: `${activityEntityId}-activity-bug-symbol-found` });
     if (activityBugData._symbolFound === undefined) {
-        activityBugSymbolFound.style.backgroundImage = `url(${getSpritePath('activity_bug_symbol_blank')})`;
+        activityBugSymbolFound.style.backgroundImage
+            = `url(${getSpritePath({ spriteName: 'activity_bug_symbol_blank' })})`;
     }
     else if (activityBugData._symbolFound === true) {
-        activityBugSymbolFound.style.backgroundImage = `url(${getSpritePath('activity_bug_symbol_found')})`;
+        activityBugSymbolFound.style.backgroundImage
+            = `url(${getSpritePath({ spriteName: 'activity_bug_symbol_found' })})`;
     }
     else if (activityBugData._symbolFound === false) {
-        activityBugSymbolFound.style.backgroundImage = `url(${getSpritePath('activity_bug_symbol_error')})`;
+        activityBugSymbolFound.style.backgroundImage
+            = `url(${getSpritePath({ spriteName: 'activity_bug_symbol_error' })})`;
     }
 };
 
-export const endActivityBug = ({ activityEntityId }: { activityEntityId: string }) => {
+export const endActivityBug = () => {
+    const activityEntityId = getStore('activityId')
+        ?? error({ message: 'Store activityId is undefined', where: endActivityBug.name });
+
     destroyElement({ elementId: `${activityEntityId}-activity-bug` });
 };
 
@@ -156,16 +216,16 @@ const getActivityBugSymbol = ({ symbol }: { symbol?: string }) => {
     const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
 
     if (symbol === manager.settings.keys.move._up) {
-        return '⬆';
+        return '🡅';
     }
     else if (symbol === manager.settings.keys.move._down) {
-        return '⬇';
+        return '🡇';
     }
     else if (symbol === manager.settings.keys.move._left) {
-        return '⬅';
+        return '🡄';
     }
     else if (symbol === manager.settings.keys.move._right) {
-        return '➡';
+        return '🡆';
     }
 
     return symbol;
@@ -173,10 +233,10 @@ const getActivityBugSymbol = ({ symbol }: { symbol?: string }) => {
 //#endregion
 
 //#region ACTIVITY FISH
-export const startActivityFish = ({ activityEntityId, activityFishData }: {
-    activityEntityId: string,
-    activityFishData: ActivityFishData,
-}) => {
+export const startActivityFish = () => {
+    const activityEntityId = getStore('activityId')
+        ?? error({ message: 'Store activityId is undefined', where: startActivityFish.name });
+
     const activity = getElement({ elementId: `${activityEntityId}-activity` });
 
     const activityFish = createElement({
@@ -210,7 +270,7 @@ export const startActivityFish = ({ activityEntityId, activityFishData }: {
         elementParent: activityFishHp,
         entityId: activityEntityId,
     });
-    activityFishHpLabel.textContent = '🐟❤️: ';
+    activityFishHpLabel.innerText = '🐟❤️ ';
 
     createElement({
         elementAbsolute: false,
@@ -235,13 +295,38 @@ export const startActivityFish = ({ activityEntityId, activityFishData }: {
         elementParent: activityFishRodTension,
         entityId: activityEntityId,
     });
-    activityFishRodTensionLabel.textContent = '🎣💀: ';
+    activityFishRodTensionLabel.innerText = '🎣💀 ';
 
     createElement({
         elementAbsolute: false,
         elementClass: 'activity-fish-rod-tension-value',
         elementId: `${activityEntityId}-activity-fish-rod-tension-value`,
         elementParent: activityFishRodTension,
+        entityId: activityEntityId,
+    });
+
+    const activityFishFrenzy = createElement({
+        elementAbsolute: false,
+        elementClass: 'activity-fish-frenzy',
+        elementId: `${activityEntityId}-activity-fish-frenzy`,
+        elementParent: activityFish,
+        entityId: activityEntityId,
+    });
+
+    // const activityFishFrenzyLabel = createElement({
+    //     elementAbsolute: false,
+    //     elementClass: 'activity-fish-frenzy-label',
+    //     elementId: `${activityEntityId}-activity-fish-frenzy-label`,
+    //     elementParent: activityFishFrenzy,
+    //     entityId: activityEntityId,
+    // });
+    // activityFishFrenzyLabel.innerText = 'Frenzy: ';
+
+    createElement({
+        elementAbsolute: false,
+        elementClass: 'activity-fish-frenzy-value',
+        elementId: `${activityEntityId}-activity-fish-frenzy-value`,
+        elementParent: activityFishFrenzy,
         entityId: activityEntityId,
     });
 
@@ -252,40 +337,24 @@ export const startActivityFish = ({ activityEntityId, activityFishData }: {
         elementParent: activityFish,
         entityId: activityEntityId,
     });
-    activityFishKey.textContent = 'Hold: 🖐';
+    activityFishKey.innerText = 'Hold 🖐';
 
-    const activityFishFrenzy = createElement({
-        elementAbsolute: false,
-        elementClass: 'activity-fish-frenzy',
-        elementId: `${activityEntityId}-activity-fish-frenzy`,
-        elementParent: activityFish,
-        entityId: activityEntityId,
-    });
-
-    const activityFishFrenzyLabel = createElement({
-        elementAbsolute: false,
-        elementClass: 'activity-fish-frenzy-label',
-        elementId: `${activityEntityId}-activity-fish-frenzy-label`,
-        elementParent: activityFishFrenzy,
-        entityId: activityEntityId,
-    });
-    activityFishFrenzyLabel.textContent = 'Frenzy: ';
-
-    createElement({
-        elementAbsolute: false,
-        elementClass: 'activity-fish-frenzy-value',
-        elementId: `${activityEntityId}-activity-fish-frenzy-value`,
-        elementParent: activityFishFrenzy,
-        entityId: activityEntityId,
-    });
-
-    updateActivityFish({ activityEntityId, activityFishData });
+    updateActivityFish();
 };
 
-export const updateActivityFish = ({ activityEntityId, activityFishData }: {
-    activityEntityId: string,
-    activityFishData: ActivityFishData,
-}) => {
+export const updateActivityFish = () => {
+    const activityEntityId = getStore('activityId')
+        ?? error({ message: 'Store activityId is undefined', where: updateActivityFish.name });
+
+    const resource = getComponent({ componentId: 'Resource', entityId: activityEntityId });
+    if (!(checkActivityFishData(resource.activityData))) {
+        throw error({
+            message: 'Activity fish data is undefined',
+            where: updateActivityFish.name,
+        });
+    }
+    const activityFishData = resource.activityData;
+
     const activityFishHpValue =
         getElement({ elementId: `${activityEntityId}-activity-fish-hp-value` });
     activityFishHpValue.innerHTML =
@@ -298,17 +367,23 @@ export const updateActivityFish = ({ activityEntityId, activityFishData }: {
 
     const activityFishFrenzyValue = getElement({ elementId: `${activityEntityId}-activity-fish-frenzy-value` });
     activityFishFrenzyValue.style.backgroundImage = (activityFishData._isFrenzy)
-        ? `url(${getSpritePath('activity_fish_frenzy_on')})`
-        : `url(${getSpritePath('activity_fish_frenzy_off')})`;
+        ? `url(${getSpritePath({ spriteName: 'activity_fish_frenzy_on' })})`
+        : `url(${getSpritePath({ spriteName: 'activity_fish_frenzy_off' })})`;
 };
 
-export const endActivityFish = ({ activityEntityId }: { activityEntityId: string }) => {
+export const endActivityFish = () => {
+    const activityEntityId = getStore('activityId')
+        ?? error({ message: 'Store activityId is undefined', where: endActivityFish.name });
+
     destroyElement({ elementId: `${activityEntityId}-activity-fish` });
 };
 //#endregion
 
 //#region ACTIVITY CRAFT
-export const startActivityCraft = ({ activityEntityId }: { activityEntityId: string }) => {
+export const startActivityCraft = () => {
+    const activityEntityId = getStore('activityId')
+        ?? error({ message: 'Store activityId is undefined', where: startActivityCraft.name });
+
     const activity = getElement({ elementId: `${activityEntityId}-activity` });
 
     createElement({
@@ -320,10 +395,10 @@ export const startActivityCraft = ({ activityEntityId }: { activityEntityId: str
     });
 };
 
-export const startSelectActivityCraft = ({ activityEntityId, activityCraftData }: {
-    activityCraftData: ActivityCraftData,
-    activityEntityId: string
-}) => {
+export const startSelectActivityCraft = () => {
+    const activityEntityId = getStore('activityId')
+        ?? error({ message: 'Store activityId is undefined', where: startSelectActivityCraft.name });
+
     const activityCraft = getElement({ elementId: `${activityEntityId}-activity-craft` });
 
     const activityCraftRecipes = createElement({
@@ -350,8 +425,8 @@ export const startSelectActivityCraft = ({ activityEntityId, activityCraftData }
             elementParent: activityCraftRecipe,
             entityId: activityEntityId,
         });
-        activityCraftRecipeIcon.style.backgroundImage =
-            `url(${getSpritePath(`item_${itemRecipes[i].name.toLowerCase()}`)})`;
+        activityCraftRecipeIcon.style.backgroundImage
+            = `url(${getSpritePath({ spriteName: `item_${itemRecipes[i].name.toLowerCase()}` })})`;
 
         const activityCraftRecipeName = createElement({
             elementAbsolute: false,
@@ -360,7 +435,7 @@ export const startSelectActivityCraft = ({ activityEntityId, activityCraftData }
             elementParent: activityCraftRecipe,
             entityId: activityEntityId,
         });
-        activityCraftRecipeName.textContent = itemRecipes[i].name;
+        activityCraftRecipeName.innerText = itemRecipes[i].name;
 
         const activityCraftRecipeIngredients = createElement({
             elementAbsolute: false,
@@ -386,8 +461,8 @@ export const startSelectActivityCraft = ({ activityEntityId, activityCraftData }
                 elementParent: activityCraftRecipeIngredient,
                 entityId: activityEntityId,
             });
-            activityCraftRecipeIngredientIcon.style.backgroundImage =
-                `url(${getSpritePath(`item_${itemRecipes[i].ingredients[j].name.toLowerCase()}`)})`;
+            activityCraftRecipeIngredientIcon.style.backgroundImage
+                = `url(${getSpritePath({ spriteName: `item_${itemRecipes[i].ingredients[j].name.toLowerCase()}` })})`;
 
             const activityCraftRecipeIngredientName = createElement({
                 elementAbsolute: false,
@@ -396,7 +471,7 @@ export const startSelectActivityCraft = ({ activityEntityId, activityCraftData }
                 elementParent: activityCraftRecipeIngredient,
                 entityId: activityEntityId,
             });
-            activityCraftRecipeIngredientName.textContent = itemRecipes[i].ingredients[j].name;
+            activityCraftRecipeIngredientName.innerText = itemRecipes[i].ingredients[j].name;
 
             const activityCraftRecipeIngredientAmount = createElement({
                 elementAbsolute: false,
@@ -405,17 +480,26 @@ export const startSelectActivityCraft = ({ activityEntityId, activityCraftData }
                 elementParent: activityCraftRecipeIngredient,
                 entityId: activityEntityId,
             });
-            activityCraftRecipeIngredientAmount.textContent = `x${itemRecipes[i].ingredients[j].amount}`;
+            activityCraftRecipeIngredientAmount.innerText = `x${itemRecipes[i].ingredients[j].amount}`;
         }
     }
 
-    updateSelectActivityCraft({ activityCraftData, activityEntityId });
+    updateSelectActivityCraft();
 };
 
-export const updateSelectActivityCraft = ({ activityEntityId, activityCraftData }: {
-    activityCraftData: ActivityCraftData,
-    activityEntityId: string
-}) => {
+export const updateSelectActivityCraft = () => {
+    const activityEntityId = getStore('activityId')
+        ?? error({ message: 'Store activityId is undefined', where: updateSelectActivityCraft.name });
+
+    const resource = getComponent({ componentId: 'Resource', entityId: activityEntityId });
+    if (!(checkActivityCraftData(resource.activityData))) {
+        throw error({
+            message: 'Activity craft data is undefined',
+            where: updateSelectActivityCraft.name,
+        });
+    }
+    const activityCraftData = resource.activityData;
+
     const activityCraftRecipes = getElement({ elementId: `${activityEntityId}-activity-craft-recipes` });
 
     for (let i = 0; i < activityCraftRecipes.children.length; i++) {
@@ -428,14 +512,17 @@ export const updateSelectActivityCraft = ({ activityEntityId, activityCraftData 
     selectedActivityCraftRecipe.style.border = 'solid 4px red';
 };
 
-export const endSelectActivityCraft = ({ activityEntityId }: { activityEntityId: string }) => {
+export const endSelectActivityCraft = () => {
+    const activityEntityId = getStore('activityId')
+        ?? error({ message: 'Store activityId is undefined', where: endSelectActivityCraft.name });
+
     destroyElement({ elementId: `${activityEntityId}-activity-craft-recipes` });
 };
 
-export const startPlayActivityCraft = ({ activityEntityId, activityCraftData }: {
-    activityCraftData: ActivityCraftData,
-    activityEntityId: string
-}) => {
+export const startPlayActivityCraft = () => {
+    const activityEntityId = getStore('activityId')
+        ?? error({ message: 'Store activityId is undefined', where: startPlayActivityCraft.name });
+
     const activityCraft = getElement({ elementId: `${activityEntityId}-activity-craft` });
 
     const activityCraftProgress = createElement({
@@ -453,7 +540,7 @@ export const startPlayActivityCraft = ({ activityEntityId, activityCraftData }: 
         elementParent: activityCraftProgress,
         entityId: activityEntityId,
     });
-    activityCraftProgressLabel.textContent = 'Craft: ';
+    activityCraftProgressLabel.innerText = 'Craft ';
 
     createElement({
         elementAbsolute: false,
@@ -470,26 +557,41 @@ export const startPlayActivityCraft = ({ activityEntityId, activityCraftData }: 
         elementParent: activityCraft,
         entityId: activityEntityId,
     });
-    activityCraftKey.innerText = 'Press: 🖐';
+    activityCraftKey.innerText = 'Press 🖐';
 
-    updatePlayActivityCraft({ activityCraftData, activityEntityId });
+    updatePlayActivityCraft();
 };
 
-export const updatePlayActivityCraft = ({ activityEntityId, activityCraftData }: {
-    activityCraftData: ActivityCraftData,
-    activityEntityId: string
-}) => {
+export const updatePlayActivityCraft = () => {
+    const activityEntityId = getStore('activityId')
+        ?? error({ message: 'Store activityId is undefined', where: updatePlayActivityCraft.name });
+
+    const resource = getComponent({ componentId: 'Resource', entityId: activityEntityId });
+    if (!(checkActivityCraftData(resource.activityData))) {
+        throw error({
+            message: 'Activity craft data is undefined',
+            where: updatePlayActivityCraft.name,
+        });
+    }
+    const activityCraftData = resource.activityData;
+
     const activityCraftProgressValue =
         getElement({ elementId: `${activityEntityId}-activity-craft-progress-value` });
     activityCraftProgressValue.innerHTML =
         `<progress value="${activityCraftData._hitCount}" max="${10}"></progress>`;
 };
 
-export const endPlayActivityCraft = ({ activityEntityId }: { activityEntityId: string }) => {
+export const endPlayActivityCraft = () => {
+    const activityEntityId = getStore('activityId')
+        ?? error({ message: 'Store activityId is undefined', where: endPlayActivityCraft.name });
+
     destroyElement({ elementId: `${activityEntityId}-activity-craft-progress` });
 };
 
-export const endActivityCraft = ({ activityEntityId }: { activityEntityId: string }) => {
+export const endActivityCraft = () => {
+    const activityEntityId = getStore('activityId')
+        ?? error({ message: 'Store activityId is undefined', where: endActivityCraft.name });
+
     destroyElement({ elementId: `${activityEntityId}-activity-craft` });
 };
 //#endregion

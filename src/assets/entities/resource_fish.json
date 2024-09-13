@@ -10,5 +10,17 @@
             "frenzyInterval": 9
         },
         "priority": 1
+    },
+    {
+        "type": "ResourceFish",
+        "name": "SecretBoss",
+        "data": {
+            "isTemporary": false,
+            "damage": 4,
+            "maxHp": 500,
+            "frenzyDuration": 3,
+            "frenzyInterval": 3
+        },
+        "priority": 1
     }
 ]

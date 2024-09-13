@@ -2,9 +2,9 @@ import { Entity, EntityTypes } from './entity';
 import { generateEntityId, getEntity } from './entity.utils';
 
 import { Component } from '@/engine/components/@component';
-import { EventTypes } from '@/engine/event';
 import { error } from '@/engine/services/error';
-import { setStore } from '@/engine/store';
+import { EventTypes } from '@/engine/services/event';
+import { setStore } from '@/engine/services/store';
 import { setEntityActive } from '@/engine/systems/state';
 import { event } from '@/render/events';
 
@@ -35,10 +35,7 @@ export const createEntity = ({ entityName }: { entityName: string }) => {
         setStore('managerId', entityId);
     }
 
-    event({
-        entityId,
-        type: EventTypes.ENTITY_CREATE,
-    });
+    event({ entityId, type: EventTypes.ENTITY_CREATE });
 
     return entityId;
 };
@@ -75,10 +72,7 @@ export const destroyEntity = ({ entityId }: {
 }) => {
     delete entities[entityId];
 
-    event({
-        entityId,
-        type: EventTypes.ENTITY_DESTROY,
-    });
+    event({ entityId, type: EventTypes.ENTITY_DESTROY });
 };
 
 export const destroyAllEntities = ({ force }: { force?: boolean }) => {

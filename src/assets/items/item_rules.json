@@ -8,5 +8,6 @@
     { "id": 7, "name": "Bug2", "maxAmount": 1 },
     { "id": 8, "name": "Fish1", "maxAmount": 1 },
     { "id": 9, "name": "FishRod1", "maxAmount": 1, "tool": "FISH" },
-    { "id": 10, "name": "BugNet1", "maxAmount": 1, "tool": "BUG" }
+    { "id": 10, "name": "BugNet1", "maxAmount": 1, "tool": "BUG" },
+    { "id": 901, "name": "FishRodSecret", "maxAmount": 1, "tool": "FISH" }
 ]

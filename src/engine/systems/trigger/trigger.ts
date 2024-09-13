@@ -1,7 +1,9 @@
-import { getComponent } from '@/engine/entities';
+import { checkComponent, getComponent } from '@/engine/entities';
 import { error } from '@/engine/services/error';
-import { getStore } from '@/engine/store';
-import { findTileByPosition } from '@/engine/systems/tilemap';
+import { getStore } from '@/engine/services/store';
+import { startDialog } from '@/engine/systems/dialog';
+import { useResource } from '@/engine/systems/resource';
+import { findTileByPosition } from '@/engine/systems/tilemap/tilemap.utils';
 
 //#region HELPERS
 const sortTriggersByPriority = ({ triggerEntityIds }: { triggerEntityIds: string[] }) =>
@@ -70,4 +72,24 @@ export const destroyTrigger = ({ entityId }: { entityId: string }) => {
         }
     }
 };
-//#endregion ACTIONS
+
+export const onTrigger = ({ entityId, triggeredEntityId }: {
+    entityId?: string | null,
+    triggeredEntityId: string,
+}) => {
+    if (!(entityId)) entityId = getStore('playerId')
+        ?? error({ message: 'Store playerId is undefined ', where: onTrigger.name });
+
+    const resource = checkComponent({ componentId: 'Resource', entityId: triggeredEntityId });
+    if (resource) {
+        useResource({ resourceEntityId: triggeredEntityId });
+        return;
+    }
+
+    const dialog = checkComponent({ componentId: 'Dialog', entityId: triggeredEntityId });
+    if (dialog) {
+        startDialog({ entityId: triggeredEntityId });
+        return;
+    }
+};
+//#endregion

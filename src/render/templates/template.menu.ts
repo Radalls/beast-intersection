@@ -1,7 +1,13 @@
 import { createElement } from './template';
-import { getElement, searchElementsByClassName, searchElementById as searchElementsById } from './template.utils';
+import {
+    getElement,
+    searchElementsByClassName,
+    searchElementsById,
+} from './template.utils';
 
-import { Manager } from '@/engine/components/manager';
+import { getComponent } from '@/engine/entities';
+import { error } from '@/engine/services/error';
+import { getStore } from '@/engine/services/store';
 import { getProjectVersion, SETTINGS, SETTINGS_KEYS_PATHS } from '@/engine/systems/manager';
 
 //#region HELPERS
@@ -15,45 +21,11 @@ const getSettingName = ({ settingId }: { settingId: string }) => {
 //#endregion
 
 //#region TEMPLATES
-//#region LOADING MENU
-export const createLoadingMenu = () => {
-    const loading = createElement({
-        elementClass: 'loading',
-        elementId: 'LoadingMenu',
-        entityId: '',
-    });
-
-    createElement({
-        elementAbsolute: false,
-        elementClass: 'loader',
-        elementId: 'LoadingLoader',
-        elementParent: loading,
-        entityId: '',
-    });
-};
-
-export const displayLoadingMenu = ({ display }: { display: boolean }) => {
-    const entityLoading = getElement({ elementId: 'LoadingMenu' });
-
-    if (display) {
-        entityLoading.style.display = 'flex';
-    }
-    else {
-        // setTimeout(() => {
-        //     entityLoading.style.display = 'none';
-        // }, 100);
-
-        entityLoading.style.display = 'none';
-    }
-};
-//#endregion
-
 //#region LAUNCH MENU
 export const createLaunchMenu = () => {
     const launch = createElement({
         elementClass: 'launch',
         elementId: 'LaunchMenu',
-        entityId: '',
     });
 
     const launchTitle = createElement({
@@ -61,7 +33,6 @@ export const createLaunchMenu = () => {
         elementClass: 'launch-title',
         elementId: 'LaunchMenuTitle',
         elementParent: launch,
-        entityId: '',
     });
     launchTitle.innerText = 'BEAST INTERSECTION';
 
@@ -71,7 +42,6 @@ export const createLaunchMenu = () => {
         elementClass: 'launch-option',
         elementId: 'LaunchMenuStart',
         elementParent: launch,
-        entityId: '',
     });
     launchStart.innerText = 'START';
 
@@ -80,7 +50,6 @@ export const createLaunchMenu = () => {
         elementClass: 'launch-option',
         elementId: 'LaunchMenuLoad',
         elementParent: launch,
-        entityId: '',
     });
     launchLoad.innerText = 'LOAD';
 
@@ -89,7 +58,6 @@ export const createLaunchMenu = () => {
         elementClass: 'launch-option',
         elementId: 'LaunchMenuSettings',
         elementParent: launch,
-        entityId: '',
     });
     launchSettings.innerText = 'SETTINGS';
 
@@ -97,69 +65,8 @@ export const createLaunchMenu = () => {
     const launchVersion = createElement({
         elementClass: 'launch-version',
         elementId: 'LaunchMenuVersion',
-        entityId: '',
     });
     launchVersion.innerText = `v${getProjectVersion()}`;
-
-    // /* Keys */
-    // const launchKeys = createElement({
-    //     elementClass: 'launch-keys',
-    //     elementId: 'LaunchMenuKeys',
-    //     entityId: '',
-    // });
-
-    // /* Settings */
-    // const settingsKey = createElement({
-    //     elementAbsolute: false,
-    //     elementClass: 'launch-key',
-    //     elementId: 'LaunchMenuSettingKey',
-    //     elementParent: launchKeys,
-    //     entityId: '',
-    // });
-
-    // const settingsKeyIcon = createElement({
-    //     elementAbsolute: false,
-    //     elementClass: 'launch-key-icon',
-    //     elementId: 'LaunchMenuSettingKeyIcon',
-    //     elementParent: settingsKey,
-    //     entityId: '',
-    // });
-    // settingsKeyIcon.innerText = '⚙';
-
-    // const settingsKeyValue = createElement({
-    //     elementAbsolute: false,
-    //     elementClass: 'launch-key-value',
-    //     elementId: 'LaunchMenuSettingsKeyValue',
-    //     elementParent: settingsKey,
-    //     entityId: '',
-    // });
-    // settingsKeyValue.innerText = 'ESC';
-
-    // /* Act */
-    // const actKey = createElement({
-    //     elementAbsolute: false,
-    //     elementClass: 'launch-key',
-    //     elementId: 'LaunchMenuActKey',
-    //     elementParent: launchKeys,
-    //     entityId: '',
-    // });
-
-    // const actKeyIcon = createElement({
-    //     elementAbsolute: false,
-    //     elementClass: 'launch-key-icon',
-    //     elementId: 'LaunchMenuActKeyIcon',
-    //     elementParent: actKey,
-    //     entityId: '',
-    // });
-    // actKeyIcon.innerText = '🖐';
-
-    // createElement({
-    //     elementAbsolute: false,
-    //     elementClass: 'launch-key-value',
-    //     elementId: 'LaunchMenuActKeyValue',
-    //     elementParent: actKey,
-    //     entityId: '',
-    // });
 };
 
 export const displayLaunchMenu = () => {
@@ -168,21 +75,20 @@ export const displayLaunchMenu = () => {
 
     const launchVersion = getElement({ elementId: 'LaunchMenuVersion' });
     launchVersion.style.display = (launchVersion.style.display === 'flex') ? 'none' : 'flex';
-
-    // const launchKeys = getElement({ elementId: 'LaunchMenuKeys' });
-    // launchKeys.style.display = (launchKeys.style.display === 'flex') ? 'none' : 'flex';
 };
 
-export const updateLaunchMenu = ({ manager }: { manager: Manager }) => {
+export const updateLaunchMenu = () => {
+    const managerEntityId = getStore('managerId')
+        ?? error({ message: 'Store managerId is undefined', where: updateLaunchMenu.name });
+
+    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
+
     const launchOptions = searchElementsByClassName({ className: 'launch-option' });
     for (const launchOption of launchOptions) {
         launchOption.style.border = '5px solid rgb(180, 180, 180)';
     }
 
     launchOptions[manager._selectedLaunchOption].style.border = '5px solid rgb(255, 0, 0)';
-
-    // const keyActValue = getElement({ elementId: 'LaunchMenuActKeyValue' });
-    // keyActValue.innerText = manager.settings.keys.action._act.toUpperCase();
 };
 //#endregion
 
@@ -191,21 +97,18 @@ export const createSettingsMenu = () => {
     const settings = createElement({
         elementClass: 'settings',
         elementId: 'SettingsMenu',
-        entityId: '',
     });
 
     const edit = createElement({
         elementClass: 'settings-edit',
         elementId: 'SettingsMenuEdit',
-        entityId: '',
     });
-    edit.innerText = 'ENTER NEW KEY';
+    edit.innerText = 'ENTER A NEW KEY';
 
     /* System */
     const systemSettings = createElement({
         elementClass: 'settings-system',
         elementId: 'SettingsMenuSystem',
-        entityId: '',
     });
 
     /* Back */
@@ -214,7 +117,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting',
         elementId: 'SettingsMenuBackSetting',
         elementParent: systemSettings,
-        entityId: '',
     });
 
     const backSettingIcon = createElement({
@@ -222,7 +124,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting-icon',
         elementId: 'SettingsMenuBackSettingIcon',
         elementParent: backSetting,
-        entityId: '',
     });
     backSettingIcon.innerText = '❌';
 
@@ -231,7 +132,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting-value',
         elementId: 'SettingsMenuBackSettingValue',
         elementParent: backSetting,
-        entityId: '',
     });
     backSettingValue.innerText = 'ESC';
 
@@ -241,7 +141,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting',
         elementId: 'SettingsMenuQuitSetting',
         elementParent: systemSettings,
-        entityId: '',
     });
 
     const quitSettingIcon = createElement({
@@ -249,7 +148,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting-icon',
         elementId: 'SettingsMenuQuitSettingIcon',
         elementParent: quitSetting,
-        entityId: '',
     });
     quitSettingIcon.innerText = '🏠';
 
@@ -258,7 +156,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting-value',
         elementId: 'SettingsMenuQuitSettingValue',
         elementParent: quitSetting,
-        entityId: '',
     });
     quitSettingValue.innerText = 'SHIFT';
 
@@ -268,7 +165,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting',
         elementId: 'SettingsMenuSaveSetting',
         elementParent: systemSettings,
-        entityId: '',
     });
 
     const saveSettingIcon = createElement({
@@ -276,7 +172,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting-icon',
         elementId: 'SettingsMenuSaveSettingIcon',
         elementParent: saveSetting,
-        entityId: '',
     });
     saveSettingIcon.innerText = '💾';
 
@@ -285,7 +180,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting-value',
         elementId: 'SettingsMenuSaveSettingValue',
         elementParent: saveSetting,
-        entityId: '',
     });
     saveSettingValue.innerText = 'CTRL';
 
@@ -295,7 +189,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting-header',
         elementId: 'SettingsMenuGeneral',
         elementParent: settings,
-        entityId: '',
     });
     generalSettings.innerText = 'GENERAL';
 
@@ -305,7 +198,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting-container',
         elementId: 'SettingsMenuAudioContainer',
         elementParent: settings,
-        entityId: '',
     });
 
     const audioLabel = createElement({
@@ -313,7 +205,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting-label',
         elementId: 'SettingsMenuAudioLabel',
         elementParent: audioContainer,
-        entityId: '',
     });
     audioLabel.innerText = 'AUDIO: ';
 
@@ -322,7 +213,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting',
         elementId: 'SettingsMenuAudioSetting',
         elementParent: audioContainer,
-        entityId: '',
     });
 
     const audioSettingIcon = createElement({
@@ -330,7 +220,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting-icon',
         elementId: 'SettingsMenuAudioSettingIcon',
         elementParent: audioSetting,
-        entityId: '',
     });
     audioSettingIcon.innerText = '🎵';
 
@@ -339,7 +228,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting-value',
         elementId: 'SettingsMenuAudioSettingValue',
         elementParent: audioSetting,
-        entityId: '',
     });
 
     /* Keybinds */
@@ -348,7 +236,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting-header',
         elementId: 'SettingsMenuKeybinds',
         elementParent: settings,
-        entityId: '',
     });
     keybindsSettings.innerText = 'KEYBINDS';
 
@@ -358,7 +245,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting-container',
         elementId: 'SettingsMenuKeyMoveUpContainer',
         elementParent: settings,
-        entityId: '',
     });
 
     const moveUpLabel = createElement({
@@ -366,7 +252,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting-label',
         elementId: 'SettingsMenuKeyMoveUpLabel',
         elementParent: moveUpContainer,
-        entityId: '',
     });
     moveUpLabel.innerText = 'UP: ';
 
@@ -375,7 +260,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting',
         elementId: 'SettingsMenuKeyMoveUpSetting',
         elementParent: moveUpContainer,
-        entityId: '',
     });
 
     const moveUpSettingIcon = createElement({
@@ -383,16 +267,14 @@ export const createSettingsMenu = () => {
         elementClass: 'setting-icon',
         elementId: 'SettingsMenuKeyMoveUpSettingIcon',
         elementParent: moveUpSetting,
-        entityId: '',
     });
-    moveUpSettingIcon.innerText = '⬆';
+    moveUpSettingIcon.innerText = '🡅';
 
     createElement({
         elementAbsolute: false,
         elementClass: 'setting-value',
         elementId: 'SettingsMenuKeyMoveUpSettingValue',
         elementParent: moveUpSetting,
-        entityId: '',
     });
 
     /* Move DOWN */
@@ -401,7 +283,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting-container',
         elementId: 'SettingsMenuKeyMoveDownContainer',
         elementParent: settings,
-        entityId: '',
     });
 
     const moveDownLabel = createElement({
@@ -409,7 +290,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting-label',
         elementId: 'SettingsMenuKeyMoveDownLabel',
         elementParent: moveDownContainer,
-        entityId: '',
     });
     moveDownLabel.innerText = 'DOWN: ';
 
@@ -418,7 +298,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting',
         elementId: 'SettingsMenuKeyMoveDownSetting',
         elementParent: moveDownContainer,
-        entityId: '',
     });
 
     const moveDownSettingIcon = createElement({
@@ -426,16 +305,14 @@ export const createSettingsMenu = () => {
         elementClass: 'setting-icon',
         elementId: 'SettingsMenuKeyMoveDownSettingIcon',
         elementParent: moveDownSetting,
-        entityId: '',
     });
-    moveDownSettingIcon.innerText = '⬇';
+    moveDownSettingIcon.innerText = '🡇';
 
     createElement({
         elementAbsolute: false,
         elementClass: 'setting-value',
         elementId: 'SettingsMenuKeyMoveDownSettingValue',
         elementParent: moveDownSetting,
-        entityId: '',
     });
 
     /* Move LEFT */
@@ -444,7 +321,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting-container',
         elementId: 'SettingsMenuKeyMoveLeftContainer',
         elementParent: settings,
-        entityId: '',
     });
 
     const moveLeftLabel = createElement({
@@ -452,7 +328,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting-label',
         elementId: 'SettingsMenuKeyMoveLeftLabel',
         elementParent: moveLeftContainer,
-        entityId: '',
     });
     moveLeftLabel.innerText = 'LEFT: ';
 
@@ -461,7 +336,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting',
         elementId: 'SettingsMenuKeyMoveLeftSetting',
         elementParent: moveLeftContainer,
-        entityId: '',
     });
 
     const moveLeftSettingIcon = createElement({
@@ -469,16 +343,14 @@ export const createSettingsMenu = () => {
         elementClass: 'setting-icon',
         elementId: 'SettingsMenuKeyMoveLeftSettingIcon',
         elementParent: moveLeftSetting,
-        entityId: '',
     });
-    moveLeftSettingIcon.innerText = '⬅';
+    moveLeftSettingIcon.innerText = '🡄';
 
     createElement({
         elementAbsolute: false,
         elementClass: 'setting-value',
         elementId: 'SettingsMenuKeyMoveLeftSettingValue',
         elementParent: moveLeftSetting,
-        entityId: '',
     });
 
     /* Move RIGHT */
@@ -487,7 +359,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting-container',
         elementId: 'SettingsMenuKeyMoveRightContainer',
         elementParent: settings,
-        entityId: '',
     });
 
     const moveRightLabel = createElement({
@@ -495,7 +366,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting-label',
         elementId: 'SettingsMenuKeyMoveRightLabel',
         elementParent: moveRightContainer,
-        entityId: '',
     });
     moveRightLabel.innerText = 'RIGHT: ';
 
@@ -504,7 +374,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting',
         elementId: 'SettingsMenuKeyMoveRightSetting',
         elementParent: moveRightContainer,
-        entityId: '',
     });
 
     const moveRightSettingIcon = createElement({
@@ -512,16 +381,14 @@ export const createSettingsMenu = () => {
         elementClass: 'setting-icon',
         elementId: 'SettingsMenuKeyMoveRightSettingIcon',
         elementParent: moveRightSetting,
-        entityId: '',
     });
-    moveRightSettingIcon.innerText = '➡️';
+    moveRightSettingIcon.innerText = '🡆';
 
     createElement({
         elementAbsolute: false,
         elementClass: 'setting-value',
         elementId: 'SettingsMenuKeyMoveRightSettingValue',
         elementParent: moveRightSetting,
-        entityId: '',
     });
 
     /* Action ACT */
@@ -530,7 +397,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting-container',
         elementId: 'SettingsMenuKeyActionActContainer',
         elementParent: settings,
-        entityId: '',
     });
 
     const actLabel = createElement({
@@ -538,7 +404,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting-label',
         elementId: 'SettingsMenuKeyActionActLabel',
         elementParent: actContainer,
-        entityId: '',
     });
     actLabel.innerText = 'ACT/SELECT: ';
 
@@ -547,7 +412,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting',
         elementId: 'SettingsMenuKeyActionActSetting',
         elementParent: actContainer,
-        entityId: '',
     });
 
     const actSettingIcon = createElement({
@@ -555,7 +419,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting-icon',
         elementId: 'SettingsMenuKeyActionActSettingIcon',
         elementParent: actSetting,
-        entityId: '',
     });
     actSettingIcon.innerText = '🖐';
 
@@ -564,7 +427,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting-value',
         elementId: 'SettingsMenuKeyActionActSettingValue',
         elementParent: actSetting,
-        entityId: '',
     });
 
     /* Action INVENTORY */
@@ -573,7 +435,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting-container',
         elementId: 'SettingsMenuKeyActionInventoryContainer',
         elementParent: settings,
-        entityId: '',
     });
 
     const inventoryLabel = createElement({
@@ -581,7 +442,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting-label',
         elementId: 'SettingsMenuKeyActionInventoryLabel',
         elementParent: inventoryContainer,
-        entityId: '',
     });
     inventoryLabel.innerText = 'INVENTORY: ';
 
@@ -590,7 +450,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting',
         elementId: 'SettingsMenuKeyActionInventorySetting',
         elementParent: inventoryContainer,
-        entityId: '',
     });
 
     const inventorySettingIcon = createElement({
@@ -598,7 +457,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting-icon',
         elementId: 'SettingsMenuKeyActionInventorySettingIcon',
         elementParent: inventorySetting,
-        entityId: '',
     });
     inventorySettingIcon.innerText = '🎒';
 
@@ -607,7 +465,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting-value',
         elementId: 'SettingsMenuKeyActionInventorySettingValue',
         elementParent: inventorySetting,
-        entityId: '',
     });
 
     /* Action TOOL */
@@ -616,7 +473,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting-container',
         elementId: 'SettingsMenuKeyActionToolContainer',
         elementParent: settings,
-        entityId: '',
     });
 
     const toolLabel = createElement({
@@ -624,7 +480,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting-label',
         elementId: 'SettingsMenuKeyActionToolLabel',
         elementParent: toolContainer,
-        entityId: '',
     });
     toolLabel.innerText = 'TOOL: ';
 
@@ -633,7 +488,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting',
         elementId: 'SettingsMenuKeyActionToolSetting',
         elementParent: toolContainer,
-        entityId: '',
     });
 
     const toolSettingIcon = createElement({
@@ -641,7 +495,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting-icon',
         elementId: 'SettingsMenuKeyActionToolSettingIcon',
         elementParent: toolSetting,
-        entityId: '',
     });
     toolSettingIcon.innerText = '🎣';
 
@@ -650,7 +503,6 @@ export const createSettingsMenu = () => {
         elementClass: 'setting-value',
         elementId: 'SettingsMenuKeyActionToolSettingValue',
         elementParent: toolSetting,
-        entityId: '',
     });
 };
 
@@ -662,7 +514,12 @@ export const displaySettingsMenu = () => {
     systemSettings.style.display = (systemSettings.style.display === 'flex') ? 'none' : 'flex';
 };
 
-export const updateSettingsMenu = ({ manager }: { manager: Manager }) => {
+export const updateSettingsMenu = () => {
+    const managerEntityId = getStore('managerId')
+        ?? error({ message: 'Store managerId is not defined', where: updateSettingsMenu.name });
+
+    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
+
     const containers = searchElementsByClassName({ className: 'setting-container' });
     for (const container of containers) {
         container.style.borderLeft = '5px solid rgb(180, 180, 180)';

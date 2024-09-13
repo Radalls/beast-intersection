@@ -1,22 +1,9 @@
-import { Energy } from '@/engine/components/energy';
 import { createEnergy, displayEnergy, updateEnergy } from '@/render/templates';
 
 //#region EVENTS
-export const onEnergyCreate = ({ energy, entityId }: {
-    energy: Energy,
-    entityId: string
-}) => {
-    createEnergy({ energy, entityId });
-};
+export const onEnergyCreate = ({ entityId }: { entityId: string }) => createEnergy({ entityId });
 
-export const onEnergyDisplay = ({ entityId }: { entityId: string }) => {
-    displayEnergy({ entityId });
-};
+export const onEnergyDisplay = ({ entityId }: { entityId: string }) => displayEnergy({ entityId });
 
-export const onEnergyUpdate = ({ energy, entityId }: {
-    energy: Energy,
-    entityId: string
-}) => {
-    updateEnergy({ energy, entityId });
-};
+export const onEnergyUpdate = ({ entityId }: { entityId: string }) => updateEnergy({ entityId });
 //#endregion

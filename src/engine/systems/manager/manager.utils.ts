@@ -1,10 +1,10 @@
 import pkg from '../../../../package.json';
 
 import { getComponent } from '@/engine/entities';
-import { EventTypes } from '@/engine/event';
 import { error } from '@/engine/services/error';
-import { setState, getState } from '@/engine/state';
-import { getStore } from '@/engine/store';
+import { EventTypes } from '@/engine/services/event';
+import { setState, getState } from '@/engine/services/state';
+import { getStore } from '@/engine/services/store';
 import { event } from '@/render/events';
 
 //#region CONSTANTS
@@ -76,7 +76,6 @@ export const editSettingAudio = ({ managerEntityId }: { managerEntityId?: string
                 ? true
                 : undefined,
         },
-        entityId: managerEntityId,
         type: (manager.settings._audio)
             ? EventTypes.AUDIO_PLAY
             : EventTypes.AUDIO_STOP,
@@ -102,14 +101,17 @@ export const editSettingKey = ({ editKey, managerEntityId }: {
         if (editKey === manager.settings.keys.action._back) {
             setState('isSettingEditOpen', false);
 
-            event({
-                entityId: managerEntityId,
-                type: EventTypes.MENU_SETTINGS_DISPLAY_EDIT,
-            });
+            event({ type: EventTypes.MENU_SETTINGS_DISPLAY_EDIT });
 
             return;
         }
         if (settingKeyAlreadyInUse({ key: editKey })) {
+            event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
+            event({
+                data: { message: `Key ${editKey} already in use` },
+                type: EventTypes.MAIN_ERROR,
+            });
+
             throw error({ message: `Key ${editKey} already in use`, where: editSettingKey.name });
         }
 
@@ -125,10 +127,7 @@ export const editSettingKey = ({ editKey, managerEntityId }: {
         setState('isSettingEditOpen', true);
     }
 
-    event({
-        entityId: managerEntityId,
-        type: EventTypes.MENU_SETTINGS_DISPLAY_EDIT,
-    });
+    event({ type: EventTypes.MENU_SETTINGS_DISPLAY_EDIT });
 };
 
 export const getProjectVersion = () => pkg.version;

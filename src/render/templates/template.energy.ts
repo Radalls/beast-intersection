@@ -1,7 +1,7 @@
 import { createElement } from './template';
 import { getElement } from './template.utils';
 
-import { Energy } from '@/engine/components/energy';
+import { getComponent } from '@/engine/entities';
 
 //#region CONSTANTS
 const ENERGY_SLOT_HEIGHT = 8;
@@ -9,10 +9,9 @@ const ENERGY_SLOT_WIDHT = 16;
 //#endregion
 
 //#region TEMPLATES
-export const createEnergy = ({ energy, entityId }: {
-    energy: Energy,
-    entityId: string,
-}) => {
+export const createEnergy = ({ entityId }: { entityId: string }) => {
+    const energy = getComponent({ componentId: 'Energy', entityId });
+
     const energyElement = createElement({
         elementClass: 'energy',
         elementId: `${entityId}-energy`,
@@ -41,10 +40,9 @@ export const displayEnergy = ({ entityId }: { entityId: string }) => {
     energy.style.display = (energy.style.display === 'flex') ? 'none' : 'flex';
 };
 
-export const updateEnergy = ({ energy, entityId }: {
-    energy: Energy,
-    entityId: string,
-}) => {
+export const updateEnergy = ({ entityId }: { entityId: string }) => {
+    const energy = getComponent({ componentId: 'Energy', entityId });
+
     clearEnergy({ entityId });
 
     const energyElement = getElement({ elementId: `${entityId}-energy` });

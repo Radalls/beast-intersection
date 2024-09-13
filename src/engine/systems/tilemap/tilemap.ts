@@ -1,70 +1,23 @@
-import { loadTileMapData, loadTileMapEntityData, TileMapData } from './tilemap.data';
-import { findTileByPosition, findTileByEntityId, getTargetXY } from './tilemap.utils';
-
-import { Tile, TileExit } from '@/engine/components/tilemap';
-import { checkComponent, destroyAllEntities, findEntityByName, getComponent } from '@/engine/entities';
-import { EntityTypes } from '@/engine/entities';
-import { EventTypes } from '@/engine/event';
+import { loadTileMapData } from './tilemap.data';
 import {
-    createEntityNpc,
-    createEntityResourceBug,
-    createEntityResourceCraft,
-    createEntityResourceFish,
-    createEntityResourceItem,
-} from '@/engine/services/entity';
+    generateTileMapTiles,
+    generateTileMapEntities,
+    findTileByPosition,
+    findTileByEntityId,
+    getTargetXY,
+    exitTile,
+    soundTile,
+} from './tilemap.utils';
+
+import { getComponent, checkComponent } from '@/engine/entities';
 import { error } from '@/engine/services/error';
-import { setState } from '@/engine/state';
-import { getStore } from '@/engine/store';
-import { checkCollider, setCollider } from '@/engine/systems/collider';
+import { EventTypes } from '@/engine/services/event';
+import { setState } from '@/engine/services/state';
+import { getStore } from '@/engine/services/store';
+import { setCollider, checkCollider } from '@/engine/systems/collider';
 import { updatePosition } from '@/engine/systems/position';
-import { setEntityActive } from '@/engine/systems/state';
 import { setTrigger } from '@/engine/systems/trigger';
-import { randAudio } from '@/render/audio';
 import { event } from '@/render/events';
-
-//#region CHECKS
-const targetExitUp = ({ tile, exit, targetX, targetY }: {
-    exit: TileExit,
-    targetX: number,
-    targetY: number,
-    tile: Tile,
-}) => (exit._direction === 'up' && targetX === tile.position._x && targetY === tile.position._y - 1);
-
-const targetExitDown = ({ tile, exit, targetX, targetY }: {
-    exit: TileExit,
-    targetX: number,
-    targetY: number,
-    tile: Tile,
-}) => (exit._direction === 'down' && targetX === tile.position._x && targetY === tile.position._y + 1);
-
-const targetExitLeft = ({ tile, exit, targetX, targetY }: {
-    exit: TileExit,
-    targetX: number,
-    targetY: number,
-    tile: Tile,
-}) => (exit._direction === 'left' && targetX === tile.position._x - 1 && targetY === tile.position._y);
-
-const targetExitRight = ({ tile, exit, targetX, targetY }: {
-    exit: TileExit,
-    targetX: number,
-    targetY: number,
-    tile: Tile,
-}) => (exit._direction === 'right' && targetX === tile.position._x + 1 && targetY === tile.position._y);
-
-const targetExit = ({ tile, exit, targetX, targetY }: {
-    exit: TileExit,
-    targetX: number,
-    targetY: number,
-    tile: Tile,
-}) =>
-    targetExitUp({ exit, targetX, targetY, tile })
-    || targetExitDown({ exit, targetX, targetY, tile })
-    || targetExitLeft({ exit, targetX, targetY, tile })
-    || targetExitRight({ exit, targetX, targetY, tile });
-
-const tileIsGrass = ({ tile }: { tile: Tile }) => tile.sprite._image.includes('grass');
-const tileIsSand = ({ tile }: { tile: Tile }) => tile.sprite._image.includes('sand');
-//#endregion
 
 //#region SYSTEMS
 export const generateTileMap = ({ tileMapEntityId, tileMapName }: {
@@ -75,10 +28,7 @@ export const generateTileMap = ({ tileMapEntityId, tileMapName }: {
         ?? error({ message: 'Store tileMapId is undefined', where: generateTileMap.name });
 
     setState('isGameLoading', true);
-    event({
-        entityId: '',
-        type: EventTypes.MENU_LOADING_ON,
-    });
+    event({ type: EventTypes.MAIN_LOADING_ON });
 
     const tileMap = getComponent({ componentId: 'TileMap', entityId: tileMapEntityId });
 
@@ -89,20 +39,14 @@ export const generateTileMap = ({ tileMapEntityId, tileMapName }: {
     tileMap._height = tileMapData.height;
     tileMap._width = tileMapData.width;
 
-    event({
-        data: tileMap,
-        entityId: tileMapEntityId,
-        type: EventTypes.TILEMAP_CREATE,
-    });
+    event({ type: EventTypes.TILEMAP_CREATE });
 
     generateTileMapTiles({ tileMapData, tileMapEntityId });
     generateTileMapEntities({ tileMapData });
 
     setState('isGameLoading', false);
-    event({
-        entityId: '',
-        type: EventTypes.MENU_LOADING_OFF,
-    });
+
+    event({ type: EventTypes.MAIN_LOADING_OFF });
 };
 
 export const setTile = ({ tileMapEntityId, entityId }: {
@@ -171,213 +115,5 @@ export const updateTile = ({ tileMapEntityId, entityId, target }: {
 
     updatePosition({ entityId, x: targetTile.position._x, y: targetTile.position._y });
     soundTile({ entityId });
-};
-
-const generateTileMapTiles = ({ tileMapEntityId, tileMapData }: {
-    tileMapData: TileMapData,
-    tileMapEntityId?: string | null
-}) => {
-    if (!(tileMapEntityId)) tileMapEntityId = getStore('tileMapId')
-        ?? error({ message: 'Store tileMapId is undefined', where: generateTileMap.name });
-
-    const tileMap = getComponent({ componentId: 'TileMap', entityId: tileMapEntityId });
-
-    for (const tile of tileMapData.tiles) {
-        const newTile: Tile = {
-            _entityColliderIds: [],
-            _entityIds: [],
-            _entityTriggerIds: [],
-            _solid: tile.solid,
-            exits: (tile.exits)
-                ? tile.exits.map(exit => ({
-                    _direction: exit.direction,
-                    _targetMap: exit.map,
-                    targetPosition: {
-                        _x: exit.x,
-                        _y: exit.y,
-                    },
-                }))
-                : undefined,
-            position: {
-                _x: tile.x,
-                _y: tile.y,
-            },
-            sprite: {
-                _image: `tile_${tile.sprite}`,
-            },
-        };
-
-        tileMap.tiles.push(newTile);
-
-        event({
-            data: newTile,
-            entityId: tileMapEntityId,
-            type: EventTypes.TILEMAP_TILE_CREATE,
-        });
-    }
-};
-
-const generateTileMapEntities = ({ tileMapEntityId, tileMapData }: {
-    tileMapData: TileMapData,
-    tileMapEntityId?: string | null,
-}) => {
-    if (!(tileMapEntityId)) tileMapEntityId = getStore('tileMapId')
-        ?? error({ message: 'Store tileMapId is undefined', where: generateTileMap.name });
-
-    for (const entity of tileMapData.entities) {
-        const entityData = loadTileMapEntityData({ entityName: entity.name, entityType: entity.type })
-            ?? error({
-                message: `EntityData for ${entity.type} ${entity.name} not found`,
-                where: generateTileMapEntities.name,
-            });
-
-        if (entity.type === EntityTypes.NPC) {
-            const { entity: npcEntity, entityId: npcEntityId } = findEntityByName({ entityName: entity.name });
-
-            if (npcEntity && npcEntityId) {
-                setEntityActive({ entityId: npcEntityId, value: true });
-                setTile({ entityId: npcEntityId, tileMapEntityId });
-            }
-            else {
-                createEntityNpc({
-                    entityName: entity.name,
-                    positionX: entity.x,
-                    positionY: entity.y,
-                    spritePath: `npc_${entity.name.toLowerCase()}`,
-                    triggerPriority: entityData.priority,
-                });
-            }
-        }
-        else if (entity.type === EntityTypes.RESOURCE_ITEM) {
-            createEntityResourceItem({
-                entityName: entity.name,
-                positionX: entity.x,
-                positionY: entity.y,
-                resourceIsTemporary: entityData.data.isTemporary,
-                resoureceItemName: entityData.name,
-                spritePath: `resource_${entity.name.toLowerCase()}`,
-                triggerPriority: entityData.priority,
-            });
-        }
-        else if (entity.type === EntityTypes.RESOURCE_BUG) {
-            createEntityResourceBug({
-                entityName: entity.name,
-                positionX: entity.x,
-                positionY: entity.y,
-                resourceActivityBugMaxHp: entityData.data.maxHp,
-                resourceActivityBugMaxNbErrors: entityData.data.maxNbErrors,
-                resourceActivityBugSymbolInterval: entityData.data.symbolInterval,
-                resourceIsTemporary: entityData.data.isTemporary,
-                resoureceItemName: entityData.name,
-                spritePath: `resource_${entity.name.toLowerCase()}`,
-                triggerPriority: entityData.priority,
-            });
-        }
-        else if (entity.type === EntityTypes.RESOURCE_FISH) {
-            createEntityResourceFish({
-                entityName: entity.name,
-                positionX: entity.x,
-                positionY: entity.y,
-                resourceActivityFishDamage: entityData.data.damage,
-                resourceActivityFishFrenzyDuration: entityData.data.frenzyDuration,
-                resourceActivityFishFrenzyInterval: entityData.data.frenzyInterval,
-                resourceActivityFishMaxHp: entityData.data.maxHp,
-                resourceActivityFishRodDamage: 2, // temp
-                resourceActivityFishRodMaxTension: 100, // temp
-                resourceIsTemporary: entityData.data.isTemporary,
-                resoureceItemName: entityData.name,
-                spritePath: `resource_${entity.name.toLowerCase()}`,
-                triggerPriority: entityData.priority,
-            });
-        }
-        else if (entity.type === EntityTypes.RESOURCE_CRAFT) {
-            createEntityResourceCraft({
-                entityName: entity.name,
-                positionX: entity.x,
-                positionY: entity.y,
-                spritePath: `resource_${entity.name.toLowerCase()}`,
-                triggerPriority: entityData.priority,
-            });
-        }
-    }
-};
-
-const exitTile = ({ tileMapEntityId, entityId, targetX, targetY }: {
-    entityId: string,
-    targetX: number,
-    targetY: number,
-    tileMapEntityId?: string | null
-}) => {
-    if (!(tileMapEntityId)) tileMapEntityId = getStore('tileMapId')
-        ?? error({ message: 'Store tileMapId is undefined', where: exitTile.name });
-
-    const entityTile = findTileByEntityId({ entityId })
-        ?? error({ message: `Tile for entity ${entityId} not found`, where: exitTile.name });
-
-    if (!(entityTile.exits)) throw error({ message: `Tile for entity ${entityId} has no exits`, where: exitTile.name });
-
-    for (const exit of entityTile.exits) {
-        if (targetExit({ exit, targetX, targetY, tile: entityTile })) {
-            destroyTileMap({ tileMapEntityId });
-            generateTileMap({ tileMapName: exit._targetMap });
-            updatePosition({ entityId, x: exit.targetPosition._x, y: exit.targetPosition._y });
-            setTile({ entityId, tileMapEntityId });
-
-            return true;
-        }
-    }
-
-    return false;
-};
-
-const destroyTileMap = ({ tileMapEntityId }: {
-    tileMapEntityId?: string | null
-}) => {
-    if (!(tileMapEntityId)) tileMapEntityId = getStore('tileMapId')
-        ?? error({ message: 'Store tileMapId is undefined', where: exitTile.name });
-
-    const tileMap = getComponent({ componentId: 'TileMap', entityId: tileMapEntityId });
-
-    for (const tile of tileMap.tiles) {
-        event({
-            data: tile,
-            entityId: tileMapEntityId,
-            type: EventTypes.TILEMAP_TILE_DESTROY,
-        });
-    }
-
-    tileMap.tiles = [];
-
-    destroyAllEntities({});
-};
-
-const soundTile = ({ tileMapEntityId, entityId }: {
-    entityId: string,
-    tileMapEntityId?: string | null,
-}) => {
-    if (!(tileMapEntityId)) tileMapEntityId = getStore('tileMapId')
-        ?? error({ message: 'Store tileMapId is undefined', where: updateTile.name });
-
-    const entityTile = findTileByEntityId({ entityId })
-        ?? error({ message: `Tile for entity ${entityId} not found`, where: updateTile.name });
-
-    if (tileIsGrass({ tile: entityTile })) {
-        event({
-            data: {
-                audioName: `step_grass${randAudio({ nb: 4 })}`,
-            },
-            entityId,
-            type: EventTypes.AUDIO_PLAY,
-        });
-    }
-    else if (tileIsSand({ tile: entityTile })) {
-        event({
-            data: {
-                audioName: `step_sand${randAudio({ nb: 4 })}`,
-            },
-            entityId,
-            type: EventTypes.AUDIO_PLAY,
-        });
-    }
 };
 //#endregion

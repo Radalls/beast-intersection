@@ -14,5 +14,13 @@
             "isTemporary": true
         },
         "priority": 2
+    },
+    {
+        "type": "ResourceItem",
+        "name": "SecretOof",
+        "data": {
+            "isTemporary": false
+        },
+        "priority": 2
     }
 ]

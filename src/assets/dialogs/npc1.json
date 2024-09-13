@@ -1,10 +1,10 @@
 {
     "quest1_start": [
-        { "id": 1, "value": "Veux tu commencer la quête ? 🤠", "next": null, "options": [2, 3] },
+        { "id": 1, "value": "Tu veux commencer la quête ? 🤠", "next": null, "options": [2, 3] },
         { "id": 2, "value": "Oui !", "next": 4, "options": [] },
         { "id": 3, "value": "Non...", "next": 5, "options": [] },
         { "id": 4, "value": "Génial !", "next": null, "options": [], "nextDialog": "quest1_pending", "questStart": "quest1" },
-        { "id": 5, "value": "Reviens me voir plus tard quand tu seras prêt.", "next": null, "options": [] }
+        { "id": 5, "value": "Reviens me voir plus tard quand tu seras prêt alors !", "next": null, "options": [] }
     ],
     "quest1_pending": [
         { "id": 1, "value": "Tu as terminé la quête ?", "next": null, "options": [] }
@@ -22,11 +22,22 @@
         { "id": 7, "value": "Le café pour se réveiller !", "next": 10, "options": [] },
         { "id": 8, "value": "Aucun des deux...", "next": 11, "options": [] },
         { "id": 9, "value": "Beurk ! C'est du pisse mémé 🤢", "next": 12, "options": [] },
-        { "id": 10, "value": "Moi aussi... tu me passes un café ? ☕", "next": 12, "options": [] },
+        { "id": 10, "value": "Moi aussi... tiens boit ça ! ☕", "next": 12, "options": [] },
         { "id": 11, "value": "Ah ? Tu es le genre de personne à n'aimer que l'eau... 😒", "next": 12, "options": [] },
-        { "id": 12, "value": "J'ai mal au dos... 😖", "next": null, "options": [13, 14] },
-        { "id": 13, "value": "Tu veux de la pommade ?", "next": 15, "options": [] },
-        { "id": 14, "value": "C'est normal, t'es vieux (*drops mic*)", "next": null, "options": [] },
-        { "id": 15, "value": "Une pomme ? Non merci j'ai déjà pris mon petit déjeuner 👴", "next": null, "options": [] }
+        { "id": 12, "value": "J'ai mal au dos... 😖", "next": null, "options": [13, 14, 15] },
+        { "id": 13, "value": "Tu devrais t'asseoir", "next": 16, "options": [] },
+        { "id": 14, "value": "M'en parle pas...", "next": 17, "options": [] },
+        { "id": 15, "value": "C'est normal, t'es vieux (*drops mic*)", "next": 19, "options": [] },
+        { "id": 16, "value": "J'aimerais bien mais on ne m'a pas codé de sprite assis 👴", "next": null, "options": [] },
+        { "id": 17, "value": "Ah ! Laisse moi t'aider dans ce cas 🕵️‍♂️", "next": 18, "options": [] },
+        { "id": 18, "value": "Et voila le travail, héhé 👴", "next": null, "options": [] },
+        { "id": 19, "value": "...", "next": null, "options": [] }
+    ],
+    "secret": [
+        { "id": 1, "value": "...", "next": 2, "options": [] },
+        { "id": 2, "value": "....", "next": 3, "options": [] },
+        { "id": 3, "value": ".....", "next": 4, "options": [] },
+        { "id": 4, "value": "......", "next": 5, "options": [] },
+        { "id": 5, "value": "Je me demande quel jour on est aujourd'hui ?", "next": null, "options": [] }
     ]
 }
