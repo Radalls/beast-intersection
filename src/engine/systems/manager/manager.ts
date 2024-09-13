@@ -1,13 +1,23 @@
-import { loadSave } from './manager.data';
+import { createSave, loadSave } from './manager.data';
+import {
+    displaySecretPath,
+    isSecretPathUnlocked,
+    isSecretSaveUnlocked,
+    isSecretUnlocked,
+    launchQuitSecret,
+    launchStartSecret,
+    lockSettingsSecret,
+    runSecretSave,
+} from './manager.secret';
 import { LAUNCH_OPTIONS, SETTINGS, editSettingAudio, editSettingKey, getProjectVersion } from './manager.utils';
 
-import { stopCycle } from '@/engine/cycle';
 import { destroyAllEntities, getComponent } from '@/engine/entities';
-import { EventTypes } from '@/engine/event';
 import { launch, run } from '@/engine/main';
+import { stopCycle } from '@/engine/services/cycle';
 import { error } from '@/engine/services/error';
-import { getState, setState } from '@/engine/state';
-import { getStore, resetStore } from '@/engine/store';
+import { EventTypes } from '@/engine/services/event';
+import { getState, setState } from '@/engine/services/state';
+import { getStore, resetStore } from '@/engine/services/store';
 import { event } from '@/render/events';
 
 //#region SYSTEMS
@@ -31,16 +41,8 @@ export const selectLaunchOption = ({ managerEntityId, offset }: {
         );
     }
 
-    event({
-        data: manager,
-        entityId: managerEntityId,
-        type: EventTypes.MENU_LAUNCH_UPDATE,
-    });
-    event({
-        data: { audioName: 'main_select' },
-        entityId: managerEntityId,
-        type: EventTypes.AUDIO_PLAY,
-    });
+    event({ type: EventTypes.MENU_LAUNCH_UPDATE });
+    event({ data: { audioName: 'main_select' }, type: EventTypes.AUDIO_PLAY });
 };
 
 export const confirmLaunchOption = ({ managerEntityId }: { managerEntityId?: string | null }) => {
@@ -50,49 +52,34 @@ export const confirmLaunchOption = ({ managerEntityId }: { managerEntityId?: str
     const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
 
     if (LAUNCH_OPTIONS[manager._selectedLaunchOption] === LAUNCH_OPTIONS[0]) {
+        if (isSecretUnlocked()) {
+            launchStartSecret();
+            return;
+        }
+        if (isSecretPathUnlocked()) {
+            displaySecretPath();
+        }
+
         setState('isGameLaunching', false);
 
-        event({
-            entityId: managerEntityId,
-            type: EventTypes.MAIN_RUN,
-        });
+        event({ type: EventTypes.MAIN_RUN });
 
         run({});
 
-        // event({
-        //     entityId: managerEntityId,
-        //     type: EventTypes.MENU_LAUNCH_DISPLAY,
-        // });
-        event({
-            entityId: managerEntityId,
-            type: EventTypes.QUEST_DISPLAY,
-        });
-
-        event({
-            data: { audioName: 'menu_launch_start' },
-            entityId: managerEntityId,
-            type: EventTypes.AUDIO_PLAY,
-        });
-        event({
-            data: { audioName: 'bgm_map1', loop: true },
-            entityId: managerEntityId,
-            type: EventTypes.AUDIO_PLAY,
-        });
-        event({
-            data: { audioName: 'bgm_menu' },
-            entityId: managerEntityId,
-            type: EventTypes.AUDIO_STOP,
-        });
+        event({ type: EventTypes.QUEST_DISPLAY });
+        event({ data: { audioName: 'menu_launch_start' }, type: EventTypes.AUDIO_PLAY });
+        event({ data: { audioName: 'bgm_map1', loop: true }, type: EventTypes.AUDIO_PLAY });
+        event({ data: { audioName: 'bgm_menu' }, type: EventTypes.AUDIO_STOP });
 
         return;
     }
     else if (LAUNCH_OPTIONS[manager._selectedLaunchOption] === LAUNCH_OPTIONS[1]) {
         loadSave().then((saveData) => {
             if (saveData.version !== getProjectVersion()) {
+                event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
                 event({
-                    data: { audioName: 'main_fail' },
-                    entityId: managerEntityId,
-                    type: EventTypes.AUDIO_PLAY,
+                    data: { message: 'Invalid save, project version does not match' },
+                    type: EventTypes.MAIN_ERROR,
                 });
 
                 throw error({
@@ -102,38 +89,20 @@ export const confirmLaunchOption = ({ managerEntityId }: { managerEntityId?: str
             }
 
             setState('isGameLaunching', false);
+            if (isSecretSaveUnlocked()) {
+                runSecretSave({ entityId: managerEntityId, saveData });
+                return;
+            }
 
-            event({
-                entityId: managerEntityId,
-                type: EventTypes.MAIN_RUN,
-            });
+            event({ type: EventTypes.MAIN_RUN });
 
             run({ saveData });
 
-            event({
-                entityId: managerEntityId,
-                type: EventTypes.MENU_LAUNCH_DISPLAY,
-            });
-            event({
-                entityId: managerEntityId,
-                type: EventTypes.QUEST_DISPLAY,
-            });
-
-            event({
-                data: { audioName: 'menu_launch_start' },
-                entityId: managerEntityId,
-                type: EventTypes.AUDIO_PLAY,
-            });
-            event({
-                data: { audioName: 'bgm_map1', loop: true },
-                entityId: managerEntityId,
-                type: EventTypes.AUDIO_PLAY,
-            });
-            event({
-                data: { audioName: 'bgm_menu' },
-                entityId: managerEntityId,
-                type: EventTypes.AUDIO_STOP,
-            });
+            event({ type: EventTypes.MENU_LAUNCH_DISPLAY });
+            event({ type: EventTypes.QUEST_DISPLAY });
+            event({ data: { audioName: 'menu_launch_start' }, type: EventTypes.AUDIO_PLAY });
+            event({ data: { audioName: 'bgm_map1', loop: true }, type: EventTypes.AUDIO_PLAY });
+            event({ data: { audioName: 'bgm_menu' }, type: EventTypes.AUDIO_STOP });
 
             return;
         });
@@ -150,8 +119,9 @@ export const quitToLaunch = ({ managerEntityId }: { managerEntityId?: string | n
         ?? error({ message: 'Store managerId is undefined', where: openSettings.name });
 
     setState('isGameLaunching', true);
+    setState('isInputCooldown', false);
 
-    closeSettings({});
+    closeSettings();
 
     destroyAllEntities({ force: true });
     stopCycle();
@@ -159,16 +129,33 @@ export const quitToLaunch = ({ managerEntityId }: { managerEntityId?: string | n
 
     launch();
 
-    event({
-        data: { audioName: 'bgm_map1' },
-        entityId: managerEntityId,
-        type: EventTypes.AUDIO_STOP,
-    });
-    event({
-        data: { audioName: 'bgm_menu', loop: true },
-        entityId: managerEntityId,
-        type: EventTypes.AUDIO_PLAY,
-    });
+    if (isSecretUnlocked()) {
+        launchQuitSecret();
+        return;
+    }
+
+    event({ data: { audioName: 'bgm_map1' }, type: EventTypes.AUDIO_STOP });
+    event({ data: { audioName: 'bgm_menu', loop: true }, type: EventTypes.AUDIO_PLAY });
+};
+
+export const onLaunchInput = ({ inputKey }: { inputKey: string }) => {
+    const managerEntityId = getStore('managerId')
+        ?? error({ message: 'Store managerId is undefined', where: onSettingsInput.name });
+
+    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
+
+    if (inputKey === manager.settings.keys.move._up) {
+        selectLaunchOption({ managerEntityId, offset: -1 });
+        return;
+    }
+    else if (inputKey === manager.settings.keys.move._down) {
+        selectLaunchOption({ managerEntityId, offset: 1 });
+        return;
+    }
+    else if (inputKey === manager.settings.keys.action._act) {
+        confirmLaunchOption({ managerEntityId });
+        return;
+    }
 };
 //#endregion
 
@@ -181,48 +168,41 @@ export const openSettings = ({ managerEntityId }: { managerEntityId?: string | n
 
     manager._selectedSetting = 0;
 
+    if (isSecretUnlocked()) {
+        lockSettingsSecret();
+        return;
+    }
+    if (isSecretPathUnlocked()) {
+        displaySecretPath();
+    }
+
     setState('isGamePaused', true);
     if (getState('isGameRunning')) {
         setState('isGameRunning', false);
 
         const playerEntityId = getStore('playerId')
             ?? error({ message: 'Store playerId is undefined', where: openSettings.name });
-        event({
-            entityId: playerEntityId,
-            type: EventTypes.ENERGY_DISPLAY,
-        });
-        event({
-            entityId: playerEntityId,
-            type: EventTypes.INVENTORY_TOOL_ACTIVE_DISPLAY,
-        });
-        event({
-            entityId: managerEntityId,
-            type: EventTypes.QUEST_DISPLAY,
-        });
+
+        event({ entityId: playerEntityId, type: EventTypes.ENERGY_DISPLAY });
+        event({ entityId: playerEntityId, type: EventTypes.INVENTORY_TOOL_ACTIVE_DISPLAY });
+        event({ type: EventTypes.QUEST_DISPLAY });
     }
 
-    event({
-        data: manager,
-        entityId: managerEntityId,
-        type: EventTypes.MENU_SETTINGS_DISPLAY,
-    });
-    event({
-        data: manager,
-        entityId: managerEntityId,
-        type: EventTypes.MENU_SETTINGS_UPDATE,
-    });
-    event({
-        data: { audioName: 'menu_settings_open' },
-        entityId: managerEntityId,
-        type: EventTypes.AUDIO_PLAY,
-    });
+    event({ type: EventTypes.MENU_SETTINGS_DISPLAY });
+    event({ type: EventTypes.MENU_SETTINGS_UPDATE });
+    event({ data: { audioName: 'menu_settings_open' }, type: EventTypes.AUDIO_PLAY });
 };
 
-export const closeSettings = ({ managerEntityId }: { managerEntityId?: string | null }) => {
-    if (!(managerEntityId)) managerEntityId = getStore('managerId')
-        ?? error({ message: 'Store managerId is undefined', where: closeSettings.name });
-
-    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
+export const closeSettings = () => {
+    if (isSecretUnlocked()) {
+        if (getState('isGameRunning')) {
+            setState('isGameRunning', false);
+            return;
+        }
+    }
+    if (isSecretPathUnlocked()) {
+        displaySecretPath();
+    }
 
     setState('isGamePaused', false);
     if (!(getState('isGameRunning')) && !(getState('isGameLaunching'))) {
@@ -230,31 +210,13 @@ export const closeSettings = ({ managerEntityId }: { managerEntityId?: string | 
 
         const playerEntityId = getStore('playerId')
             ?? error({ message: 'Store playerId is undefined', where: closeSettings.name });
-        event({
-            entityId: playerEntityId,
-            type: EventTypes.ENERGY_DISPLAY,
-        });
-        event({
-            entityId: playerEntityId,
-            type: EventTypes.INVENTORY_TOOL_ACTIVE_DISPLAY,
-        });
-
-        event({
-            entityId: managerEntityId,
-            type: EventTypes.QUEST_DISPLAY,
-        });
+        event({ entityId: playerEntityId, type: EventTypes.ENERGY_DISPLAY });
+        event({ entityId: playerEntityId, type: EventTypes.INVENTORY_TOOL_ACTIVE_DISPLAY });
+        event({ type: EventTypes.QUEST_DISPLAY });
     }
 
-    event({
-        data: manager,
-        entityId: managerEntityId,
-        type: EventTypes.MENU_SETTINGS_DISPLAY,
-    });
-    event({
-        data: { audioName: 'menu_settings_close' },
-        entityId: managerEntityId,
-        type: EventTypes.AUDIO_PLAY,
-    });
+    event({ type: EventTypes.MENU_SETTINGS_DISPLAY });
+    event({ data: { audioName: 'menu_settings_close' }, type: EventTypes.AUDIO_PLAY });
 };
 
 export const confirmSetting = ({ managerEntityId, editKey }: {
@@ -276,16 +238,8 @@ export const confirmSetting = ({ managerEntityId, editKey }: {
         throw error({ message: 'Setting not yet implemented', where: confirmSetting.name });
     }
 
-    event({
-        data: manager,
-        entityId: managerEntityId,
-        type: EventTypes.MENU_SETTINGS_UPDATE,
-    });
-    event({
-        data: { audioName: 'main_confirm' },
-        entityId: managerEntityId,
-        type: EventTypes.AUDIO_PLAY,
-    });
+    event({ type: EventTypes.MENU_SETTINGS_UPDATE });
+    event({ data: { audioName: 'main_confirm' }, type: EventTypes.AUDIO_PLAY });
 };
 
 export const selectSetting = ({ managerEntityId, offset }: {
@@ -307,16 +261,56 @@ export const selectSetting = ({ managerEntityId, offset }: {
         );
     }
 
-    event({
-        data: manager,
-        entityId: managerEntityId,
-        type: EventTypes.MENU_SETTINGS_UPDATE,
-    });
-    event({
-        data: { audioName: 'main_select' },
-        entityId: managerEntityId,
-        type: EventTypes.AUDIO_PLAY,
-    });
+    event({ type: EventTypes.MENU_SETTINGS_UPDATE });
+    event({ data: { audioName: 'main_select' }, type: EventTypes.AUDIO_PLAY });
+};
+
+export const onSettingsInput = ({ inputKey }: { inputKey: string }) => {
+    const managerEntityId = getStore('managerId')
+        ?? error({ message: 'Store managerId is undefined', where: onSettingsInput.name });
+
+    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
+
+    if (inputKey === manager.settings.keys.action._back) {
+        if (getState('isSettingEditOpen')) {
+            confirmSetting({ editKey: inputKey });
+            return;
+        }
+
+        closeSettings();
+        return;
+    }
+    if (getState('isSettingEditOpen')) {
+        if (inputKey === manager.settings.keys.action._save) return;
+        if (inputKey === manager.settings.keys.action._quit) return;
+
+        confirmSetting({ editKey: inputKey });
+        return;
+    }
+    else if (inputKey === manager.settings.keys.action._act) {
+        confirmSetting({});
+        return;
+    }
+    else if (inputKey === manager.settings.keys.move._up) {
+        selectSetting({ offset: -1 });
+        return;
+    }
+    else if (inputKey === manager.settings.keys.move._down) {
+        selectSetting({ offset: 1 });
+        return;
+    }
+    else if (inputKey === manager.settings.keys.action._save) {
+        if (getState('isGameLaunching')) return;
+
+        createSave();
+        return;
+    }
+    else if (inputKey === manager.settings.keys.action._quit) {
+        if (getState('isGameLaunching')) return;
+
+        quitToLaunch({});
+        return;
+    }
 };
 //#endregion
 //#endregion

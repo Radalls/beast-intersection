@@ -4,31 +4,21 @@ import {
     addToolToInventory,
     createTool,
     findInventorySlotsWithItem,
+    invalidItemAmount,
+    invalidItemName,
+    invalidItemSprite,
     removeInventorySlots,
+    slotAvailable,
 } from './inventory.utils';
 
-import { Inventory, Item } from '@/engine/components/inventory';
+import { Item } from '@/engine/components/inventory';
 import { getComponent } from '@/engine/entities';
-import { EventTypes } from '@/engine/event';
 import { error } from '@/engine/services/error';
-import { getStore } from '@/engine/store';
+import { EventTypes } from '@/engine/services/event';
+import { getStore } from '@/engine/services/store';
 import { event } from '@/render/events';
 
-//#region CHECKS
-const invalidItemName = (itemName: string) => !(itemName) || itemName === '';
-const invalidItemAmount = (itemAmount: number) => itemAmount <= 0;
-const invalidItemSprite = (itemSprite: string) => !(itemSprite) || itemSprite === '';
-const slotAvailable = (inventory: Inventory) => inventory.slots.length < inventory._maxSlots;
-
-//#endregion
-
 //#region SYSTEMS
-/**
- * Adds an item to an inventory.
- * @param entityId needs to have an inventory
- * @param item     needs to have an amount and a name
- * @returns whether the item was added to the inventory
- */
 export const addItemToInventory = ({ entityId, item, itemAmount }: {
     entityId?: string | null,
     item: Item,
@@ -60,11 +50,7 @@ export const addItemToInventory = ({ entityId, item, itemAmount }: {
                 if (slot._amount + itemAmount <= slot._maxAmount) {
                     slot._amount += itemAmount;
 
-                    event({
-                        data: inventory,
-                        entityId,
-                        type: EventTypes.INVENTORY_UPDATE,
-                    });
+                    event({ entityId, type: EventTypes.INVENTORY_UPDATE });
 
                     return { success: true };
                 }
@@ -90,11 +76,7 @@ export const addItemToInventory = ({ entityId, item, itemAmount }: {
                 itemMaxAmount: itemRule.maxAmount,
             });
 
-            event({
-                data: inventory,
-                entityId,
-                type: EventTypes.INVENTORY_UPDATE,
-            });
+            event({ entityId, type: EventTypes.INVENTORY_UPDATE });
 
             return { success: true };
         }
@@ -114,22 +96,11 @@ export const addItemToInventory = ({ entityId, item, itemAmount }: {
         });
     }
 
-    event({
-        data: inventory,
-        entityId,
-        type: EventTypes.INVENTORY_UPDATE,
-    });
+    event({ entityId, type: EventTypes.INVENTORY_UPDATE });
 
     return { amountRemaining: itemAmount, success: false };
 };
 
-/**
- * Removes an item from an inventory.
- * @param entity     needs to have an inventory
- * @param itemName   name of the item to remove
- * @param itemAmount amount of the item to remove
- * @returns whether the item was removed from the inventory
- */
 export const removeItemFromInventory = ({ entityId, itemName, itemAmount }: {
     entityId?: string | null,
     itemAmount: number,
@@ -173,11 +144,7 @@ export const removeItemFromInventory = ({ entityId, itemName, itemAmount }: {
 
     removeInventorySlots({ inventory, slotsToRemove });
 
-    event({
-        data: inventory,
-        entityId,
-        type: EventTypes.INVENTORY_UPDATE,
-    });
+    event({ entityId, type: EventTypes.INVENTORY_UPDATE });
 
     return true;
 };
@@ -191,13 +158,10 @@ export const activateInventoryTool = ({ entityId }: {
     const inventory = getComponent({ componentId: 'Inventory', entityId });
 
     if (!(inventory.tools.length)) {
-        event({
-            data: { audioName: 'inventory_tool_empty' },
-            entityId,
-            type: EventTypes.AUDIO_PLAY,
-        });
+        event({ data: { audioName: 'inventory_tool_empty' }, type: EventTypes.AUDIO_PLAY });
+        event({ data: { message: 'No tools in inventory' }, type: EventTypes.MAIN_ERROR });
 
-        error({
+        throw error({
             message: 'No tools in inventory',
             where: activateInventoryTool.name,
         });
@@ -213,37 +177,21 @@ export const activateInventoryTool = ({ entityId }: {
             inactiveTool._active = true;
             activeTool._active = false;
 
-            event({
-                data: { audioName: 'inventory_tool_active' },
-                entityId,
-                type: EventTypes.AUDIO_PLAY,
-            });
+            event({ data: { audioName: 'inventory_tool_active' }, type: EventTypes.AUDIO_PLAY });
         }
         else {
             activeTool._active = false;
 
-            event({
-                data: { audioName: 'inventory_tool_empty' },
-                entityId,
-                type: EventTypes.AUDIO_PLAY,
-            });
+            event({ data: { audioName: 'inventory_tool_empty' }, type: EventTypes.AUDIO_PLAY });
         }
     }
     else {
         inventory.tools[0]._active = true;
 
-        event({
-            data: { audioName: 'inventory_tool_active' },
-            entityId,
-            type: EventTypes.AUDIO_PLAY,
-        });
+        event({ data: { audioName: 'inventory_tool_active' }, type: EventTypes.AUDIO_PLAY });
     }
 
-    event({
-        data: inventory,
-        entityId,
-        type: EventTypes.INVENTORY_TOOL_ACTIVATE,
-    });
+    event({ entityId, type: EventTypes.INVENTORY_TOOL_ACTIVATE });
 };
 
 export const checkInventory = ({ entityId, items }: {

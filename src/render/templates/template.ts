@@ -1,26 +1,49 @@
-import { getElement, getSpritePath, searchElementById } from './template.utils';
+import { getElement, getSpritePath, searchElementsById } from './template.utils';
 
-import { Position } from '@/engine/components/position';
-import { Sprite } from '@/engine/components/sprite';
-import { getRawEntityId, isPlayer } from '@/engine/entities';
+import { getComponent, getRawEntityId, isPlayer } from '@/engine/entities';
+import { error } from '@/engine/services/error';
 import { app } from '@/render/main';
 
 //#region CONSTANTS
 export const TILE_PIXEL_SIZE = 64;
+
+type ElementData =
+    | {
+        elementAbsolute?: boolean;
+        elementClass?: string;
+        elementId?: string;
+        elementParent?: HTMLElement;
+        entityId: string;
+    }
+    | {
+        elementAbsolute?: boolean;
+        elementClass?: string;
+        elementId: string;
+        elementParent?: HTMLElement;
+        entityId?: string;
+    };
 //#endregion
 
 //#region TEMPLATES
-export const createElement = ({ entityId, elementId, elementClass, elementParent, elementAbsolute = true }: {
-    elementAbsolute?: boolean,
-    elementClass?: string,
-    elementId?: string,
-    elementParent?: HTMLElement
-    entityId: string,
-}) => {
+export const createElement = ({
+    entityId,
+    elementId,
+    elementClass,
+    elementParent,
+    elementAbsolute = true,
+}: ElementData) => {
+    if (!(entityId) && !(elementId)) {
+        throw error({
+            message: 'Either entityId or elementId must be provided',
+            where: createElement.name,
+        });
+    }
+
     const element = document.createElement('div');
 
-    element.setAttribute('id', elementId ?? entityId);
-    element.setAttribute('class', elementClass ?? getRawEntityId({ entityId }).toLowerCase());
+    const id = elementId ?? entityId!;
+    element.setAttribute('id', id);
+    element.setAttribute('class', elementClass ?? getRawEntityId({ entityId: id }).toLowerCase());
 
     element.style.position = elementAbsolute ? 'absolute' : 'relative';
 
@@ -38,16 +61,15 @@ export const destroyElement = ({ elementId }: { elementId: string }) => {
     }
 
     if (isPlayer({ entityId: elementId })) {
-        searchElementById({ partialElementId: 'Player' }).map((el) => el.remove());
+        searchElementsById({ partialElementId: 'Player' }).map((el) => el.remove());
     }
 
     element.remove();
 };
 
-export const updatePosition = ({ elementId, position }: {
-    elementId: string,
-    position: Position,
-}) => {
+export const updatePosition = ({ elementId }: { elementId: string }) => {
+    const position = getComponent({ componentId: 'Position', entityId: elementId });
+
     const element = getElement({ elementId });
 
     element.style.left = `${position._x * TILE_PIXEL_SIZE + TILE_PIXEL_SIZE}px`;
@@ -57,13 +79,12 @@ export const updatePosition = ({ elementId, position }: {
     element.style.zIndex = `${position._y}`;
 };
 
-export const createSprite = ({ elementId, sprite }: {
-    elementId: string,
-    sprite: Sprite,
-}) => {
+export const createSprite = ({ elementId }: { elementId: string }) => {
+    const sprite = getComponent({ componentId: 'Sprite', entityId: elementId });
+
     const element = getElement({ elementId });
 
-    element.style.backgroundImage = `url(${getSpritePath(sprite._image)})`;
+    element.style.backgroundImage = `url(${getSpritePath({ spriteName: sprite._image })})`;
     element.style.width = `${sprite._width * TILE_PIXEL_SIZE}px`;
     element.style.height = `${sprite._height * TILE_PIXEL_SIZE}px`;
 };

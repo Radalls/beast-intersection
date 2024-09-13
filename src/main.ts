@@ -8,6 +8,7 @@ import '@/render/styles/global.css';
 import '@/render/styles/inventory.css';
 import '@/render/styles/menu.css';
 import '@/render/styles/quest.css';
+import '@/render/styles/secret.css';
 import '@/render/styles/tilemap.css';
 
 renderMain();

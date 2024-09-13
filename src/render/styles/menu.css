@@ -1,35 +1,3 @@
-/* LOADING MENU */
-.loading {
-    align-items: center;
-    background-color: rgba(0, 0, 0, 0.995);
-    display: none;
-    height: 100%;
-    justify-content: center;
-    width: 100%;
-    z-index: 100;
-}
-
-.loader {
-    border-top: 16px solid rgb(97, 243, 81);
-    border-right: 16px solid rgb(28, 219, 28);
-    border-bottom: 16px solid rgb(29, 170, 29);
-    border-left: 16px solid rgb(34, 123, 34);
-    border-radius: 50%;
-    width: 120px;
-    height: 120px;
-    animation: spin 2s linear infinite;
-}
-
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
 /* LAUNCH MENU */
 .launch {
     align-items: center;
@@ -128,14 +96,15 @@
 .settings-edit {
     align-items: center;
     background-color: rgb(245, 245, 245);
+    border: 5px solid rgb(212, 15, 15);
+    border-radius: 10px;
     display: none;
     font-size: 26px;
     height: 64px;
-    justify-content: center;
     left: 50%;
-    top: 50%;
+    padding: 8px 16px;
+    top: 64px;
     transform: translate(-50%, -50%);
-    width: 256px;
     z-index: 101;
 }
 

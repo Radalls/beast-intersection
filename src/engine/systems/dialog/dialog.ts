@@ -1,74 +1,35 @@
 import { loadDialogData, loadQuestData } from './dialog.data';
+import {
+    getDialogCurrentText,
+    invalidDialog,
+    invalidDialogTextNext,
+    isDialogTextDialogNext,
+    isDialogTextEnd,
+    isDialogTextOptionsSet,
+    isDialogTextQuestEnd,
+    isDialogTextQuestStart,
+    setDialogCurrentText,
+} from './dialog.utils';
 
-import { Dialog, DialogText } from '@/engine/components/dialog';
 import { getComponent } from '@/engine/entities';
-import { EventTypes } from '@/engine/event';
 import { error } from '@/engine/services/error';
-import { endQuest } from '@/engine/services/quest';
-import { setState } from '@/engine/state';
-import { setStore, clearStore } from '@/engine/store';
+import { EventTypes } from '@/engine/services/event';
+import { setState } from '@/engine/services/state';
+import { clearStore, setStore } from '@/engine/services/store';
+import { fillEnergy } from '@/engine/systems/energy';
+import { emptyPlayerInventory } from '@/engine/systems/inventory';
+import {
+    endDialogSecret,
+    endDialogSecretRun,
+    endQuest,
+    isSecretRun,
+    isSecretUnlocked,
+    isSecretWin,
+    startDialogSecret,
+    winSecret,
+} from '@/engine/systems/manager';
 import { setEntityTalking } from '@/engine/systems/state';
 import { event } from '@/render/events';
-
-//#region CHECKS
-const invalidDialog = (dialog: Dialog) => !(dialog.texts.length) || !(dialog.texts.some((text) => text._id === 1));
-const invalidDialogText = (text: DialogText) => !(text._value.length);
-const invalidDialogTextNext = (text: DialogText) => text._next !== undefined && text._options.length > 0;
-const isDialogTextEnd = (text: DialogText) => !(text._next) && !(text._options.length);
-const isDialogTextDialogNext = (text: DialogText) => text._nextDialog !== undefined;
-const isDialogTextQuestStart = (text: DialogText) => text._questStart !== undefined;
-const isDialogTextQuestEnd = (text: DialogText) => text._questEnd !== undefined;
-const isDialogTextOptionsSet = (text: DialogText) => text._options.length > 0;
-//#endregion
-
-//#region HELPERS
-const getDialogText = (dialog: Dialog, textId: number = 1) => dialog.texts.find((text) => text._id === textId);
-
-const getDialogCurrentText = (dialog: Dialog) => getDialogText(dialog, dialog._currentTextId);
-
-const setDialogCurrentText = (entityId: string, dialog: Dialog, textIndex: number = 1) => {
-    dialog._currentTextId = textIndex;
-
-    const dialogCurrentText = getDialogCurrentText(dialog)
-        ?? error({
-            message: `DialogText ${entityId}-${dialog._currentTextId} not found`,
-            where: setDialogCurrentText.name,
-        });
-
-    if (invalidDialogText(dialogCurrentText)) {
-        error({
-            message: `DialogText ${entityId}-${dialog._currentTextId} is invalid`,
-            where: setDialogCurrentText.name,
-        });
-    }
-
-    if (isDialogTextOptionsSet(dialogCurrentText)) {
-        dialog._currentOptionIndex = 0;
-    }
-    else {
-        dialog._currentOptionIndex = undefined;
-    }
-
-    setDialogCurrentValues(dialog);
-};
-
-const setDialogCurrentValues = (dialog: Dialog) => {
-    dialog._currentValue = undefined;
-    const dialogCurrentText = getDialogCurrentText(dialog)
-        ?? error({ message: `DialogText ${dialog._currentTextId} not found`, where: setDialogCurrentValues.name });
-    dialog._currentValue = dialogCurrentText._value;
-
-    dialog._currentOptionsValues = undefined;
-    if (isDialogTextOptionsSet(dialogCurrentText)) {
-        dialog._currentOptionsValues = dialogCurrentText._options.map((option) => getDialogText(dialog, option)?._value
-            ?? error({
-                message: `DialogText ${dialog._currentTextId} option ${option} not found`,
-                where: setDialogCurrentValues.name,
-            }),
-        );
-    }
-};
-//#endregion
 
 //#region SYSTEMS
 export const startDialog = ({ entityId }: { entityId: string }) => {
@@ -83,16 +44,8 @@ export const startDialog = ({ entityId }: { entityId: string }) => {
     setState('isPlayerDialogOpen', true);
     setStore('dialogId', entityId);
 
-    event({
-        data: entityDialog,
-        entityId,
-        type: EventTypes.DIALOG_START,
-    });
-    event({
-        data: { audioName: 'main_select' },
-        entityId,
-        type: EventTypes.AUDIO_PLAY,
-    });
+    event({ entityId, type: EventTypes.DIALOG_START });
+    event({ data: { audioName: 'main_select' }, type: EventTypes.AUDIO_PLAY });
 };
 
 export const nextDialog = ({ entityId }: { entityId: string }) => {
@@ -103,6 +56,15 @@ export const nextDialog = ({ entityId }: { entityId: string }) => {
             message: `DialogText ${entityId}-${entityDialog._currentTextId} not found`,
             where: nextDialog.name,
         });
+
+    /* TEMP */
+    if (dialogPreviousText._value.includes('☕')) fillEnergy({});
+    if (dialogPreviousText._value.includes('🕵️‍♂️')) emptyPlayerInventory({});
+    /* TEMP */
+
+    if (entityDialog._currentId === 'secret') {
+        startDialogSecret({ entityId });
+    }
 
     if (entityDialog._currentOptionIndex !== undefined && isDialogTextOptionsSet(dialogPreviousText)) {
         entityDialog._currentTextId = dialogPreviousText._options[entityDialog._currentOptionIndex];
@@ -139,16 +101,8 @@ export const nextDialog = ({ entityId }: { entityId: string }) => {
     }
     setDialogCurrentText(entityId, entityDialog, dialogCurrentText._next);
 
-    event({
-        data: entityDialog,
-        entityId,
-        type: EventTypes.DIALOG_UPDATE,
-    });
-    event({
-        data: { audioName: 'main_select' },
-        entityId,
-        type: EventTypes.AUDIO_PLAY,
-    });
+    event({ entityId, type: EventTypes.DIALOG_UPDATE });
+    event({ data: { audioName: 'main_select' }, type: EventTypes.AUDIO_PLAY });
 };
 
 export const selectDialogOption = ({ entityId, offset }: { entityId: string, offset: 1 | -1 }) => {
@@ -181,19 +135,16 @@ export const selectDialogOption = ({ entityId, offset }: { entityId: string, off
         );
     }
 
-    event({
-        data: entityDialog,
-        entityId,
-        type: EventTypes.DIALOG_UPDATE,
-    });
-    event({
-        data: { audioName: 'main_select' },
-        entityId,
-        type: EventTypes.AUDIO_PLAY,
-    });
+    event({ entityId, type: EventTypes.DIALOG_UPDATE });
+    event({ data: { audioName: 'main_select' }, type: EventTypes.AUDIO_PLAY });
 };
 
 export const endDialog = ({ entityId }: { entityId: string }) => {
+    if (isSecretWin()) {
+        winSecret();
+        return;
+    }
+
     const entityDialog = getComponent({ componentId: 'Dialog', entityId });
 
     entityDialog._currentTextId = undefined;
@@ -203,9 +154,15 @@ export const endDialog = ({ entityId }: { entityId: string }) => {
     setState('isPlayerDialogOpen', false);
     clearStore('dialogId');
 
-    event({
-        entityId,
-        type: EventTypes.DIALOG_END,
-    });
+    if (isSecretRun()) {
+        endDialogSecretRun({ entityId });
+        return;
+    }
+    if (isSecretUnlocked()) {
+        endDialogSecret({ entityId });
+        return;
+    }
+
+    event({ entityId, type: EventTypes.DIALOG_END });
 };
 //#endregion SYSTEMS

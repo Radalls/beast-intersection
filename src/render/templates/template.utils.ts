@@ -2,13 +2,16 @@ import { error } from '@/engine/services/error';
 
 //#region CONSTANTS
 const spriteFiles: Record<string, { default: string }>
-    = import.meta.glob('/src/assets/sprites/**/*.png', { eager: true });
+    = import.meta.glob('/src/assets/sprites/**/*.{png,gif}', { eager: true });
 //#endregion
 
 //#region UTILS
-export const getSpritePath = (spriteName: string) => {
+export const getSpritePath = ({ spriteName, gif }: {
+    gif?: boolean,
+    spriteName: string,
+}) => {
     const spriteKey = spriteName.replace(/^(.*?)(\/[^/]+)?(\.[^./]+)?$/, '$1').split('_')[0];
-    const spritePath = `/src/assets/sprites/${spriteKey}/${spriteName}.png`;
+    const spritePath = `/src/assets/sprites/${spriteKey}/${spriteName}.${(gif) ? 'gif' : 'png'}`;
 
     return spriteFiles[spritePath].default
         ?? error({ message: `Sprite ${spriteName} not found`, where: getSpritePath.name });
@@ -23,7 +26,7 @@ export const checkElement = ({ elementId }: { elementId: string }) => {
     return document.getElementById(elementId) !== null;
 };
 
-export const searchElementById = ({ partialElementId }: { partialElementId: string }) => {
+export const searchElementsById = ({ partialElementId }: { partialElementId: string }) => {
     return [...document.querySelectorAll(`[id*="${partialElementId}"]`)] as HTMLElement[];
 };
 

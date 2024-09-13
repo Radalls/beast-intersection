@@ -1,14 +1,18 @@
 import { Inventory, Item, Tool } from '@/engine/components/inventory';
 import { ActivityTypes } from '@/engine/components/resource';
 import { getComponent } from '@/engine/entities';
-import { EventTypes } from '@/engine/event';
 import { error } from '@/engine/services/error';
-import { setState } from '@/engine/state';
-import { getStore } from '@/engine/store';
+import { EventTypes } from '@/engine/services/event';
+import { setState } from '@/engine/services/state';
+import { getStore } from '@/engine/services/store';
 import { event } from '@/render/events';
 
 //#region CHECKS
-const toolSlotUnavailable = (inventory: Inventory) => inventory.tools.length >= inventory._maxTools;
+export const invalidItemName = (itemName: string) => !(itemName) || itemName === '';
+export const invalidItemAmount = (itemAmount: number) => itemAmount <= 0;
+export const invalidItemSprite = (itemSprite: string) => !(itemSprite) || itemSprite === '';
+export const slotAvailable = (inventory: Inventory) => inventory.slots.length < inventory._maxSlots;
+export const toolSlotUnavailable = (inventory: Inventory) => inventory.tools.length >= inventory._maxTools;
 //#endregion
 
 //#region UTILS
@@ -74,11 +78,7 @@ export const addToolToInventory = ({ entityId, tool }: {
         tool,
     });
 
-    event({
-        data: inventory,
-        entityId,
-        type: EventTypes.INVENTORY_TOOL_UPDATE,
-    });
+    event({ entityId, type: EventTypes.INVENTORY_TOOL_UPDATE });
 
     return { success: true };
 };
@@ -91,19 +91,9 @@ export const openPlayerInventory = ({ playerEntityId }: {
 
     setState('isPlayerInventoryOpen', true);
 
-    event({
-        entityId: playerEntityId,
-        type: EventTypes.INVENTORY_DISPLAY,
-    });
-    event({
-        entityId: playerEntityId,
-        type: EventTypes.INVENTORY_TOOL_ACTIVE_DISPLAY,
-    });
-    event({
-        data: { audioName: 'inventory_open' },
-        entityId: playerEntityId,
-        type: EventTypes.AUDIO_PLAY,
-    });
+    event({ entityId: playerEntityId, type: EventTypes.INVENTORY_DISPLAY });
+    event({ entityId: playerEntityId, type: EventTypes.INVENTORY_TOOL_ACTIVE_DISPLAY });
+    event({ data: { audioName: 'inventory_open' }, type: EventTypes.AUDIO_PLAY });
 };
 
 export const closePlayerInventory = ({ playerEntityId }: {
@@ -114,19 +104,9 @@ export const closePlayerInventory = ({ playerEntityId }: {
 
     setState('isPlayerInventoryOpen', false);
 
-    event({
-        entityId: playerEntityId,
-        type: EventTypes.INVENTORY_DISPLAY,
-    });
-    event({
-        entityId: playerEntityId,
-        type: EventTypes.INVENTORY_TOOL_ACTIVE_DISPLAY,
-    });
-    event({
-        data: { audioName: 'inventory_close' },
-        entityId: playerEntityId,
-        type: EventTypes.AUDIO_PLAY,
-    });
+    event({ entityId: playerEntityId, type: EventTypes.INVENTORY_DISPLAY });
+    event({ entityId: playerEntityId, type: EventTypes.INVENTORY_TOOL_ACTIVE_DISPLAY });
+    event({ data: { audioName: 'inventory_close' }, type: EventTypes.AUDIO_PLAY });
 };
 
 export const playerActiveTool = ({ playerEntityId }: {
@@ -166,5 +146,35 @@ export const playerHasActivityToolActive = ({ playerEntityId, activity }: {
     activity = ActivityTypes[activity as keyof typeof ActivityTypes];
 
     return inventory.tools.some((tool) => tool._active && tool.tool._activity === activity);
+};
+
+export const playerInventoryFull = ({ playerEntityId, item }: {
+    item: Item,
+    playerEntityId?: string | null,
+}) => {
+    if (!(playerEntityId)) playerEntityId = getStore('playerId')
+        ?? error({ message: 'Store playerId is undefined', where: playerHasActivityToolActive.name });
+
+    const inventory = getComponent({ componentId: 'Inventory', entityId: playerEntityId });
+
+    if (slotAvailable(inventory)) return false;
+    else {
+        const itemSlots = findInventorySlotsWithItem({ inventory, itemName: item.info._name });
+        if (!(itemSlots.some(slot => slot._amount < slot._maxAmount))) return true;
+        else return false;
+    }
+};
+
+export const emptyPlayerInventory = ({ playerEntityId }: {
+    playerEntityId?: string | null,
+}) => {
+    if (!(playerEntityId)) playerEntityId = getStore('playerId')
+        ?? error({ message: 'Store playerId is undefined', where: emptyPlayerInventory.name });
+
+    const inventory = getComponent({ componentId: 'Inventory', entityId: playerEntityId });
+
+    inventory.slots = [];
+
+    event({ entityId: playerEntityId, type: EventTypes.INVENTORY_UPDATE });
 };
 //#endregion

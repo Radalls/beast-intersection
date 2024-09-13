@@ -1,13 +1,10 @@
 import { createElement, destroyElement } from './template';
 import { getElement } from './template.utils';
 
-import { Dialog } from '@/engine/components/dialog';
+import { getComponent } from '@/engine/entities';
 
 //#region TEMPLATES
-export const startDialog = ({ entityId, dialog }: {
-    dialog: Dialog,
-    entityId: string
-}) => {
+export const startDialog = ({ entityId }: { entityId: string }) => {
     const dialogElement = createElement({
         elementClass: 'dialog',
         elementId: `${entityId}-dialog`,
@@ -29,15 +26,14 @@ export const startDialog = ({ entityId, dialog }: {
         entityId,
     });
 
-    updateDialog({ dialog, entityId });
+    updateDialog({ entityId });
 };
 
-export const updateDialog = ({ entityId, dialog }: {
-    dialog: Dialog,
-    entityId: string
-}) => {
+export const updateDialog = ({ entityId }: { entityId: string }) => {
+    const dialog = getComponent({ componentId: 'Dialog', entityId });
+
     const dialogText = getElement({ elementId: `${entityId}-dialog-text` });
-    dialogText.textContent = dialog._currentValue ?? 'DIALOG TEXT ERROR';
+    dialogText.innerText = dialog._currentValue ?? 'DIALOG TEXT ERROR';
 
     destroyDialogOptions({ entityId });
 
@@ -54,7 +50,7 @@ export const updateDialog = ({ entityId, dialog }: {
                     elementParent: dialogTextOptions,
                     entityId,
                 });
-                dialogOption.textContent = dialog._currentOptionsValues[i];
+                dialogOption.innerText = dialog._currentOptionsValues[i];
             }
         }
 

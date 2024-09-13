@@ -1,8 +1,8 @@
 import { DialogText } from '@/engine/components/dialog';
 import { getComponent, getRawEntityId } from '@/engine/entities';
 import { error } from '@/engine/services/error';
-import { createQuest, QuestData } from '@/engine/services/quest';
-import { getStore } from '@/engine/store';
+import { getStore } from '@/engine/services/store';
+import { createQuest, QuestData } from '@/engine/systems/manager';
 
 const dialogFiles: Record<string, { default: { [dialogId: string]: DialogTextData[] } }>
     = import.meta.glob('/src/assets/dialogs/*.json', { eager: true });

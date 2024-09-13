@@ -7,3 +7,4 @@ export * from './event.inventory';
 export * from './event.menu';
 export * from './event.quest';
 export * from './event.tilemap';
+export * from './event.utils';

@@ -1,19 +1,19 @@
-import { TileMap, Tile } from '@/engine/components/tilemap';
+import { Tile } from '@/engine/components/tilemap';
+import { error } from '@/engine/services/error';
+import { getStore } from '@/engine/services/store';
 import { createTileMap, createTileMapTile, destroyElement } from '@/render/templates';
 
 //#region EVENTS
-export const onTileMapCreate = ({ tileMapEntityId, tileMap }: {
-    tileMap: TileMap,
-    tileMapEntityId: string
-}) => createTileMap({ tileMap, tileMapEntityId });
+export const onTileMapCreate = () => createTileMap();
 
-export const onTileMapTileCreate = ({ tileMapEntityId, tile }: {
-    tile: Tile,
-    tileMapEntityId: string
-}) => createTileMapTile({ tile, tileMapEntityId });
+export const onTileMapTileCreate = ({ tile }: { tile: Tile }) => createTileMapTile({ tile });
 
-export const onTileMapTileDestroy = ({ tileMapEntityId, tile }: {
+export const onTileMapTileDestroy = ({ tile }: {
     tile: Tile,
-    tileMapEntityId: string
-}) => destroyElement({ elementId: `${tileMapEntityId}-tile-${tile.position._x}-${tile.position._y}` });
+}) => {
+    const tileMapEntityId = getStore('tileMapId')
+        ?? error({ message: 'Store tileMapId is undefined', where: onTileMapTileDestroy.name });
+
+    destroyElement({ elementId: `${tileMapEntityId}-tile-${tile.position._x}-${tile.position._y}` });
+};
 //#endregion

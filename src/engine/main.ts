@@ -1,8 +1,7 @@
-import { startCycle } from './cycle';
-import { createEntityManager, createEntityPlayer, createEntityTileMap } from './services/entity';
-import { initQuest } from './services/quest';
-import { setState } from './state';
-import { SaveData } from './systems/manager/manager.data';
+import { startCycle } from '@/engine/services/cycle';
+import { createEntityManager, createEntityPlayer, createEntityTileMap } from '@/engine/services/entity';
+import { setState } from '@/engine/services/state';
+import { initQuest, SaveData } from '@/engine/systems/manager';
 
 export const main = () => {
     launch();
@@ -25,8 +24,12 @@ export const run = ({ saveData }: { saveData?: SaveData }) => {
     });
 
     createEntityPlayer({
-        positionX: 3,
-        positionY: 3,
+        positionX: (saveData?.playerPosition)
+            ? undefined
+            : 3,
+        positionY: (saveData?.playerPosition)
+            ? undefined
+            : 3,
         savedEnergy: saveData?.playerEnergy,
         savedInventory: saveData?.playerInventory,
         savedPosition: saveData?.playerPosition,

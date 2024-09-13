@@ -1,4 +1,3 @@
-import { Inventory } from '@/engine/components/inventory';
 import {
     activateInventoryTool,
     createInventory,
@@ -9,28 +8,16 @@ import {
 } from '@/render/templates';
 
 //#region EVENTS
-export const onInventoryCreate = ({ entityId, inventory }: {
-    entityId: string,
-    inventory: Inventory,
-}) => createInventory({ entityId, inventory });
+export const onInventoryCreate = ({ entityId }: { entityId: string }) => createInventory({ entityId });
 
 export const onInventoryDisplay = ({ entityId }: { entityId: string }) => displayInventory({ entityId });
 
-export const onInventoryUpdate = ({ entityId, inventory }: {
-    entityId: string,
-    inventory: Inventory,
-}) => updateInventory({ entityId, inventory });
+export const onInventoryUpdate = ({ entityId }: { entityId: string }) => updateInventory({ entityId });
 
-export const onInventoryToolActivate = ({ entityId, inventory }: {
-    entityId: string,
-    inventory: Inventory,
-}) => activateInventoryTool({ entityId, inventory });
+export const onInventoryToolActivate = ({ entityId }: { entityId: string }) => activateInventoryTool({ entityId });
 
 export const onInventoryToolActiveDisplay
     = ({ entityId }: { entityId: string }) => displayInventoryToolActive({ entityId });
 
-export const onInventoryToolsUpdate = ({ entityId, inventory }: {
-    entityId: string,
-    inventory: Inventory,
-}) => updateInventoryTools({ entityId, inventory });
+export const onInventoryToolsUpdate = ({ entityId }: { entityId: string }) => updateInventoryTools({ entityId });
 //#endregion

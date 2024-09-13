@@ -10,6 +10,11 @@
     z-index: 100;
 }
 
+.activity-cancel {
+    height: 32px;
+    width: 96px;
+}
+
 .activity-win {
     align-items: center;
     background-color: rgb(245, 245, 245);
@@ -44,7 +49,7 @@
 
 .activity-bug-score-label {
     font-size: 24px;
-    text-align: left;
+    text-align: center;
 }
 
 .activity-bug-symbol {
@@ -57,8 +62,8 @@
 
 .activity-bug-symbol-value {
     font-weight: bold;
-    text-align: left;
-    width: 192px;
+    text-align: center;
+    width: 160px;
 }
 
 .activity-bug-symbol-found {
@@ -70,7 +75,7 @@
 .activity-fish {
     align-items: center;
     display: flex;
-    gap: 64px;
+    gap: 32px;
     height: 192px;
     justify-content: center;
     text-align: center;
@@ -93,7 +98,7 @@
 .activity-fish-hp-label {
     font-size: 24px;
     text-align: left;
-    width: 96px;
+    width: 72px;
 }
 
 .activity-fish-rod-tension {
@@ -106,19 +111,18 @@
 .activity-fish-rod-tension-label {
     font-size: 24px;
     text-align: left;
-    width: 96px;
+    width: 72px;
 }
 
 .activity-fish-key {
     font-size: 32px;
-    width: 192px
+    width: 160px
 }
 
 .activity-fish-frenzy {
     align-items: center;
     display: flex;
     gap: 8px;
-    padding-right: 32px;
 }
 
 .activity-fish-frenzy-label {
@@ -196,5 +200,5 @@
 
 .activity-craft-key {
     font-size: 32px;
-    width: 192px
+    width: 160px
 }

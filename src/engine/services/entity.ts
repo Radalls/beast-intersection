@@ -1,4 +1,3 @@
-
 import {
     addSprite,
     addPosition,
@@ -21,7 +20,13 @@ import { Inventory } from '@/engine/components/inventory';
 import { Manager } from '@/engine/components/manager';
 import { Position } from '@/engine/components/position';
 import { createEntity, MANAGER_ENTITY_NAME, PLAYER_ENTITY_NAME, TILEMAP_ENTITY_NAME } from '@/engine/entities';
-import { getStore } from '@/engine/store';
+import { getStore } from '@/engine/services/store';
+import {
+    isSecretRun,
+    createEntityPlayerSecret,
+    createEntityResourceItemSecret,
+    createEntityResourceFishSecret,
+} from '@/engine/systems/manager';
 import { generateTileMap, setTile } from '@/engine/systems/tilemap';
 
 //#region SERVICES
@@ -45,7 +50,7 @@ export const createEntityPlayer = ({
     spritePath,
     positionX = 0,
     positionY = 0,
-    inventoryMaxSlots = 20,
+    inventoryMaxSlots = 10,
     energyMax = 10,
     savedPosition,
     savedInventory,
@@ -62,6 +67,23 @@ export const createEntityPlayer = ({
     spritePath: string,
     spriteWidth?: number,
 }) => {
+    if (isSecretRun()) {
+        createEntityPlayerSecret({
+            energyMax,
+            inventoryMaxSlots,
+            positionX,
+            positionY,
+            savedEnergy,
+            savedInventory,
+            savedPosition,
+            spriteHeight,
+            spritePath,
+            spriteWidth,
+        });
+
+        return;
+    }
+
     const entityId = createEntity({ entityName: PLAYER_ENTITY_NAME });
 
     addSprite({ entityId, height: spriteHeight, image: spritePath, width: spriteWidth });
@@ -131,6 +153,22 @@ export const createEntityResourceItem = ({
     spriteWidth?: number,
     triggerPriority?: number,
 }) => {
+    if (isSecretRun()) {
+        createEntityResourceItemSecret({
+            entityName,
+            positionX,
+            positionY,
+            resourceIsTemporary,
+            resoureceItemName,
+            spriteHeight,
+            spritePath,
+            spriteWidth,
+            triggerPriority,
+        });
+
+        return;
+    }
+
     const entityId = createEntity({ entityName });
 
     addSprite({ entityId, height: spriteHeight, image: spritePath, width: spriteWidth });
@@ -222,6 +260,28 @@ export const createEntityResourceFish = ({
     spriteWidth?: number,
     triggerPriority?: number,
 }) => {
+    if (isSecretRun()) {
+        createEntityResourceFishSecret({
+            entityName,
+            positionX,
+            positionY,
+            resourceActivityFishDamage,
+            resourceActivityFishFrenzyDuration,
+            resourceActivityFishFrenzyInterval,
+            resourceActivityFishMaxHp,
+            resourceActivityFishRodDamage,
+            resourceActivityFishRodMaxTension,
+            resourceIsTemporary,
+            resoureceItemName,
+            spriteHeight,
+            spritePath,
+            spriteWidth,
+            triggerPriority,
+        });
+
+        return;
+    }
+
     const entityId = createEntity({ entityName });
 
     addSprite({ entityId, height: spriteHeight, image: spritePath, width: spriteWidth });

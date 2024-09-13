@@ -1,7 +1,9 @@
 import { createElement, destroyElement } from './template';
 import { getElement, getSpritePath, searchElementsByClassName } from './template.utils';
 
-import { Manager } from '@/engine/components/manager';
+import { getComponent } from '@/engine/entities';
+import { error } from '@/engine/services/error';
+import { getStore } from '@/engine/services/store';
 
 //#region CONSTANTS
 const QUEST_ITEM_HEIGHT = 23;
@@ -12,7 +14,6 @@ export const createQuestsMenu = () => {
     createElement({
         elementClass: 'quests',
         elementId: 'PlayerQuestsMenu',
-        entityId: '',
     });
 };
 
@@ -22,7 +23,12 @@ export const displayQuests = () => {
     quests.style.display = (quests.style.display === 'block') ? 'none' : 'block';
 };
 
-export const createQuest = ({ manager }: { manager: Manager }) => {
+export const createQuest = () => {
+    const managerEntityId = getStore('managerId')
+        ?? error({ message: 'Store managerId is undefined', where: createQuest.name });
+
+    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
+
     const quests = getElement({ elementId: 'PlayerQuestsMenu' });
     const questData = manager.quests[manager._selectedQuest];
 
@@ -31,7 +37,6 @@ export const createQuest = ({ manager }: { manager: Manager }) => {
         elementClass: 'quest',
         elementId: `Quest${manager._selectedQuest}`,
         elementParent: quests,
-        entityId: '',
     });
 
     if (questData?.items) {
@@ -43,7 +48,6 @@ export const createQuest = ({ manager }: { manager: Manager }) => {
                 elementClass: 'quest-item',
                 elementId: `Quest${manager._selectedQuest}Item${item._name}`,
                 elementParent: quest,
-                entityId: '',
             });
             questItem.innerText = `- Obtain ${item._amount} ${item._name}`;
         }
@@ -54,12 +58,16 @@ export const createQuest = ({ manager }: { manager: Manager }) => {
         elementClass: 'quest-complete',
         elementId: `Quest${manager._selectedQuest}Complete`,
         elementParent: quest,
-        entityId: '',
     });
-    questComplete.style.backgroundImage = `url(${getSpritePath('quest_complete')})`;
+    questComplete.style.backgroundImage = `url(${getSpritePath({ spriteName: 'quest_complete' })})`;
 };
 
-export const completeQuest = ({ manager }: { manager: Manager }) => {
+export const completeQuest = () => {
+    const managerEntityId = getStore('managerId')
+        ?? error({ message: 'Store managerId is undefined', where: completeQuest.name });
+
+    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
+
     const questData = manager.quests[manager._selectedQuest];
 
     const quest = getElement({ elementId: `Quest${manager._selectedQuest}` });
@@ -80,13 +88,17 @@ export const completeQuest = ({ manager }: { manager: Manager }) => {
             elementClass: 'quest-talk',
             elementId: `Quest${manager._selectedQuest}Talk`,
             elementParent: quest,
-            entityId: '',
         });
         questTalk.innerText = `Talk to ${questData.talk}`;
     }
 };
 
-export const destroyQuest = ({ manager }: { manager: Manager }) => {
+export const destroyQuest = () => {
+    const managerEntityId = getStore('managerId')
+        ?? error({ message: 'Store managerId is undefined', where: destroyQuest.name });
+
+    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
+
     destroyElement({ elementId: `Quest${manager._selectedQuest}` });
 };
 //#endregion

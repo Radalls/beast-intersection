@@ -1,4 +1,4 @@
-import { getState } from '@/engine/state';
+import { getState } from '@/engine/services/state';
 import { playAudio, stopAudio } from '@/render/audio';
 
 //#region EVENTS

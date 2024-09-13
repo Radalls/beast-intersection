@@ -1,6 +1,6 @@
 import { getComponent } from '@/engine/entities';
-import { EventTypes } from '@/engine/event';
 import { error } from '@/engine/services/error';
+import { EventTypes } from '@/engine/services/event';
 import { event } from '@/render/events';
 
 //#region CHECKS
@@ -32,10 +32,6 @@ export const updatePosition = ({ entityId, x, y }: {
     position._x = x;
     position._y = y;
 
-    event({
-        data: position,
-        entityId,
-        type: EventTypes.ENTITY_POSITION_UPDATE,
-    });
+    event({ entityId, type: EventTypes.ENTITY_POSITION_UPDATE });
 };
 //#endregion

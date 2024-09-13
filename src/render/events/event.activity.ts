@@ -1,4 +1,3 @@
-import { ActivityBugData, ActivityCraftData, ActivityFishData, Resource } from '@/engine/components/resource';
 import {
     endActivity,
     endActivityBug,
@@ -6,6 +5,7 @@ import {
     endActivityFish,
     endPlayActivityCraft,
     endSelectActivityCraft,
+    loseActivity,
     startActivity,
     startActivityBug,
     startActivityCraft,
@@ -20,86 +20,47 @@ import {
 } from '@/render/templates';
 
 //#region MAIN ACTIVITY
-export const onActivityStart = (
-    { activityEntityId }: { activityEntityId: string },
-) => startActivity({ activityEntityId });
+export const onActivityStart = () => startActivity();
 
-export const onActivityWin = ({ activityEntityId, resource }: {
-    activityEntityId: string,
-    resource: Resource,
-}) => winActivity({ activityEntityId, resource });
+export const onActivityWin = () => winActivity();
 
-export const onActivityEnd = ({ activityEntityId }: { activityEntityId: string }) => endActivity({ activityEntityId });
+export const onActivityLose = () => loseActivity();
+
+export const onActivityEnd = () => endActivity();
 //#endregion
 
 //#region EVENTS
 //#region ACTIVITY BUG
-export const onActivityBugStart = ({ activityEntityId, activityBugData }: {
-    activityBugData: ActivityBugData,
-    activityEntityId: string
-}) => startActivityBug({ activityBugData, activityEntityId });
+export const onActivityBugStart = () => startActivityBug();
 
-export const onActivityBugUpdate = ({ activityEntityId, activityBugData }: {
-    activityBugData: ActivityBugData,
-    activityEntityId: string
-}) => updateActivityBug({ activityBugData, activityEntityId });
+export const onActivityBugUpdate = () => updateActivityBug();
 
-export const onActivityBugEnd = (
-    { activityEntityId }: { activityEntityId: string },
-) => endActivityBug({ activityEntityId });
+export const onActivityBugEnd = () => endActivityBug();
 //#endregion
 
 //#region ACTIVITY FISH
-export const onActivityFishStart = ({ activityEntityId, activityFishData }: {
-    activityEntityId: string,
-    activityFishData: ActivityFishData,
-}) => startActivityFish({ activityEntityId, activityFishData });
+export const onActivityFishStart = () => startActivityFish();
 
-export const onActivityFishUpdate = ({ activityEntityId, activityFishData }: {
-    activityEntityId: string,
-    activityFishData: ActivityFishData,
-}) => updateActivityFish({ activityEntityId, activityFishData });
+export const onActivityFishUpdate = () => updateActivityFish();
 
-export const onActivityFishEnd = (
-    { activityEntityId }: { activityEntityId: string },
-) => endActivityFish({ activityEntityId });
+export const onActivityFishEnd = () => endActivityFish();
 //#endregion
 
 //#region ACTIVITY CRAFT
-export const onActivityCraftStart = (
-    { activityEntityId }: { activityEntityId: string },
-) => startActivityCraft({ activityEntityId });
+export const onActivityCraftStart = () => startActivityCraft();
 
-export const onActivityCraftSelectStart = ({ activityEntityId, activityCraftData }: {
-    activityCraftData: ActivityCraftData,
-    activityEntityId: string
-}) => startSelectActivityCraft({ activityCraftData, activityEntityId });
+export const onActivityCraftSelectStart = () => startSelectActivityCraft();
 
-export const onActivityCraftSelectUpdate = ({ activityEntityId, activityCraftData }: {
-    activityCraftData: ActivityCraftData,
-    activityEntityId: string
-}) => updateSelectActivityCraft({ activityCraftData, activityEntityId });
+export const onActivityCraftSelectUpdate = () => updateSelectActivityCraft();
 
-export const onActivityCraftSelectEnd = (
-    { activityEntityId }: { activityEntityId: string },
-) => endSelectActivityCraft({ activityEntityId });
+export const onActivityCraftSelectEnd = () => endSelectActivityCraft();
 
-export const onActivityCraftPlayStart = ({ activityEntityId, activityCraftData }: {
-    activityCraftData: ActivityCraftData,
-    activityEntityId: string
-}) => startPlayActivityCraft({ activityCraftData, activityEntityId });
+export const onActivityCraftPlayStart = () => startPlayActivityCraft();
 
-export const onActivityCraftPlayUpdate = ({ activityEntityId, activityCraftData }: {
-    activityCraftData: ActivityCraftData,
-    activityEntityId: string
-}) => updatePlayActivityCraft({ activityCraftData, activityEntityId });
+export const onActivityCraftPlayUpdate = () => updatePlayActivityCraft();
 
-export const onActivityCraftPlayEnd = (
-    { activityEntityId }: { activityEntityId: string }
-) => endPlayActivityCraft({ activityEntityId });
+export const onActivityCraftPlayEnd = () => endPlayActivityCraft();
 
-export const onActivityCraftEnd = (
-    { activityEntityId }: { activityEntityId: string }
-) => endActivityCraft({ activityEntityId });
+export const onActivityCraftEnd = () => endActivityCraft();
 //#endregion
 //#endregion

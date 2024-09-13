@@ -2,7 +2,7 @@ import { getComponent } from '@/engine/entities';
 import { error } from '@/engine/services/error';
 import { findTileByPosition } from '@/engine/systems/tilemap/tilemap.utils';
 
-//#region ACTIONS
+//#region SYSTEMS
 export const setCollider = ({ entityId }: { entityId: string }) => {
     const entityPosition = getComponent({ componentId: 'Position', entityId });
     const entityCollider = getComponent({ componentId: 'Collider', entityId });
@@ -48,4 +48,4 @@ export const destroyCollider = ({ entityId }: { entityId: string }) => {
         }
     }
 };
-//#endregion ACTIONS
+//#endregion

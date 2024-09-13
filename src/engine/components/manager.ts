@@ -1,4 +1,4 @@
-import { Quest } from '@/engine/services/quest';
+import { Quest } from '@/engine/systems/manager';
 
 export type Manager = {
     _: 'Manager',
