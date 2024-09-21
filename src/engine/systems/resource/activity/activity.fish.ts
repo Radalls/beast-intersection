@@ -8,11 +8,35 @@ import { EventTypes } from '@/engine/services/event';
 import { setState } from '@/engine/services/state';
 import { getStore } from '@/engine/services/store';
 import { playerInventoryFull } from '@/engine/systems/inventory';
-import { isSecretRun, loseActivityFishSecret, winActivityFishSecret } from '@/engine/systems/manager';
+import {
+    isSecretRun,
+    loseActivityFishSecret,
+    startActivityFishSecret,
+    winActivityFishSecret,
+} from '@/engine/systems/manager';
 import { randAudio } from '@/render/audio';
 import { event } from '@/render/events';
 
 //#region SERVICES
+export const onActivityFishInput = ({ inputKey }: { inputKey: string }) => {
+    const managerEntityId = getStore('managerId')
+        ?? error({ message: 'Store managerId is undefined', where: onActivityFishInput.name });
+
+    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
+
+    const activityFishEntityId = getStore('activityId')
+        ?? error({ message: 'Store activityId is undefined ', where: onActivityFishInput.name });
+
+    if (inputKey === manager.settings.keys.action._back) {
+        if (isSecretRun()) return;
+
+        loseActivityFish();
+    }
+    else {
+        playActivityFish({ activityId: activityFishEntityId, symbol: inputKey });
+    }
+};
+
 export const startActivityFish = ({ activityId }: { activityId: string }) => {
     const activityResource = getComponent({ componentId: 'Resource', entityId: activityId });
 
@@ -43,6 +67,10 @@ export const startActivityFish = ({ activityId }: { activityId: string }) => {
     }
 
     startActivity({ activityId });
+
+    if (isSecretRun()) {
+        startActivityFishSecret();
+    }
 
     const activityFishData = activityResource.activityData as ActivityFishData;
     activityFishData._fishHp = activityFishData._fishMaxHp;
@@ -154,24 +182,5 @@ export const endActivityFish = () => {
     clearCycle('activityFishTickIntervalFrenzyOff');
 
     event({ type: EventTypes.ACTIVITY_FISH_END });
-};
-
-export const onActivityFishInput = ({ inputKey }: { inputKey: string }) => {
-    const managerEntityId = getStore('managerId')
-        ?? error({ message: 'Store managerId is undefined', where: onActivityFishInput.name });
-
-    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
-
-    const activityFishEntityId = getStore('activityId')
-        ?? error({ message: 'Store activityId is undefined ', where: onActivityFishInput.name });
-
-    if (inputKey === manager.settings.keys.action._back) {
-        if (isSecretRun()) return;
-
-        loseActivityFish();
-    }
-    else {
-        playActivityFish({ activityId: activityFishEntityId, symbol: inputKey });
-    }
 };
 //#endregion

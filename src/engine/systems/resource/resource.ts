@@ -65,13 +65,6 @@ export const getResourceItem = ({ entityId, resourceEntityId }: {
     }
 
     if (playerInventoryFull({ item: resource.item })) {
-        event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
-
-        error({
-            message: 'Player inventory is full',
-            where: getResourceItem.name,
-        });
-
         return false;
     }
 

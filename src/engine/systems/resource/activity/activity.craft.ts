@@ -23,6 +23,39 @@ const checkActivityCraftData = (activityData: ActivityData): activityData is Act
 //#endregion
 
 //#region SERVICES
+export const onActivityCraftInput = ({ inputKey }: { inputKey: string }) => {
+    const managerEntityId = getStore('managerId')
+        ?? error({ message: 'Store managerId is undefined', where: onActivityCraftInput.name });
+
+    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
+
+    const activityCraftEntityId = getStore('activityId')
+        ?? error({ message: 'Store activityId is undefined ', where: onActivityCraftInput.name });
+
+    if (getState('isActivityCraftSelecting')) {
+        if (inputKey === manager.settings.keys.action._act) {
+            confirmActivityCraftRecipe({ activityId: activityCraftEntityId });
+        }
+        else if (inputKey === manager.settings.keys.move._up) {
+            selectActivityCraftRecipe({ activityId: activityCraftEntityId, offset: -1 });
+        }
+        else if (inputKey === manager.settings.keys.move._down) {
+            selectActivityCraftRecipe({ activityId: activityCraftEntityId, offset: 1 });
+        }
+        else if (inputKey === manager.settings.keys.action._back) {
+            endActivityCraft({ activityId: activityCraftEntityId });
+        }
+    }
+    else if (getState('isActivityCraftPlaying')) {
+        if (inputKey === manager.settings.keys.action._back) {
+            loseActivity();
+        }
+        else {
+            playActivityCraft({ activityId: activityCraftEntityId, symbol: inputKey });
+        }
+    }
+};
+
 //#region SELECT
 export const startActivityCraft = ({ activityId }: { activityId: string }) => {
     startActivity({ activityId });
@@ -59,13 +92,23 @@ export const selectActivityCraftRecipe = ({ activityId, offset }: { activityId?:
     }
 
     if (offset === -1) {
-        activityCraftData._currentRecipeIndex = Math.max(0, activityCraftData._currentRecipeIndex - 1);
+        if (activityCraftData._currentRecipeIndex === 0) {
+            activityCraftData._currentRecipeIndex = itemRecipes.length - 1;
+        }
+        else {
+            activityCraftData._currentRecipeIndex = Math.max(0, activityCraftData._currentRecipeIndex - 1);
+        }
     }
     else if (offset === 1) {
-        activityCraftData._currentRecipeIndex = Math.min(
-            itemRecipes.length - 1,
-            activityCraftData._currentRecipeIndex + 1,
-        );
+        if (activityCraftData._currentRecipeIndex === itemRecipes.length - 1) {
+            activityCraftData._currentRecipeIndex = 0;
+        }
+        else {
+            activityCraftData._currentRecipeIndex = Math.min(
+                itemRecipes.length - 1,
+                activityCraftData._currentRecipeIndex + 1,
+            );
+        }
     }
 
     event({ type: EventTypes.ACTIVITY_CRAFT_SELECT_UPDATE });
@@ -255,40 +298,6 @@ const removeCraftIngredients = ({ activityId }: { activityId?: string | null }) 
                 message: `Could not remove ${ingredient.amount} ${ingredient.name} from inventory`,
                 where: removeCraftIngredients.name,
             });
-        }
-    }
-};
-//#endregion
-
-export const onActivityCraftInput = ({ inputKey }: { inputKey: string }) => {
-    const managerEntityId = getStore('managerId')
-        ?? error({ message: 'Store managerId is undefined', where: onActivityCraftInput.name });
-
-    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
-
-    const activityCraftEntityId = getStore('activityId')
-        ?? error({ message: 'Store activityId is undefined ', where: onActivityCraftInput.name });
-
-    if (getState('isActivityCraftSelecting')) {
-        if (inputKey === manager.settings.keys.action._act) {
-            confirmActivityCraftRecipe({ activityId: activityCraftEntityId });
-        }
-        else if (inputKey === manager.settings.keys.move._up) {
-            selectActivityCraftRecipe({ activityId: activityCraftEntityId, offset: -1 });
-        }
-        else if (inputKey === manager.settings.keys.move._down) {
-            selectActivityCraftRecipe({ activityId: activityCraftEntityId, offset: 1 });
-        }
-        else if (inputKey === manager.settings.keys.action._back) {
-            endActivityCraft({ activityId: activityCraftEntityId });
-        }
-    }
-    else if (getState('isActivityCraftPlaying')) {
-        if (inputKey === manager.settings.keys.action._back) {
-            loseActivity();
-        }
-        else {
-            playActivityCraft({ activityId: activityCraftEntityId, symbol: inputKey });
         }
     }
 };
