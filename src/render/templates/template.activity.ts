@@ -179,10 +179,10 @@ export const updateActivityBug = () => {
     const activityBugData = resource.activityData;
 
     const activityBugScoreHp = getElement({ elementId: `${activityEntityId}-activity-bug-score-hp` });
-    activityBugScoreHp.innerText = `🦋❤️ ${activityBugData._hp}`;
+    activityBugScoreHp.innerText = `🦋 ${activityBugData._hp}`;
 
     const activityBugScoreError = getElement({ elementId: `${activityEntityId}-activity-bug-score-error` });
-    activityBugScoreError.innerText = `💔 ${activityBugData._nbErrors}/${activityBugData._maxNbErrors}`;
+    activityBugScoreError.innerText = `💀 ${activityBugData._nbErrors}/${activityBugData._maxNbErrors}`;
 
     const activityBugSymbolValue = getElement({ elementId: `${activityEntityId}-activity-bug-symbol-value` });
     activityBugSymbolValue.innerText = `Press ${getActivityBugSymbol({ symbol: activityBugData._symbol }) ?? '...'}`;
@@ -270,7 +270,7 @@ export const startActivityFish = () => {
         elementParent: activityFishHp,
         entityId: activityEntityId,
     });
-    activityFishHpLabel.innerText = '🐟❤️ ';
+    activityFishHpLabel.innerText = '🐟 ';
 
     createElement({
         elementAbsolute: false,
@@ -295,7 +295,7 @@ export const startActivityFish = () => {
         elementParent: activityFishRodTension,
         entityId: activityEntityId,
     });
-    activityFishRodTensionLabel.innerText = '🎣💀 ';
+    activityFishRodTensionLabel.innerText = '💀 ';
 
     createElement({
         elementAbsolute: false,

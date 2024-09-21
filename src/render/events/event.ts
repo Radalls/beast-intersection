@@ -38,7 +38,7 @@ import {
     onSettingsMenuUpdate,
 } from './event.menu';
 import { onQuestComplete, onQuestEnd, onQuestsDisplay, onQuestStart } from './event.quest';
-import { onSecretPathDisplay, onSecretStart, onSecretWinDisplay } from './event.secret';
+import { onSecretBossDisplay, onSecretPathDisplay, onSecretStart, onSecretWinDisplay } from './event.secret';
 import { onTileMapCreate, onTileMapTileCreate, onTileMapTileDestroy } from './event.tilemap';
 import {
     checkAudioData,
@@ -143,6 +143,7 @@ export const event = <T extends keyof Component>(event: Event<T>) => {
     else if (event.type === EventTypes.QUEST_START) onQuestStart();
     /* Secret */
     else if (event.type === EventTypes.SECRET_START) onSecretStart();
+    else if (event.type === EventTypes.SECRET_BOSS_DISPLAY) onSecretBossDisplay();
     else if (event.type === EventTypes.SECRET_PATH_DISPLAY) onSecretPathDisplay();
     else if (event.type === EventTypes.SECRET_WIN_DISPLAY) onSecretWinDisplay();
     /* Tilemap */

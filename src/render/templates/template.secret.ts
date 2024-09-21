@@ -9,11 +9,22 @@ export const startSecret = () => {
     });
     secretPath.style.backgroundImage = `url(${getSpritePath({ spriteName: 'secret_path' })})`;
 
+    const secretBoss = createElement({
+        elementClass: 'secret-boss',
+        elementId: 'SecretBoss',
+    });
+    secretBoss.style.backgroundImage = `url(${getSpritePath({ gif: true, spriteName: 'secret_boss' })})`;
+
     const secretWin = createElement({
         elementClass: 'secret-win',
         elementId: 'SecretWin',
     });
     secretWin.style.backgroundImage = `url(${getSpritePath({ gif: true, spriteName: 'secret_win' })})`;
+};
+
+export const displaySecretBoss = () => {
+    const secretBoss = getElement({ elementId: 'SecretBoss' });
+    secretBoss.style.display = (secretBoss.style.display === 'block') ? 'none' : 'block';
 };
 
 export const displaySecretPath = () => {

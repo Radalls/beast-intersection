@@ -27,7 +27,7 @@
         { "id": 12, "value": "J'ai mal au dos... 😖", "next": null, "options": [13, 14, 15] },
         { "id": 13, "value": "Tu devrais t'asseoir", "next": 16, "options": [] },
         { "id": 14, "value": "M'en parle pas...", "next": 17, "options": [] },
-        { "id": 15, "value": "C'est normal, t'es vieux (*drops mic*)", "next": 19, "options": [] },
+        { "id": 15, "value": "C'est normal, t'es vieux (*drops mic*)", "next": 1, "options": [], "nextDialog": "secret" },
         { "id": 16, "value": "J'aimerais bien mais on ne m'a pas codé de sprite assis 👴", "next": null, "options": [] },
         { "id": 17, "value": "Ah ! Laisse moi t'aider dans ce cas 🕵️‍♂️", "next": 18, "options": [] },
         { "id": 18, "value": "Et voila le travail, héhé 👴", "next": null, "options": [] },

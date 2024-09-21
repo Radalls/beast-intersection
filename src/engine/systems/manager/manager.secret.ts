@@ -412,6 +412,12 @@ export const endDialogSecretRun = ({ entityId }: { entityId: string }) => {
 //#endregion
 
 //#region ACTIVITY
+export const startActivityFishSecret = () => {
+    if (!(isSecretRun())) return;
+
+    event({ type: EventTypes.SECRET_BOSS_DISPLAY });
+};
+
 export const winActivityFishSecret = ({ activityId }: { activityId: string }) => {
     if (!(isSecretRun())) return;
 
@@ -423,6 +429,7 @@ export const winActivityFishSecret = ({ activityId }: { activityId: string }) =>
     loadDialogData({ dialogId: 'victory', entityId: activityId });
     startDialog({ entityId: activityId });
 
+    event({ type: EventTypes.SECRET_BOSS_DISPLAY });
     event({ data: { audioName: 'secret_boss' }, type: EventTypes.AUDIO_STOP });
 };
 
@@ -435,6 +442,7 @@ export const loseActivityFishSecret = ({ activityId }: { activityId: string }) =
     loadDialogData({ dialogId: 'rematch', entityId: activityId });
     startDialog({ entityId: activityId });
 
+    event({ type: EventTypes.SECRET_BOSS_DISPLAY });
     event({ data: { audioName: 'secret_boss' }, type: EventTypes.AUDIO_STOP });
     event({ data: { audioName: 'secret_map', loop: true }, type: EventTypes.AUDIO_PLAY });
 };
