@@ -1,11 +1,11 @@
-import { Entity, EntityTypes } from './entity';
-import { generateEntityId, getEntity } from './entity.utils';
+import { Entity } from './entity';
+import { checkComponent, generateEntityId, getEntity } from './entity.utils';
 
 import { Component } from '@/engine/components/@component';
 import { error } from '@/engine/services/error';
 import { EventTypes } from '@/engine/services/event';
 import { setStore } from '@/engine/services/store';
-import { setEntityActive } from '@/engine/systems/state';
+import { setEntityLoad } from '@/engine/systems/state';
 import { event } from '@/render/events';
 
 export const entities: Record<string, Entity> = {};
@@ -91,11 +91,11 @@ export const destroyAllEntities = ({ force }: { force?: boolean }) => {
             || entityId.includes(TILEMAP_ENTITY_NAME)
         ) return;
 
-        if (entityId.includes(EntityTypes.NPC)) {
+        if (checkComponent({ componentId: 'State', entityId })) {
             const state = getComponent({ componentId: 'State', entityId });
 
-            if (state._active) {
-                setEntityActive({ entityId, value: false });
+            if (state._load) {
+                setEntityLoad({ entityId, value: false });
             }
 
             return;

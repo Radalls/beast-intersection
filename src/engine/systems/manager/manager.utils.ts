@@ -41,6 +41,38 @@ export const SETTINGS_KEYS_PATHS: { [key: string]: { path: string[] } } = {
 //#endregion
 
 //#region UTILS
+export const getKeyMoveDirection = ({ inputKey, managerEntityId }: {
+    inputKey: string,
+    managerEntityId?: string | null,
+}) => {
+    if (!(managerEntityId)) managerEntityId = getStore('managerId')
+        ?? error({ message: 'Store managerId is undefined', where: getKeyMoveDirection.name });
+
+    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
+
+    if (inputKey === manager.settings.keys.move._up) return 'up';
+    else if (inputKey === manager.settings.keys.move._down) return 'down';
+    else if (inputKey === manager.settings.keys.move._left) return 'left';
+    else if (inputKey === manager.settings.keys.move._right) return 'right';
+
+    return null;
+};
+
+export const getKeyMoveOffset = ({ inputKey, managerEntityId }: {
+    inputKey: string,
+    managerEntityId?: string | null,
+}) => {
+    if (!(managerEntityId)) managerEntityId = getStore('managerId')
+        ?? error({ message: 'Store managerId is undefined', where: getKeyMoveOffset.name });
+
+    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
+
+    if (inputKey === manager.settings.keys.move._up) return -1;
+    else if (inputKey === manager.settings.keys.move._down) return 1;
+
+    return null;
+};
+
 //#region SETTINGS
 export const settingKeyAlreadyInUse = ({ key, managerEntityId }: {
     key: string,
@@ -108,7 +140,7 @@ export const editSettingKey = ({ editKey, managerEntityId }: {
         if (settingKeyAlreadyInUse({ key: editKey })) {
             event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
             event({
-                data: { message: `Key ${editKey} already in use` },
+                data: { message: `La touche ${editKey.toUpperCase()} est déjà utilisée ailleurs` },
                 type: EventTypes.MAIN_ERROR,
             });
 

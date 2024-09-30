@@ -22,12 +22,21 @@
     border-radius: 8px;
     bottom: 64px;
     display: flex;
-    font-size: 16px;
+    gap: 2px;
     justify-content: center;
     left: 32px;
     padding: 16px;
-    text-align: center;
     z-index: 100;
+}
+
+.activity-win-message {
+    font-size: 16px;
+    text-align: center;
+}
+
+.activity-win-item {
+    height: 32px;
+    width: 32px;
 }
 
 /* ACTIVITY BUG */
@@ -37,13 +46,13 @@
     gap: 32px;
     height: 128px;
     justify-content: center;
+    padding: 0px 16px;
     text-align: center;
 }
 
 .activity-bug-score {
     display: flex;
     flex-direction: column;
-    padding-left: 32px;
     width: 128px
 }
 
@@ -63,12 +72,13 @@
 .activity-bug-symbol-value {
     font-weight: bold;
     text-align: center;
-    width: 160px;
 }
 
 .activity-bug-symbol-found {
+    background-position: center center;
+    background-repeat: no-repeat;
     height: 64px;
-    width: 64px;
+    width: 128px
 }
 
 /* ACTIVITY FISH */
@@ -78,6 +88,7 @@
     gap: 32px;
     height: 192px;
     justify-content: center;
+    padding: 0px 16px;
     text-align: center;
 }
 
@@ -85,7 +96,6 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
-    padding-left: 32px;
 }
 
 .activity-fish-hp {
@@ -116,7 +126,6 @@
 
 .activity-fish-key {
     font-size: 32px;
-    width: 160px
 }
 
 .activity-fish-frenzy {
@@ -158,21 +167,28 @@
 .activity-craft-recipe {
     align-items: center;
     border: solid 4px rgb(0, 0, 0);
+    border-radius: 8px;
     display: flex;
     gap: 32px;
     padding: 8px;
     width: 100%;
 }
 
-.activity-craft-recipe-icon {
+.activity-craft-recipe-item {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.activity-craft-recipe-item-icon {
     height: 64px;
     width: 64px;
 }
 
 .activity-craft-recipe-ingredients {
     display: flex;
-    flex-direction: column;
-    gap: 2px;
+    gap: 16px;
 }
 
 .activity-craft-recipe-ingredient {
@@ -182,7 +198,6 @@
 }
 
 .activity-craft-recipe-ingredient-icon {
-    background-size: contain;
     height: 32px;
     width: 32px;
 }
@@ -200,5 +215,4 @@
 
 .activity-craft-key {
     font-size: 32px;
-    width: 160px
 }

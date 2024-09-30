@@ -22,7 +22,6 @@ export const startDialog = ({ entityId }: { entityId: string }) => {
     createElement({
         elementClass: 'dialog-text-options',
         elementId: `${entityId}-dialog-text-options`,
-        elementParent: dialogElement,
         entityId,
     });
 
@@ -32,6 +31,8 @@ export const startDialog = ({ entityId }: { entityId: string }) => {
 export const updateDialog = ({ entityId }: { entityId: string }) => {
     const dialog = getComponent({ componentId: 'Dialog', entityId });
 
+    const dialogElement = getElement({ elementId: `${entityId}-dialog` });
+
     const dialogText = getElement({ elementId: `${entityId}-dialog-text` });
     dialogText.innerText = dialog._currentValue ?? 'DIALOG TEXT ERROR';
 
@@ -39,6 +40,10 @@ export const updateDialog = ({ entityId }: { entityId: string }) => {
 
     const dialogTextOptions = getElement({ elementId: `${entityId}-dialog-text-options` });
     dialogTextOptions.style.visibility = (dialog._currentOptionIndex !== undefined) ? 'visible' : 'hidden';
+    if (dialogTextOptions.style.visibility === 'visible') {
+        dialogTextOptions.style.bottom
+            = `${parseFloat(getComputedStyle(dialogElement).bottom) + dialogElement.getBoundingClientRect().height}px`;
+    }
 
     if (dialog._currentOptionsValues) {
         if (!(dialogTextOptions.children.length)) {
@@ -72,6 +77,7 @@ const destroyDialogOptions = ({ entityId }: { entityId: string }) => {
 
 export const endDialog = ({ entityId }: { entityId: string }) => {
     destroyDialogOptions({ entityId });
+    destroyElement({ elementId: `${entityId}-dialog-text-options` });
     destroyElement({ elementId: `${entityId}-dialog` });
 };
 //#endregion

@@ -12,7 +12,6 @@ import {
 import { getComponent, checkComponent } from '@/engine/entities';
 import { error } from '@/engine/services/error';
 import { EventTypes } from '@/engine/services/event';
-import { setState } from '@/engine/services/state';
 import { getStore } from '@/engine/services/store';
 import { setCollider, checkCollider } from '@/engine/systems/collider';
 import { updatePosition } from '@/engine/systems/position';
@@ -27,9 +26,6 @@ export const generateTileMap = ({ tileMapEntityId, tileMapName }: {
     if (!(tileMapEntityId)) tileMapEntityId = getStore('tileMapId')
         ?? error({ message: 'Store tileMapId is undefined', where: generateTileMap.name });
 
-    setState('isGameLoading', true);
-    event({ type: EventTypes.MAIN_LOADING_ON });
-
     const tileMap = getComponent({ componentId: 'TileMap', entityId: tileMapEntityId });
 
     const tileMapData = loadTileMapData({ tileMapName })
@@ -43,10 +39,6 @@ export const generateTileMap = ({ tileMapEntityId, tileMapName }: {
 
     generateTileMapTiles({ tileMapData, tileMapEntityId });
     generateTileMapEntities({ tileMapData });
-
-    setState('isGameLoading', false);
-
-    event({ type: EventTypes.MAIN_LOADING_OFF });
 };
 
 export const setTile = ({ tileMapEntityId, entityId }: {

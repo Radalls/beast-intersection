@@ -1,4 +1,3 @@
-import { isSecretSaveUnlocked, createSecretSave, isSecretUnlocked, checkSecretSave } from './manager.secret';
 import { getProjectVersion } from './manager.utils';
 
 import { Energy } from '@/engine/components/energy';
@@ -23,25 +22,24 @@ export type SaveData = {
 //#endregion
 
 //#region DATA
-export const createSave = () => {
-    if (isSecretSaveUnlocked()) {
-        createSecretSave();
-        return;
-    }
-
-    const managerEntityId = getStore('managerId')
+export const createSave = ({ managerEntityId, playerEntityId, tileMapEntityId }: {
+    managerEntityId?: string | null,
+    playerEntityId?: string | null,
+    tileMapEntityId?: string | null
+}) => {
+    if (!(managerEntityId)) managerEntityId = getStore('managerId')
         ?? error({ message: 'Store managerId is undefined', where: createSave.name });
 
     const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
 
-    const playerEntityId = getStore('playerId')
+    if (!(playerEntityId)) playerEntityId = getStore('playerId')
         ?? error({ message: 'Store playerId is undefined', where: createSave.name });
 
     const playerPosition = getComponent({ componentId: 'Position', entityId: playerEntityId });
     const playerInventory = getComponent({ componentId: 'Inventory', entityId: playerEntityId });
     const playerEnergy = getComponent({ componentId: 'Energy', entityId: playerEntityId });
 
-    const tileMapEntityId = getStore('tileMapId')
+    if (!(tileMapEntityId)) tileMapEntityId = getStore('tileMapId')
         ?? error({ message: 'Store tileMapId is undefined', where: createSave.name });
 
     const tileMapName = getComponent({ componentId: 'TileMap', entityId: tileMapEntityId })._name
@@ -90,44 +88,6 @@ export const loadSave = (): Promise<SaveData> => {
                 }));
 
                 return;
-            }
-            if (isSecretUnlocked()) {
-                if (!(checkSecretSave({ saveName: file.name }))) {
-                    renderEvent({
-                        data: { audioName: 'secret_start' },
-                        type: EventTypes.AUDIO_PLAY,
-                    });
-                    renderEvent({
-                        data: { message: 'There is no secrets here...' },
-                        type: EventTypes.MAIN_ERROR,
-                    });
-
-                    reject(error({
-                        message: 'There is no secrets here...',
-                        where: loadSave.name,
-                    }));
-
-                    return;
-                }
-            }
-            if (!(isSecretSaveUnlocked())) {
-                if (checkSecretSave({ saveName: file.name })) {
-                    renderEvent({
-                        data: { audioName: 'secret_start' },
-                        type: EventTypes.AUDIO_PLAY,
-                    });
-                    renderEvent({
-                        data: { message: 'You are not worthy of this secret...' },
-                        type: EventTypes.MAIN_ERROR,
-                    });
-
-                    reject(error({
-                        message: 'You are not worthy of this secret...',
-                        where: loadSave.name,
-                    }));
-
-                    return;
-                }
             }
 
             try {

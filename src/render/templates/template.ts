@@ -60,7 +60,7 @@ export const destroyElement = ({ elementId }: { elementId: string }) => {
         element.removeChild(element.firstChild);
     }
 
-    if (isPlayer({ entityId: elementId })) {
+    if (isPlayer({ entityId: elementId, strict: true })) {
         searchElementsById({ partialElementId: 'Player' }).map((el) => el.remove());
     }
 
@@ -84,7 +84,9 @@ export const createSprite = ({ elementId }: { elementId: string }) => {
 
     const element = getElement({ elementId });
 
-    element.style.backgroundImage = `url(${getSpritePath({ spriteName: sprite._image })})`;
+    element.style.backgroundImage = (!(sprite._gif))
+        ? `url(${getSpritePath({ spriteName: sprite._image })})`
+        : `url(${getSpritePath({ gif: true, spriteName: sprite._image })})`;
     element.style.width = `${sprite._width * TILE_PIXEL_SIZE}px`;
     element.style.height = `${sprite._height * TILE_PIXEL_SIZE}px`;
 };

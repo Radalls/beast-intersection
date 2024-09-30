@@ -1,15 +1,12 @@
 import { createSave, loadSave } from './manager.data';
 import {
-    displaySecretPath,
-    isSecretPathUnlocked,
-    isSecretSaveUnlocked,
-    isSecretUnlocked,
-    launchQuitSecret,
-    launchStartSecret,
-    lockSettingsSecret,
-    runSecretSave,
-} from './manager.secret';
-import { LAUNCH_OPTIONS, SETTINGS, editSettingAudio, editSettingKey, getProjectVersion } from './manager.utils';
+    LAUNCH_OPTIONS,
+    SETTINGS,
+    editSettingAudio,
+    editSettingKey,
+    getKeyMoveOffset,
+    getProjectVersion,
+} from './manager.utils';
 
 import { destroyAllEntities, getComponent } from '@/engine/entities';
 import { launch, run } from '@/engine/main';
@@ -22,6 +19,34 @@ import { event } from '@/render/events';
 
 //#region SYSTEMS
 //#region LAUNCH
+export const onLaunchInput = ({ inputKey, managerEntityId }: {
+    inputKey: string,
+    managerEntityId?: string | null,
+}) => {
+    if (!(managerEntityId)) managerEntityId = getStore('managerId')
+        ?? error({ message: 'Store managerId is undefined', where: onSettingsInput.name });
+
+    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
+
+    if (inputKey === manager.settings.keys.action._act) {
+        confirmLaunchOption({ managerEntityId });
+        return;
+    }
+    else if (
+        inputKey === manager.settings.keys.move._up
+        || inputKey === manager.settings.keys.move._down
+    ) {
+        const inputOffset = getKeyMoveOffset({ inputKey, managerEntityId });
+        if (!(inputOffset)) throw error({
+            message: 'Invalid input',
+            where: onLaunchInput.name,
+        });
+
+        selectLaunchOption({ managerEntityId, offset: inputOffset });
+        return;
+    }
+};
+
 export const selectLaunchOption = ({ managerEntityId, offset }: {
     managerEntityId?: string | null,
     offset: 1 | -1,
@@ -52,14 +77,6 @@ export const confirmLaunchOption = ({ managerEntityId }: { managerEntityId?: str
     const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
 
     if (LAUNCH_OPTIONS[manager._selectedLaunchOption] === LAUNCH_OPTIONS[0]) {
-        if (isSecretUnlocked()) {
-            launchStartSecret();
-            return;
-        }
-        if (isSecretPathUnlocked()) {
-            displaySecretPath();
-        }
-
         setState('isGameLaunching', false);
 
         event({ type: EventTypes.MAIN_RUN });
@@ -78,7 +95,7 @@ export const confirmLaunchOption = ({ managerEntityId }: { managerEntityId?: str
             if (saveData.version !== getProjectVersion()) {
                 event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
                 event({
-                    data: { message: 'Invalid save, project version does not match' },
+                    data: { message: 'La version de cette sauvegarde est invalide' },
                     type: EventTypes.MAIN_ERROR,
                 });
 
@@ -89,10 +106,6 @@ export const confirmLaunchOption = ({ managerEntityId }: { managerEntityId?: str
             }
 
             setState('isGameLaunching', false);
-            if (isSecretSaveUnlocked()) {
-                runSecretSave({ entityId: managerEntityId, saveData });
-                return;
-            }
 
             event({ type: EventTypes.MAIN_RUN });
 
@@ -129,37 +142,68 @@ export const quitToLaunch = ({ managerEntityId }: { managerEntityId?: string | n
 
     launch();
 
-    if (isSecretUnlocked()) {
-        launchQuitSecret();
-        return;
-    }
-
     event({ data: { audioName: 'bgm_map1' }, type: EventTypes.AUDIO_STOP });
     event({ data: { audioName: 'bgm_menu', loop: true }, type: EventTypes.AUDIO_PLAY });
-};
-
-export const onLaunchInput = ({ inputKey }: { inputKey: string }) => {
-    const managerEntityId = getStore('managerId')
-        ?? error({ message: 'Store managerId is undefined', where: onSettingsInput.name });
-
-    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
-
-    if (inputKey === manager.settings.keys.move._up) {
-        selectLaunchOption({ managerEntityId, offset: -1 });
-        return;
-    }
-    else if (inputKey === manager.settings.keys.move._down) {
-        selectLaunchOption({ managerEntityId, offset: 1 });
-        return;
-    }
-    else if (inputKey === manager.settings.keys.action._act) {
-        confirmLaunchOption({ managerEntityId });
-        return;
-    }
 };
 //#endregion
 
 //#region SETTINGS
+export const onSettingsInput = ({ inputKey, managerEntityId }: {
+    inputKey: string,
+    managerEntityId?: string | null,
+}) => {
+    if (!(managerEntityId)) managerEntityId = getStore('managerId')
+        ?? error({ message: 'Store managerId is undefined', where: onSettingsInput.name });
+
+    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
+
+    if (inputKey === manager.settings.keys.action._back) {
+        if (getState('isSettingEditOpen')) {
+            confirmSetting({ editKey: inputKey });
+            return;
+        }
+
+        closeSettings();
+        return;
+    }
+    if (getState('isSettingEditOpen')) {
+        if (inputKey === manager.settings.keys.action._save) return;
+        if (inputKey === manager.settings.keys.action._quit) return;
+
+        confirmSetting({ editKey: inputKey });
+        return;
+    }
+    else if (inputKey === manager.settings.keys.action._act) {
+        confirmSetting({});
+        return;
+    }
+    else if (
+        inputKey === manager.settings.keys.move._up
+        || inputKey === manager.settings.keys.move._down
+    ) {
+        const inputOffset = getKeyMoveOffset({ inputKey, managerEntityId });
+        if (!(inputOffset)) throw error({
+            message: 'Invalid input',
+            where: onSettingsInput.name,
+        });
+
+        selectSetting({ offset: inputOffset });
+        return;
+    }
+    else if (inputKey === manager.settings.keys.action._save) {
+        if (getState('isGameLaunching')) return;
+
+        createSave({});
+        return;
+    }
+    else if (inputKey === manager.settings.keys.action._quit) {
+        if (getState('isGameLaunching')) return;
+
+        quitToLaunch({});
+        return;
+    }
+};
+
 export const openSettings = ({ managerEntityId }: { managerEntityId?: string | null }) => {
     if (!(managerEntityId)) managerEntityId = getStore('managerId')
         ?? error({ message: 'Store managerId is undefined', where: openSettings.name });
@@ -168,23 +212,12 @@ export const openSettings = ({ managerEntityId }: { managerEntityId?: string | n
 
     manager._selectedSetting = 0;
 
-    if (isSecretUnlocked()) {
-        lockSettingsSecret();
-        return;
-    }
-    if (isSecretPathUnlocked()) {
-        displaySecretPath();
-    }
-
     setState('isGamePaused', true);
     if (getState('isGameRunning')) {
         setState('isGameRunning', false);
 
-        const playerEntityId = getStore('playerId')
-            ?? error({ message: 'Store playerId is undefined', where: openSettings.name });
-
-        event({ entityId: playerEntityId, type: EventTypes.ENERGY_DISPLAY });
-        event({ entityId: playerEntityId, type: EventTypes.INVENTORY_TOOL_ACTIVE_DISPLAY });
+        event({ type: EventTypes.ENERGY_DISPLAY });
+        event({ type: EventTypes.INVENTORY_TOOL_ACTIVE_DISPLAY });
         event({ type: EventTypes.QUEST_DISPLAY });
     }
 
@@ -194,24 +227,12 @@ export const openSettings = ({ managerEntityId }: { managerEntityId?: string | n
 };
 
 export const closeSettings = () => {
-    if (isSecretUnlocked()) {
-        if (getState('isGameRunning')) {
-            setState('isGameRunning', false);
-            return;
-        }
-    }
-    if (isSecretPathUnlocked()) {
-        displaySecretPath();
-    }
-
     setState('isGamePaused', false);
     if (!(getState('isGameRunning')) && !(getState('isGameLaunching'))) {
         setState('isGameRunning', true);
 
-        const playerEntityId = getStore('playerId')
-            ?? error({ message: 'Store playerId is undefined', where: closeSettings.name });
-        event({ entityId: playerEntityId, type: EventTypes.ENERGY_DISPLAY });
-        event({ entityId: playerEntityId, type: EventTypes.INVENTORY_TOOL_ACTIVE_DISPLAY });
+        event({ type: EventTypes.ENERGY_DISPLAY });
+        event({ type: EventTypes.INVENTORY_TOOL_ACTIVE_DISPLAY });
         event({ type: EventTypes.QUEST_DISPLAY });
     }
 
@@ -263,54 +284,6 @@ export const selectSetting = ({ managerEntityId, offset }: {
 
     event({ type: EventTypes.MENU_SETTINGS_UPDATE });
     event({ data: { audioName: 'main_select' }, type: EventTypes.AUDIO_PLAY });
-};
-
-export const onSettingsInput = ({ inputKey }: { inputKey: string }) => {
-    const managerEntityId = getStore('managerId')
-        ?? error({ message: 'Store managerId is undefined', where: onSettingsInput.name });
-
-    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
-
-    if (inputKey === manager.settings.keys.action._back) {
-        if (getState('isSettingEditOpen')) {
-            confirmSetting({ editKey: inputKey });
-            return;
-        }
-
-        closeSettings();
-        return;
-    }
-    if (getState('isSettingEditOpen')) {
-        if (inputKey === manager.settings.keys.action._save) return;
-        if (inputKey === manager.settings.keys.action._quit) return;
-
-        confirmSetting({ editKey: inputKey });
-        return;
-    }
-    else if (inputKey === manager.settings.keys.action._act) {
-        confirmSetting({});
-        return;
-    }
-    else if (inputKey === manager.settings.keys.move._up) {
-        selectSetting({ offset: -1 });
-        return;
-    }
-    else if (inputKey === manager.settings.keys.move._down) {
-        selectSetting({ offset: 1 });
-        return;
-    }
-    else if (inputKey === manager.settings.keys.action._save) {
-        if (getState('isGameLaunching')) return;
-
-        createSave();
-        return;
-    }
-    else if (inputKey === manager.settings.keys.action._quit) {
-        if (getState('isGameLaunching')) return;
-
-        quitToLaunch({});
-        return;
-    }
 };
 //#endregion
 //#endregion

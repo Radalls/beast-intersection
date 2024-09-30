@@ -18,17 +18,8 @@ import { setState } from '@/engine/services/state';
 import { clearStore, setStore } from '@/engine/services/store';
 import { fillEnergy } from '@/engine/systems/energy';
 import { emptyPlayerInventory } from '@/engine/systems/inventory';
-import {
-    endDialogSecret,
-    endDialogSecretRun,
-    endQuest,
-    isSecretRun,
-    isSecretUnlocked,
-    isSecretWin,
-    startDialogSecret,
-    winSecret,
-} from '@/engine/systems/manager';
-import { setEntityTalking } from '@/engine/systems/state';
+import { endQuest } from '@/engine/systems/manager';
+import { setEntityActive } from '@/engine/systems/state';
 import { event } from '@/render/events';
 
 //#region SYSTEMS
@@ -38,7 +29,7 @@ export const startDialog = ({ entityId }: { entityId: string }) => {
         error({ message: `Dialog ${entityId} is invalid`, where: startDialog.name });
     }
 
-    setEntityTalking({ entityId, value: true });
+    setEntityActive({ entityId, value: true });
     setDialogCurrentText(entityId, entityDialog);
 
     setState('isPlayerDialogOpen', true);
@@ -57,17 +48,11 @@ export const nextDialog = ({ entityId }: { entityId: string }) => {
             where: nextDialog.name,
         });
 
-    /* TEMP */
-    if (dialogPreviousText._value.includes('☕')) fillEnergy({});
-    if (dialogPreviousText._value.includes('🕵️‍♂️')) emptyPlayerInventory({});
-    /* TEMP */
-
-    if (entityDialog._currentId === 'secret') {
-        startDialogSecret({ entityId });
-    }
+    if (dialogPreviousText._value.includes('☕')) fillEnergy({}); // temp
+    if (dialogPreviousText._value.includes('🕵️‍♂️')) emptyPlayerInventory({}); // temp
 
     if (entityDialog._currentOptionIndex !== undefined && isDialogTextOptionsSet(dialogPreviousText)) {
-        entityDialog._currentTextId = dialogPreviousText._options[entityDialog._currentOptionIndex];
+        entityDialog._currentTextId = dialogPreviousText._options?.[entityDialog._currentOptionIndex];
         entityDialog._currentOptionIndex = undefined;
     }
 
@@ -81,7 +66,7 @@ export const nextDialog = ({ entityId }: { entityId: string }) => {
         dialogCurrentText._questStart && loadQuestData({ questName: dialogCurrentText._questStart });
     }
     else if (isDialogTextQuestEnd(dialogCurrentText)) {
-        endQuest();
+        endQuest({});
     }
 
     if (isDialogTextDialogNext(dialogCurrentText)) {
@@ -118,21 +103,31 @@ export const selectDialogOption = ({ entityId, offset }: { entityId: string, off
             where: selectDialogOption.name,
         });
 
-    if (!(isDialogTextOptionsSet(dialogCurrentText))) {
-        error({
+    if (!(dialogCurrentText._options)) {
+        throw error({
             message: `DialogText ${entityId}-${entityDialog._currentTextId} options not found`,
             where: selectDialogOption.name,
         });
     }
 
     if (offset === -1) {
-        entityDialog._currentOptionIndex = Math.max(0, entityDialog._currentOptionIndex - 1);
+        if (entityDialog._currentOptionIndex === 0) {
+            entityDialog._currentOptionIndex = dialogCurrentText._options.length - 1;
+        }
+        else {
+            entityDialog._currentOptionIndex = Math.max(0, entityDialog._currentOptionIndex - 1);
+        }
     }
     else if (offset === 1) {
-        entityDialog._currentOptionIndex = Math.min(
-            dialogCurrentText._options.length - 1,
-            entityDialog._currentOptionIndex + 1,
-        );
+        if (entityDialog._currentOptionIndex === dialogCurrentText._options.length - 1) {
+            entityDialog._currentOptionIndex = 0;
+        }
+        else {
+            entityDialog._currentOptionIndex = Math.min(
+                dialogCurrentText._options.length - 1,
+                entityDialog._currentOptionIndex + 1,
+            );
+        }
     }
 
     event({ entityId, type: EventTypes.DIALOG_UPDATE });
@@ -140,28 +135,14 @@ export const selectDialogOption = ({ entityId, offset }: { entityId: string, off
 };
 
 export const endDialog = ({ entityId }: { entityId: string }) => {
-    if (isSecretWin()) {
-        winSecret();
-        return;
-    }
-
     const entityDialog = getComponent({ componentId: 'Dialog', entityId });
 
     entityDialog._currentTextId = undefined;
     entityDialog._currentOptionIndex = undefined;
 
-    setEntityTalking({ entityId, value: false });
+    setEntityActive({ entityId, value: false });
     setState('isPlayerDialogOpen', false);
     clearStore('dialogId');
-
-    if (isSecretRun()) {
-        endDialogSecretRun({ entityId });
-        return;
-    }
-    if (isSecretUnlocked()) {
-        endDialogSecret({ entityId });
-        return;
-    }
 
     event({ entityId, type: EventTypes.DIALOG_END });
 };

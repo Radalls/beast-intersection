@@ -1,13 +1,9 @@
 import { createElement, destroyElement } from './template';
-import { getElement, getSpritePath, searchElementsByClassName } from './template.utils';
+import { checkElement, getElement, getSpritePath, searchElementsByClassName } from './template.utils';
 
 import { getComponent } from '@/engine/entities';
 import { error } from '@/engine/services/error';
 import { getStore } from '@/engine/services/store';
-
-//#region CONSTANTS
-const QUEST_ITEM_HEIGHT = 23;
-//#endregion
 
 //#region TEMPLATES
 export const createQuestsMenu = () => {
@@ -32,6 +28,10 @@ export const createQuest = () => {
     const quests = getElement({ elementId: 'PlayerQuestsMenu' });
     const questData = manager.quests[manager._selectedQuest];
 
+    if (checkElement({ elementId: `Quest${manager._selectedQuest}` })) {
+        destroyElement({ elementId: `Quest${manager._selectedQuest}` });
+    }
+
     const quest = createElement({
         elementAbsolute: false,
         elementClass: 'quest',
@@ -40,26 +40,86 @@ export const createQuest = () => {
     });
 
     if (questData?.items) {
-        quest.style.height = `${QUEST_ITEM_HEIGHT * questData.items.length}px`;
-
         for (const item of questData.items) {
             const questItem = createElement({
                 elementAbsolute: false,
                 elementClass: 'quest-item',
-                elementId: `Quest${manager._selectedQuest}Item${item._name}`,
+                elementId: `Quest-${manager._selectedQuest}-Item-${item._name}`,
                 elementParent: quest,
             });
-            questItem.innerText = `- Obtain ${item._amount} ${item._name}`;
+
+            const questItemAmount = createElement({
+                elementAbsolute: false,
+                elementClass: 'quest-item-amount',
+                elementId: `Quest-${manager._selectedQuest}-Item-${item._name}-Amount`,
+                elementParent: questItem,
+            });
+            questItemAmount.innerText = `- Obtient ${item._amount} `;
+
+            const questItemIcon = createElement({
+                elementAbsolute: false,
+                elementClass: 'quest-item-icon',
+                elementId: `Quest-${manager._selectedQuest}-Item-${item._name}-Icon`,
+                elementParent: questItem,
+            });
+            questItemIcon.style.backgroundImage
+                = `url(${getSpritePath({ spriteName: `item_${item._name.toLowerCase()}` })})`;
         }
     }
 
-    const questComplete = createElement({
-        elementAbsolute: false,
-        elementClass: 'quest-complete',
-        elementId: `Quest${manager._selectedQuest}Complete`,
-        elementParent: quest,
-    });
-    questComplete.style.backgroundImage = `url(${getSpritePath({ spriteName: 'quest_complete' })})`;
+    if (questData?.places) {
+        for (const place of questData.places) {
+            const questPlace = createElement({
+                elementAbsolute: false,
+                elementClass: 'quest-place',
+                elementId: `Quest-${manager._selectedQuest}-Place-${place._name}`,
+                elementParent: quest,
+            });
+
+            const questPlaceAmount = createElement({
+                elementAbsolute: false,
+                elementClass: 'quest-place-amount',
+                elementId: `Quest-${manager._selectedQuest}-Place-${place._name}-Amount`,
+                elementParent: questPlace,
+            });
+            questPlaceAmount.innerText = `- Place ${place._amount} `;
+
+            const questPlaceIcon = createElement({
+                elementAbsolute: false,
+                elementClass: 'quest-place-icon',
+                elementId: `Quest-${manager._selectedQuest}-Place-${place._name}-Icon`,
+                elementParent: questPlace,
+            });
+            questPlaceIcon.style.backgroundImage
+                = `url(${getSpritePath({ spriteName: `item_${place._name.toLowerCase()}` })})`;
+
+            if (place._active) {
+                const questPlaceActive = createElement({
+                    elementAbsolute: false,
+                    elementClass: 'quest-place-active',
+                    elementId: `Quest-${manager._selectedQuest}-Place-${place._name}-Active`,
+                    elementParent: quest,
+                });
+
+                const questPlaceActiveText = createElement({
+                    elementAbsolute: false,
+                    elementClass: 'quest-place-active-text',
+                    elementId: `Quest-${manager._selectedQuest}-Place-${place._name}-ActiveText`,
+                    elementParent: questPlaceActive,
+                });
+                questPlaceActiveText.innerText = '- Active ';
+
+                const questPlaceActiveIcon = createElement({
+                    elementAbsolute: false,
+                    elementClass: 'quest-place-active-icon',
+                    elementId: `Quest-${manager._selectedQuest}-Place-${place._name}-ActiveIcon`,
+                    elementParent: questPlaceActive,
+                });
+                questPlaceActiveIcon.style.backgroundImage
+                    = `url(${getSpritePath({ spriteName: `resource_${place._name.toLowerCase()}` })})`;
+            }
+        }
+    }
 };
 
 export const completeQuest = () => {
@@ -72,9 +132,6 @@ export const completeQuest = () => {
 
     const quest = getElement({ elementId: `Quest${manager._selectedQuest}` });
 
-    const questComplete = getElement({ elementId: `Quest${manager._selectedQuest}Complete` });
-    questComplete.style.display = 'block';
-
     if (questData?.items) {
         const questItems = searchElementsByClassName({ className: 'quest-item' });
         for (const item of questItems) {
@@ -82,15 +139,53 @@ export const completeQuest = () => {
         }
     }
 
+    if (questData?.places) {
+        const questPlaces = searchElementsByClassName({ className: 'quest-place' });
+        for (const place of questPlaces) {
+            destroyElement({ elementId: place.id });
+        }
+
+        if (questData.places.some((place) => place._active)) {
+            const questPlacesActive = searchElementsByClassName({ className: 'quest-place-active' });
+            for (const place of questPlacesActive) {
+                destroyElement({ elementId: place.id });
+            }
+        }
+    }
+
+    const questComplete = createElement({
+        elementAbsolute: false,
+        elementClass: 'quest-complete',
+        elementId: `Quest-${manager._selectedQuest}-Complete`,
+        elementParent: quest,
+    });
+
     if (questData?.talk) {
         const questTalk = createElement({
             elementAbsolute: false,
             elementClass: 'quest-talk',
-            elementId: `Quest${manager._selectedQuest}Talk`,
-            elementParent: quest,
+            elementId: `Quest-${manager._selectedQuest}-Talk`,
+            elementParent: questComplete,
         });
-        questTalk.innerText = `Talk to ${questData.talk}`;
+        questTalk.innerText = '- Parle à ';
+
+        const questTalkIcon = createElement({
+            elementAbsolute: false,
+            elementClass: 'quest-talk-icon',
+            elementId: `Quest-${manager._selectedQuest}-TalkIcon`,
+            elementParent: questComplete,
+        });
+        questTalkIcon.style.backgroundImage
+            = `url(${getSpritePath({ spriteName: `npc_${questData.talk.toLowerCase()}_talk` })})`;
     }
+
+    const questCompleteIcon = createElement({
+        elementAbsolute: false,
+        elementClass: 'quest-complete-icon',
+        elementId: `Quest-${manager._selectedQuest}-CompleteIcon`,
+        elementParent: questComplete,
+    });
+    questCompleteIcon.style.backgroundImage = `url(${getSpritePath({ spriteName: 'quest_complete' })})`;
 };
 
 export const destroyQuest = () => {

@@ -1,0 +1,953 @@
+{
+    "id": 1,
+    "name": "map_2-1",
+    "height": 10,
+    "width": 10,
+    "tiles": [
+        {
+            "sprite": "grass_v2",
+            "x": 0,
+            "y": 0,
+            "exits": [
+                {
+                    "direction": "up",
+                    "map": "map_2-2",
+                    "x": 0,
+                    "y": 9
+                },
+                {
+                    "direction": "left",
+                    "map": "map_1-1",
+                    "x": 9,
+                    "y": 0
+                }
+            ]
+        },
+        {
+            "sprite": "grass",
+            "x": 1,
+            "y": 0,
+            "exits": [
+                {
+                    "direction": "up",
+                    "map": "map_2-2",
+                    "x": 1,
+                    "y": 9
+                }
+            ]
+        },
+        {
+            "sprite": "grass",
+            "x": 2,
+            "y": 0,
+            "exits": [
+                {
+                    "direction": "up",
+                    "map": "map_2-2",
+                    "x": 2,
+                    "y": 9
+                }
+            ]
+        },
+        {
+            "sprite": "grass_v1",
+            "x": 3,
+            "y": 0,
+            "exits": [
+                {
+                    "direction": "up",
+                    "map": "map_2-2",
+                    "x": 3,
+                    "y": 9
+                }
+            ]
+        },
+        {
+            "sprite": "grass",
+            "x": 4,
+            "y": 0,
+            "exits": [
+                {
+                    "direction": "up",
+                    "map": "map_2-2",
+                    "x": 4,
+                    "y": 9
+                }
+            ]
+        },
+        {
+            "sprite": "grass_v1",
+            "x": 5,
+            "y": 0,
+            "exits": [
+                {
+                    "direction": "up",
+                    "map": "map_2-2",
+                    "x": 5,
+                    "y": 9
+                }
+            ]
+        },
+        {
+            "sprite": "grass",
+            "x": 6,
+            "y": 0,
+            "exits": [
+                {
+                    "direction": "up",
+                    "map": "map_2-2",
+                    "x": 6,
+                    "y": 9
+                }
+            ]
+        },
+        {
+            "sprite": "water2",
+            "x": 7,
+            "y": 0,
+            "solid": true
+        },
+        {
+            "sprite": "water2",
+            "x": 8,
+            "y": 0,
+            "solid": true
+        },
+        {
+            "sprite": "water2_v1",
+            "x": 9,
+            "y": 0,
+            "solid": true
+        },
+        {
+            "sprite": "grass",
+            "x": 0,
+            "y": 1,
+            "exits": [
+                {
+                    "direction": "left",
+                    "map": "map_1-1",
+                    "x": 9,
+                    "y": 1
+                }
+            ]
+        },
+        {
+            "sprite": "grass2_grass_ul",
+            "x": 1,
+            "y": 1
+        },
+        {
+            "sprite": "grass2_grass_ur",
+            "x": 2,
+            "y": 1
+        },
+        {
+            "sprite": "grass",
+            "x": 3,
+            "y": 1
+        },
+        {
+            "sprite": "grass_v2",
+            "x": 4,
+            "y": 1
+        },
+        {
+            "sprite": "grass_v1",
+            "x": 5,
+            "y": 1
+        },
+        {
+            "sprite": "grass",
+            "x": 6,
+            "y": 1
+        },
+        {
+            "sprite": "water2",
+            "x": 7,
+            "y": 1,
+            "solid": true
+        },
+        {
+            "sprite": "water2",
+            "x": 8,
+            "y": 1,
+            "solid": true
+        },
+        {
+            "sprite": "water2_v2",
+            "x": 9,
+            "y": 1,
+            "solid": true
+        },
+        {
+            "sprite": "grass",
+            "x": 0,
+            "y": 2,
+            "exits": [
+                {
+                    "direction": "left",
+                    "map": "map_1-1",
+                    "x": 9,
+                    "y": 2
+                }
+            ]
+        },
+        {
+            "sprite": "grass2_grass_dl",
+            "x": 1,
+            "y": 2
+        },
+        {
+            "sprite": "grass2_grass_dr",
+            "x": 2,
+            "y": 2
+        },
+        {
+            "sprite": "grass_v1",
+            "x": 3,
+            "y": 2
+        },
+        {
+            "sprite": "grass_v2",
+            "x": 4,
+            "y": 2
+        },
+        {
+            "sprite": "grass_v2",
+            "x": 5,
+            "y": 2
+        },
+        {
+            "sprite": "grass",
+            "x": 6,
+            "y": 2
+        },
+        {
+            "sprite": "water2_grass_dl",
+            "x": 7,
+            "y": 2,
+            "solid": true
+        },
+        {
+            "sprite": "water2",
+            "x": 8,
+            "y": 2,
+            "solid": true
+        },
+        {
+            "sprite": "water2",
+            "x": 9,
+            "y": 2,
+            "solid": true
+        },
+        {
+            "sprite": "grass",
+            "x": 0,
+            "y": 3,
+            "exits": [
+                {
+                    "direction": "left",
+                    "map": "map_1-1",
+                    "x": 9,
+                    "y": 3
+                }
+            ]
+        },
+        {
+            "sprite": "grass_v2",
+            "x": 1,
+            "y": 3
+        },
+        {
+            "sprite": "grass",
+            "x": 2,
+            "y": 3
+        },
+        {
+            "sprite": "grass",
+            "x": 3,
+            "y": 3
+        },
+        {
+            "sprite": "grass",
+            "x": 4,
+            "y": 3
+        },
+        {
+            "sprite": "grass_v1",
+            "x": 5,
+            "y": 3
+        },
+        {
+            "sprite": "grass",
+            "x": 6,
+            "y": 3
+        },
+        {
+            "sprite": "grass",
+            "x": 7,
+            "y": 3
+        },
+        {
+            "sprite": "water2",
+            "x": 8,
+            "y": 3,
+            "solid": true
+        },
+        {
+            "sprite": "water2",
+            "x": 9,
+            "y": 3,
+            "solid": true
+        },
+        {
+            "sprite": "grass",
+            "x": 0,
+            "y": 4,
+            "exits": [
+                {
+                    "direction": "left",
+                    "map": "map_1-1",
+                    "x": 9,
+                    "y": 4
+                }
+            ]
+        },
+        {
+            "sprite": "grass_v2",
+            "x": 1,
+            "y": 4
+        },
+        {
+            "sprite": "grass",
+            "x": 2,
+            "y": 4
+        },
+        {
+            "sprite": "grass",
+            "x": 3,
+            "y": 4
+        },
+        {
+            "sprite": "grass2_grass_ul",
+            "x": 4,
+            "y": 4
+        },
+        {
+            "sprite": "grass2_v1",
+            "x": 5,
+            "y": 4
+        },
+        {
+            "sprite": "grass",
+            "x": 6,
+            "y": 4
+        },
+        {
+            "sprite": "grass",
+            "x": 7,
+            "y": 4
+        },
+        {
+            "sprite": "water2",
+            "x": 8,
+            "y": 4,
+            "solid": true
+        },
+        {
+            "sprite": "water2",
+            "x": 9,
+            "y": 4,
+            "solid": true
+        },
+        {
+            "sprite": "grass",
+            "x": 0,
+            "y": 5,
+            "exits": [
+                {
+                    "direction": "left",
+                    "map": "map_1-1",
+                    "x": 9,
+                    "y": 5
+                }
+            ]
+        },
+        {
+            "sprite": "grass",
+            "x": 1,
+            "y": 5
+        },
+        {
+            "sprite": "grass",
+            "x": 2,
+            "y": 5
+        },
+        {
+            "sprite": "grass",
+            "x": 3,
+            "y": 5
+        },
+        {
+            "sprite": "grass2",
+            "x": 4,
+            "y": 5
+        },
+        {
+            "sprite": "grass2_grass_dr",
+            "x": 5,
+            "y": 5
+        },
+        {
+            "sprite": "grass",
+            "x": 6,
+            "y": 5
+        },
+        {
+            "sprite": "grass",
+            "x": 7,
+            "y": 5
+        },
+        {
+            "sprite": "water2",
+            "x": 8,
+            "y": 5,
+            "solid": true
+        },
+        {
+            "sprite": "water2_v2",
+            "x": 9,
+            "y": 5,
+            "solid": true
+        },
+        {
+            "sprite": "grass",
+            "x": 0,
+            "y": 6,
+            "exits": [
+                {
+                    "direction": "left",
+                    "map": "map_1-1",
+                    "x": 9,
+                    "y": 6
+                }
+            ]
+        },
+        {
+            "sprite": "grass_v2",
+            "x": 1,
+            "y": 6
+        },
+        {
+            "sprite": "grass",
+            "x": 2,
+            "y": 6
+        },
+        {
+            "sprite": "grass",
+            "x": 3,
+            "y": 6
+        },
+        {
+            "sprite": "grass",
+            "x": 4,
+            "y": 6
+        },
+        {
+            "sprite": "grass",
+            "x": 5,
+            "y": 6
+        },
+        {
+            "sprite": "grass_v2",
+            "x": 6,
+            "y": 6
+        },
+        {
+            "sprite": "grass",
+            "x": 7,
+            "y": 6
+        },
+        {
+            "sprite": "water2",
+            "x": 8,
+            "y": 6,
+            "solid": true
+        },
+        {
+            "sprite": "water2",
+            "x": 9,
+            "y": 6,
+            "solid": true
+        },
+        {
+            "sprite": "grass",
+            "x": 0,
+            "y": 7,
+            "exits": [
+                {
+                    "direction": "left",
+                    "map": "map_1-1",
+                    "x": 9,
+                    "y": 7
+                }
+            ]
+        },
+        {
+            "sprite": "grass2_grass_ul",
+            "x": 1,
+            "y": 7
+        },
+        {
+            "sprite": "grass2_grass_ur",
+            "x": 2,
+            "y": 7
+        },
+        {
+            "sprite": "grass_v1",
+            "x": 3,
+            "y": 7
+        },
+        {
+            "sprite": "grass",
+            "x": 4,
+            "y": 7
+        },
+        {
+            "sprite": "grass",
+            "x": 5,
+            "y": 7
+        },
+        {
+            "sprite": "grass_v1",
+            "x": 6,
+            "y": 7
+        },
+        {
+            "sprite": "grass",
+            "x": 7,
+            "y": 7
+        },
+        {
+            "sprite": "water2_grass_dl",
+            "x": 8,
+            "y": 7,
+            "solid": true
+        },
+        {
+            "sprite": "water2",
+            "x": 9,
+            "y": 7,
+            "solid": true
+        },
+        {
+            "sprite": "grass",
+            "x": 0,
+            "y": 8,
+            "exits": [
+                {
+                    "direction": "left",
+                    "map": "map_1-1",
+                    "x": 9,
+                    "y": 8
+                }
+            ]
+        },
+        {
+            "sprite": "grass2_grass_dl",
+            "x": 1,
+            "y": 8
+        },
+        {
+            "sprite": "grass2_grass_dr",
+            "x": 2,
+            "y": 8
+        },
+        {
+            "sprite": "grass",
+            "x": 3,
+            "y": 8
+        },
+        {
+            "sprite": "grass",
+            "x": 4,
+            "y": 8
+        },
+        {
+            "sprite": "grass",
+            "x": 5,
+            "y": 8
+        },
+        {
+            "sprite": "grass",
+            "x": 6,
+            "y": 8
+        },
+        {
+            "sprite": "grass",
+            "x": 7,
+            "y": 8
+        },
+        {
+            "sprite": "grass_v2",
+            "x": 8,
+            "y": 8
+        },
+        {
+            "sprite": "water2_grass_dl",
+            "x": 9,
+            "y": 8,
+            "solid": true
+        },
+        {
+            "sprite": "grass_v1",
+            "x": 0,
+            "y": 9,
+            "exits": [
+                {
+                    "direction": "down",
+                    "map": "map_2-0",
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "direction": "left",
+                    "map": "map_1-1",
+                    "x": 9,
+                    "y": 9
+                }
+            ]
+        },
+        {
+            "sprite": "grass_v1",
+            "x": 1,
+            "y": 9,
+            "exits": [
+                {
+                    "direction": "down",
+                    "map": "map_2-0",
+                    "x": 1,
+                    "y": 0
+                }
+            ]
+        },
+        {
+            "sprite": "grass_v1",
+            "x": 2,
+            "y": 9,
+            "exits": [
+                {
+                    "direction": "down",
+                    "map": "map_2-0",
+                    "x": 2,
+                    "y": 0
+                }
+            ]
+        },
+        {
+            "sprite": "grass",
+            "x": 3,
+            "y": 9,
+            "exits": [
+                {
+                    "direction": "down",
+                    "map": "map_2-0",
+                    "x": 3,
+                    "y": 0
+                }
+            ]
+        },
+        {
+            "sprite": "grass",
+            "x": 4,
+            "y": 9,
+            "exits": [
+                {
+                    "direction": "down",
+                    "map": "map_2-0",
+                    "x": 4,
+                    "y": 0
+                }
+            ]
+        },
+        {
+            "sprite": "grass",
+            "x": 5,
+            "y": 9,
+            "exits": [
+                {
+                    "direction": "down",
+                    "map": "map_2-0",
+                    "x": 5,
+                    "y": 0
+                }
+            ]
+        },
+        {
+            "sprite": "grass_v1",
+            "x": 6,
+            "y": 9,
+            "exits": [
+                {
+                    "direction": "down",
+                    "map": "map_2-0",
+                    "x": 6,
+                    "y": 0
+                }
+            ]
+        },
+        {
+            "sprite": "grass",
+            "x": 7,
+            "y": 9,
+            "exits": [
+                {
+                    "direction": "down",
+                    "map": "map_2-0",
+                    "x": 7,
+                    "y": 0
+                }
+            ]
+        },
+        {
+            "sprite": "grass",
+            "x": 8,
+            "y": 9,
+            "exits": [
+                {
+                    "direction": "down",
+                    "map": "map_2-0",
+                    "x": 8,
+                    "y": 0
+                }
+            ]
+        },
+        {
+            "sprite": "grass",
+            "x": 9,
+            "y": 9,
+            "exits": [
+                {
+                    "direction": "down",
+                    "map": "map_2-0",
+                    "x": 9,
+                    "y": 0
+                }
+            ]
+        }
+    ],
+    "entities": [
+        {
+            "type": "ResourceItem",
+            "items": [
+                {
+                    "name": "Flower1",
+                    "rate": 1
+                }
+            ],
+            "x": 0,
+            "y": 0
+        },
+        {
+            "type": "ResourceItem",
+            "items": [
+                {
+                    "name": "Flower1",
+                    "rate": 1
+                }
+            ],
+            "x": 5,
+            "y": 0
+        },
+        {
+            "type": "ResourceItem",
+            "items": [
+                {
+                    "name": "Leaf1",
+                    "rate": 0.6
+                },
+                {
+                    "name": "Wood1",
+                    "rate": 0.2
+                }
+            ],
+            "x": 2,
+            "y": 1
+        },
+        {
+            "type": "ResourceFish",
+            "items": [
+                {
+                    "name": "Fish1",
+                    "rate": 0.6
+                },
+                {
+                    "name": "Fish4",
+                    "rate": 0.4
+                }
+            ],
+            "x": 7,
+            "y": 1
+        },
+        {
+            "type": "ResourceItem",
+            "items": [
+                {
+                    "name": "Flower2",
+                    "rate": 1
+                }
+            ],
+            "x": 4,
+            "y": 2
+        },
+        {
+            "type": "ResourceBug",
+            "items": [
+                {
+                    "name": "Bug2",
+                    "rate": 0.7
+                }
+            ],
+            "x": 3,
+            "y": 3
+        },
+        {
+            "type": "ResourceFish",
+            "items": [
+                {
+                    "name": "Fish1",
+                    "rate": 0.6
+                },
+                {
+                    "name": "Fish4",
+                    "rate": 0.4
+                }
+            ],
+            "x": 9,
+            "y": 3
+        },
+        {
+            "type": "ResourceItem",
+            "items": [
+                {
+                    "name": "Flower1",
+                    "rate": 1
+                }
+            ],
+            "x": 1,
+            "y": 4
+        },
+        {
+            "type": "ResourceItem",
+            "items": [
+                {
+                    "name": "Leaf1",
+                    "rate": 0.6
+                },
+                {
+                    "name": "Wood1",
+                    "rate": 0.2
+                }
+            ],
+            "x": 5,
+            "y": 4
+        },
+        {
+            "type": "ResourceItem",
+            "items": [
+                {
+                    "name": "Flower1",
+                    "rate": 1
+                }
+            ],
+            "x": 7,
+            "y": 5
+        },
+        {
+            "type": "ResourceFish",
+            "items": [
+                {
+                    "name": "Fish1",
+                    "rate": 0.6
+                },
+                {
+                    "name": "Fish4",
+                    "rate": 0.4
+                }
+            ],
+            "x": 8,
+            "y": 5
+        },
+        {
+            "type": "ResourceBug",
+            "items": [
+                {
+                    "name": "Bug2",
+                    "rate": 0.7
+                }
+            ],
+            "x": 3,
+            "y": 6
+        },
+        {
+            "type": "ResourceItem",
+            "items": [
+                {
+                    "name": "Flower2",
+                    "rate": 1
+                }
+            ],
+            "x": 0,
+            "y": 7
+        },
+        {
+            "type": "ResourceItem",
+            "items": [
+                {
+                    "name": "Leaf1",
+                    "rate": 0.6
+                },
+                {
+                    "name": "Wood1",
+                    "rate": 0.2
+                }
+            ],
+            "x": 1,
+            "y": 7
+        },
+        {
+            "type": "ResourceItem",
+            "items": [
+                {
+                    "name": "Flower1",
+                    "rate": 1
+                }
+            ],
+            "x": 3,
+            "y": 7
+        },
+        {
+            "type": "ResourceBug",
+            "items": [
+                {
+                    "name": "Bug4",
+                    "rate": 0.7
+                }
+            ],
+            "x": 5,
+            "y": 7
+        },
+        {
+            "type": "ResourceItem",
+            "items": [
+                {
+                    "name": "Flower1",
+                    "rate": 1
+                }
+            ],
+            "x": 6,
+            "y": 8
+        }
+    ]
+}

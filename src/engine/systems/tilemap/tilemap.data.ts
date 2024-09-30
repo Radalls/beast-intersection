@@ -2,13 +2,12 @@ import { error } from '@/engine/services/error';
 
 const tileMapFiles: Record<string, { default: TileMapData }>
     = import.meta.glob('/src/assets/maps/*.json', { eager: true });
-const entityFiles: Record<string, { default: EntityData[] }>
-    = import.meta.glob('/src/assets/entities/*.json', { eager: true });
 
 //#region TYPES
 export type TileMapData = {
     entities: {
-        name: string,
+        items?: { name: string, rate: number }[],
+        name?: string,
         type: string,
         x: number,
         y: number,
@@ -30,13 +29,6 @@ export type TileMapData = {
     }[],
     width: number
 };
-
-export type EntityData = {
-    data?: any,
-    name: string,
-    priority?: number,
-    type: string
-};
 //#endregion
 
 //#region DATA
@@ -46,26 +38,5 @@ export const loadTileMapData = ({ tileMapName }: { tileMapName: string }) => {
         ?? error({ message: `TileMapData for ${tileMapName} not found`, where: loadTileMapData.name });
 
     return tileMapData as TileMapData;
-};
-
-export const loadTileMapEntityData = ({ entityType, entityName }: {
-    entityName: string,
-    entityType: string
-}) => {
-    const entityTypePath
-        = `/src/assets/entities/${entityType.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase()}.json`;
-    const entityTypeData = entityFiles[entityTypePath].default
-        ?? error({
-            message: `EntityData for ${entityType} not found`,
-            where: loadTileMapEntityData.name,
-        });
-
-    const entityData = entityTypeData.find((e) => e.name === entityName)
-        ?? error({
-            message: `EntityData for ${entityType} ${entityName} not found`,
-            where: loadTileMapEntityData.name,
-        });
-
-    return entityData as EntityData;
 };
 //#endregion

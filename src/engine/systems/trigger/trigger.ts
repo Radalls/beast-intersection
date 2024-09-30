@@ -13,7 +13,23 @@ const sortTriggersByPriority = ({ triggerEntityIds }: { triggerEntityIds: string
         return bTrigger._priority - aTrigger._priority;
     });
 
-const findPriorityTriggerEntityId = ({ triggerEntityIds }: { triggerEntityIds: string[] }) => triggerEntityIds[0];
+const findPriorityTriggerEntityId = ({ triggerEntityIds }: { triggerEntityIds: string[] }) => {
+    if (triggerEntityIds.length === 0) return null;
+
+    const triggerEntityId = triggerEntityIds[0];
+
+    if (checkComponent({ componentId: 'State', entityId: triggerEntityId })) {
+        const state = getComponent({ componentId: 'State', entityId: triggerEntityId });
+        if (!(state._load) || state._cooldown) {
+            return findPriorityTriggerEntityId({ triggerEntityIds: triggerEntityIds.slice(1) });
+        }
+
+        return triggerEntityId;
+    }
+    else {
+        return triggerEntityId;
+    }
+};
 //#endregion
 
 //#region SYSTEMS
@@ -54,7 +70,30 @@ export const checkTrigger = ({ entityId }: { entityId?: string | null }) => {
         return null;
     }
 
-    return findPriorityTriggerEntityId({ triggerEntityIds: entityTile._entityTriggerIds });
+    const triggerEntityId = findPriorityTriggerEntityId({ triggerEntityIds: entityTile._entityTriggerIds });
+    if (triggerEntityId) {
+        onTrigger({ entityId, triggerEntityId: triggerEntityId });
+    }
+};
+
+export const onTrigger = ({ entityId, triggerEntityId }: {
+    entityId?: string | null,
+    triggerEntityId: string,
+}) => {
+    if (!(entityId)) entityId = getStore('playerId')
+        ?? error({ message: 'Store playerId is undefined ', where: onTrigger.name });
+
+    const resource = checkComponent({ componentId: 'Resource', entityId: triggerEntityId });
+    if (resource) {
+        useResource({ resourceEntityId: triggerEntityId });
+        return;
+    }
+
+    const dialog = checkComponent({ componentId: 'Dialog', entityId: triggerEntityId });
+    if (dialog) {
+        startDialog({ entityId: triggerEntityId });
+        return;
+    }
 };
 
 export const destroyTrigger = ({ entityId }: { entityId: string }) => {
@@ -70,26 +109,6 @@ export const destroyTrigger = ({ entityId }: { entityId: string }) => {
         if (pointTile) {
             pointTile._entityTriggerIds = pointTile._entityTriggerIds.filter((id) => id !== entityId);
         }
-    }
-};
-
-export const onTrigger = ({ entityId, triggeredEntityId }: {
-    entityId?: string | null,
-    triggeredEntityId: string,
-}) => {
-    if (!(entityId)) entityId = getStore('playerId')
-        ?? error({ message: 'Store playerId is undefined ', where: onTrigger.name });
-
-    const resource = checkComponent({ componentId: 'Resource', entityId: triggeredEntityId });
-    if (resource) {
-        useResource({ resourceEntityId: triggeredEntityId });
-        return;
-    }
-
-    const dialog = checkComponent({ componentId: 'Dialog', entityId: triggeredEntityId });
-    if (dialog) {
-        startDialog({ entityId: triggeredEntityId });
-        return;
     }
 };
 //#endregion

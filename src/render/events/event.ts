@@ -25,6 +25,9 @@ import { onError, onLoadingDisplay } from './event.global';
 import {
     onInventoryCreate,
     onInventoryDisplay,
+    onInventoryOptionDisplay,
+    onInventoryOptionUpdate,
+    onInventorySelectSlot,
     onInventoryToolActivate,
     onInventoryToolActiveDisplay,
     onInventoryToolsUpdate,
@@ -38,7 +41,6 @@ import {
     onSettingsMenuUpdate,
 } from './event.menu';
 import { onQuestComplete, onQuestEnd, onQuestsDisplay, onQuestStart } from './event.quest';
-import { onSecretBossDisplay, onSecretPathDisplay, onSecretStart, onSecretWinDisplay } from './event.secret';
 import { onTileMapCreate, onTileMapTileCreate, onTileMapTileDestroy } from './event.tilemap';
 import {
     checkAudioData,
@@ -49,6 +51,7 @@ import {
     onEntityDisplay,
     onEntityPositionUpdate,
     onEntitySpriteCreate,
+    onEntitySpriteUpdate,
 } from './event.utils';
 
 import { Component } from '@/engine/components/@component';
@@ -90,9 +93,9 @@ export const event = <T extends keyof Component>(event: Event<T>) => {
     else if (event.type === EventTypes.DIALOG_UPDATE && event.entityId) onDialogNext({ entityId: event.entityId });
     else if (event.type === EventTypes.DIALOG_END && event.entityId) onDialogEnd({ entityId: event.entityId });
     /* Energy */
-    else if (event.type === EventTypes.ENERGY_CREATE && event.entityId) onEnergyCreate({ entityId: event.entityId });
-    else if (event.type === EventTypes.ENERGY_DISPLAY && event.entityId) onEnergyDisplay({ entityId: event.entityId });
-    else if (event.type === EventTypes.ENERGY_UPDATE && event.entityId) onEnergyUpdate({ entityId: event.entityId });
+    else if (event.type === EventTypes.ENERGY_CREATE) onEnergyCreate();
+    else if (event.type === EventTypes.ENERGY_DISPLAY) onEnergyDisplay();
+    else if (event.type === EventTypes.ENERGY_UPDATE) onEnergyUpdate();
     /* Entity */
     else if (event.type === EventTypes.ENTITY_CREATE && event.entityId) onEntityCreate({ entityId: event.entityId });
     else if (event.type === EventTypes.ENTITY_DESTROY && event.entityId) onEntityDestroy({ entityId: event.entityId });
@@ -101,29 +104,21 @@ export const event = <T extends keyof Component>(event: Event<T>) => {
         onEntityPositionUpdate({ entityId: event.entityId });
     }
     else if (event.type === EventTypes.ENTITY_SPRITE_CREATE && event.entityId) {
-        onEntitySpriteCreate({
-            entityId: event.entityId,
-        });
+        onEntitySpriteCreate({ entityId: event.entityId });
+    }
+    else if (event.type === EventTypes.ENTITY_SPRITE_UPDATE && event.entityId) {
+        onEntitySpriteUpdate({ entityId: event.entityId });
     }
     /* Inventory */
-    else if (event.type === EventTypes.INVENTORY_CREATE && event.entityId) {
-        onInventoryCreate({ entityId: event.entityId });
-    }
-    else if (event.type === EventTypes.INVENTORY_DISPLAY && event.entityId) {
-        onInventoryDisplay({ entityId: event.entityId });
-    }
-    else if (event.type === EventTypes.INVENTORY_UPDATE && event.entityId) {
-        onInventoryUpdate({ entityId: event.entityId });
-    }
-    else if (event.type === EventTypes.INVENTORY_TOOL_ACTIVATE && event.entityId) {
-        onInventoryToolActivate({ entityId: event.entityId });
-    }
-    else if (event.type === EventTypes.INVENTORY_TOOL_ACTIVE_DISPLAY && event.entityId) {
-        onInventoryToolActiveDisplay({ entityId: event.entityId });
-    }
-    else if (event.type === EventTypes.INVENTORY_TOOL_UPDATE && event.entityId) {
-        onInventoryToolsUpdate({ entityId: event.entityId });
-    }
+    else if (event.type === EventTypes.INVENTORY_CREATE) onInventoryCreate();
+    else if (event.type === EventTypes.INVENTORY_DISPLAY) onInventoryDisplay();
+    else if (event.type === EventTypes.INVENTORY_UPDATE) onInventoryUpdate();
+    else if (event.type === EventTypes.INVENTORY_OPTION_DISPLAY) onInventoryOptionDisplay();
+    else if (event.type === EventTypes.INVENTORY_OPTION_UPDATE) onInventoryOptionUpdate();
+    else if (event.type === EventTypes.INVENTORY_SELECT_SLOT) onInventorySelectSlot();
+    else if (event.type === EventTypes.INVENTORY_TOOL_ACTIVATE) onInventoryToolActivate();
+    else if (event.type === EventTypes.INVENTORY_TOOL_ACTIVE_DISPLAY) onInventoryToolActiveDisplay();
+    else if (event.type === EventTypes.INVENTORY_TOOL_UPDATE) onInventoryToolsUpdate();
     /* Main */
     else if (event.type === EventTypes.MAIN_RUN) run();
     else if (event.type === EventTypes.MAIN_LOADING_ON || event.type === EventTypes.MAIN_LOADING_OFF) {
@@ -141,11 +136,6 @@ export const event = <T extends keyof Component>(event: Event<T>) => {
     else if (event.type === EventTypes.QUEST_DISPLAY) onQuestsDisplay();
     else if (event.type === EventTypes.QUEST_END) onQuestEnd();
     else if (event.type === EventTypes.QUEST_START) onQuestStart();
-    /* Secret */
-    else if (event.type === EventTypes.SECRET_START) onSecretStart();
-    else if (event.type === EventTypes.SECRET_BOSS_DISPLAY) onSecretBossDisplay();
-    else if (event.type === EventTypes.SECRET_PATH_DISPLAY) onSecretPathDisplay();
-    else if (event.type === EventTypes.SECRET_WIN_DISPLAY) onSecretWinDisplay();
     /* Tilemap */
     else if (event.type === EventTypes.TILEMAP_CREATE) onTileMapCreate();
     else if (event.type === EventTypes.TILEMAP_TILE_CREATE && checkTileData(event.data)) {

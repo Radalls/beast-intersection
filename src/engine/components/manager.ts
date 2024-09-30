@@ -2,6 +2,9 @@ import { Quest } from '@/engine/systems/manager';
 
 export type Manager = {
     _: 'Manager',
+    _selectedCraftRecipe: number,
+    _selectedInventorySlot: number,
+    _selectedInventorySlotOption: number,
     _selectedLaunchOption: number,
     _selectedQuest: number,
     _selectedSetting: number,

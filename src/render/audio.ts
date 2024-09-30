@@ -59,8 +59,11 @@ export const initAudios = () => {
     /* BGM */
     createAudio({ audioName: 'bgm_map1' });
     createAudio({ audioName: 'bgm_menu' });
+    /* ENERGY */
+    createAudio({ audioName: 'energy_gain' });
     /* INVENTORY */
     createAudio({ audioName: 'inventory_close' });
+    createAudio({ audioName: 'inventory_empty' });
     createAudio({ audioName: 'inventory_open' });
     createAudio({ audioName: 'inventory_tool_active' });
     createAudio({ audioName: 'inventory_tool_empty' });
@@ -69,13 +72,10 @@ export const initAudios = () => {
     createAudio({ audioName: 'menu_settings_close' });
     createAudio({ audioName: 'menu_settings_open' });
     createAudio({ audioName: 'menu_settings_save' });
-    /* SECRET */
-    createAudio({ audioName: 'secret_boss' });
-    createAudio({ audioName: 'secret_correct' });
-    createAudio({ audioName: 'secret_map' });
-    createAudio({ audioName: 'secret_menu' });
-    createAudio({ audioName: 'secret_start' });
-    createAudio({ audioName: 'secret_victory' });
+    /* QUEST */
+    createAudio({ audioName: 'quest_complete' });
+    createAudio({ audioName: 'quest_end' });
+    createAudio({ audioName: 'quest_start' });
     /* STEPS */
     createAudio({ audioName: 'step_grass1' });
     createAudio({ audioName: 'step_grass2' });

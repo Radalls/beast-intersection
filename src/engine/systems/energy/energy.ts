@@ -29,7 +29,7 @@ export const useEnergy = ({ amount, entityId }: {
     if (energy._current >= amount) {
         energy._current -= amount;
 
-        event({ entityId, type: EventTypes.ENERGY_UPDATE });
+        event({ type: EventTypes.ENERGY_UPDATE });
 
         return true;
     }
@@ -50,11 +50,15 @@ export const gainEnergy = ({ amount, entityId }: {
     if (energy._current < energy._max) {
         energy._current = Math.min(energy._current + amount, energy._max);
 
-        event({ entityId, type: EventTypes.ENERGY_UPDATE });
+        event({ type: EventTypes.ENERGY_UPDATE });
+        event({ data: { audioName: 'energy_gain' }, type: EventTypes.AUDIO_PLAY });
 
         return true;
     }
     else {
+        event({ data: { message: 'Je n\'ai pas besoin de ça maintenant' }, type: EventTypes.MAIN_ERROR });
+        event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
+
         error({ message: `Entity ${entityId} has max energy`, where: useEnergy.name });
 
         return false;
@@ -69,6 +73,7 @@ export const fillEnergy = ({ entityId }: { entityId?: string | null }) => {
 
     energy._current = energy._max;
 
-    event({ entityId, type: EventTypes.ENERGY_UPDATE });
+    event({ type: EventTypes.ENERGY_UPDATE });
+    event({ data: { audioName: 'energy_gain' }, type: EventTypes.AUDIO_PLAY });
 };
 //#endregion

@@ -1,4 +1,4 @@
-import { ActivityTypes } from './resource';
+import { ResourceTypes } from './resource';
 import { Sprite } from './sprite';
 
 export type Inventory = {
@@ -15,7 +15,7 @@ export type Item = {
 };
 
 export type Tool = {
-    _activity: ActivityTypes;
+    _activity: ResourceTypes;
     item: Item;
 };
 
