@@ -15,12 +15,16 @@ export const onEntityDisplay = ({ entityId }: { entityId: string }) => {
 
     const element = getElement({ elementId: entityId });
 
-    element.style.display = (state._active) ? 'block' : 'none';
+    element.style.display = 'block';
+    if (!(state._load)) element.style.display = 'none';
+    if (state._cooldown) element.style.display = 'none';
 };
 
 export const onEntityPositionUpdate = ({ entityId }: { entityId: string }) => updatePosition({ elementId: entityId });
 
 export const onEntitySpriteCreate = ({ entityId }: { entityId: string }) => createSprite({ elementId: entityId });
+
+export const onEntitySpriteUpdate = ({ entityId }: { entityId: string }) => createSprite({ elementId: entityId });
 
 export const onInputKeyDown = (e: any) => engineOnInputKeyDown(e.key);
 

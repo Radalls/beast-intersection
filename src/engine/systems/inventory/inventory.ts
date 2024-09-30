@@ -1,24 +1,101 @@
-import { findItemRule } from './inventory.data';
+import { findItemRule, itemIsTool } from './inventory.data';
 import {
     addInventorySlot,
     addToolToInventory,
+    closePlayerInventory,
+    closePlayerInventorySlotOption,
+    confirmPlayerInventorySlot,
+    confirmPlayerInventorySlotOption,
     createTool,
     findInventorySlotsWithItem,
+    findInventoryTool,
     invalidItemAmount,
     invalidItemName,
     invalidItemSprite,
     removeInventorySlots,
+    selectPlayerInventorySlot,
+    selectPlayerInventorySlotOption,
     slotAvailable,
 } from './inventory.utils';
 
 import { Item } from '@/engine/components/inventory';
+import { ResourceTypes } from '@/engine/components/resource';
 import { getComponent } from '@/engine/entities';
 import { error } from '@/engine/services/error';
 import { EventTypes } from '@/engine/services/event';
+import { getState } from '@/engine/services/state';
 import { getStore } from '@/engine/services/store';
+import { getKeyMoveDirection, getKeyMoveOffset } from '@/engine/systems/manager';
 import { event } from '@/render/events';
 
 //#region SYSTEMS
+export const onInventoryInput = ({ inputKey, managerEntityId, playerEntityId }: {
+    inputKey: string,
+    managerEntityId?: string | null,
+    playerEntityId?: string | null,
+}) => {
+    if (!(managerEntityId)) managerEntityId = getStore('managerId')
+        ?? error({ message: 'Store managerId is undefined', where: onInventoryInput.name });
+
+    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
+
+    if (!(playerEntityId)) playerEntityId = getStore('playerId')
+        ?? error({ message: 'Store playerId is undefined', where: onInventoryInput.name });
+
+    if (inputKey === manager.settings.keys.action._inventory) {
+        if (getState('isPlayerInventorySlotSelected')) {
+            event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
+            return;
+        }
+
+        closePlayerInventory({});
+        return;
+    }
+    else if (inputKey === manager.settings.keys.action._back) {
+        if (getState('isPlayerInventorySlotSelected')) {
+            closePlayerInventorySlotOption();
+            return;
+        }
+        else {
+            closePlayerInventory({});
+            return;
+        }
+    }
+    else if (inputKey === manager.settings.keys.action._tool) {
+        if (getState('isPlayerInventorySlotSelected')) {
+            event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
+            return;
+        }
+
+        activateInventoryTool({ entityId: playerEntityId });
+        return;
+    }
+    else if (inputKey === manager.settings.keys.action._act) {
+        if (!(getState('isPlayerInventorySlotSelected'))) {
+            confirmPlayerInventorySlot({});
+            return;
+        }
+        else {
+            confirmPlayerInventorySlotOption({});
+            return;
+        }
+    }
+    else {
+        if (!(getState('isPlayerInventorySlotSelected'))) {
+            const inputDirection = getKeyMoveDirection({ inputKey, managerEntityId });
+            if (!(inputDirection)) return;
+
+            selectPlayerInventorySlot({ input: inputDirection, playerEntityId });
+        }
+        else {
+            const inputOffset = getKeyMoveOffset({ inputKey, managerEntityId });
+            if (!(inputOffset)) return;
+
+            selectPlayerInventorySlotOption({ offset: inputOffset, playerEntityId });
+        }
+    }
+};
+
 export const addItemToInventory = ({ entityId, item, itemAmount }: {
     entityId?: string | null,
     item: Item,
@@ -36,11 +113,17 @@ export const addItemToInventory = ({ entityId, item, itemAmount }: {
 
     const inventory = getComponent({ componentId: 'Inventory', entityId });
 
-    const itemRule = findItemRule(item.info._name)
+    const itemRule = findItemRule({ itemName: item.info._name })
         ?? error({ message: `Item ${item.info._name} does not exist`, where: addItemToInventory.name });
 
     if (itemRule.tool) {
-        return addToolToInventory({ entityId, tool: createTool({ activity: itemRule.tool, item }) });
+        return addToolToInventory({
+            entityId,
+            tool: createTool({
+                activity: itemRule.tool as ResourceTypes,
+                item,
+            }),
+        });
     }
 
     const slotsWithItem = findInventorySlotsWithItem({ inventory, itemName: item.info._name });
@@ -50,7 +133,7 @@ export const addItemToInventory = ({ entityId, item, itemAmount }: {
                 if (slot._amount + itemAmount <= slot._maxAmount) {
                     slot._amount += itemAmount;
 
-                    event({ entityId, type: EventTypes.INVENTORY_UPDATE });
+                    event({ type: EventTypes.INVENTORY_UPDATE });
 
                     return { success: true };
                 }
@@ -76,7 +159,7 @@ export const addItemToInventory = ({ entityId, item, itemAmount }: {
                 itemMaxAmount: itemRule.maxAmount,
             });
 
-            event({ entityId, type: EventTypes.INVENTORY_UPDATE });
+            event({ type: EventTypes.INVENTORY_UPDATE });
 
             return { success: true };
         }
@@ -96,7 +179,7 @@ export const addItemToInventory = ({ entityId, item, itemAmount }: {
         });
     }
 
-    event({ entityId, type: EventTypes.INVENTORY_UPDATE });
+    event({ type: EventTypes.INVENTORY_UPDATE });
 
     return { amountRemaining: itemAmount, success: false };
 };
@@ -144,7 +227,7 @@ export const removeItemFromInventory = ({ entityId, itemName, itemAmount }: {
 
     removeInventorySlots({ inventory, slotsToRemove });
 
-    event({ entityId, type: EventTypes.INVENTORY_UPDATE });
+    event({ type: EventTypes.INVENTORY_UPDATE });
 
     return true;
 };
@@ -159,7 +242,7 @@ export const activateInventoryTool = ({ entityId }: {
 
     if (!(inventory.tools.length)) {
         event({ data: { audioName: 'inventory_tool_empty' }, type: EventTypes.AUDIO_PLAY });
-        event({ data: { message: 'No tools in inventory' }, type: EventTypes.MAIN_ERROR });
+        event({ data: { message: 'Je n\'ai pas d\'outils' }, type: EventTypes.MAIN_ERROR });
 
         throw error({
             message: 'No tools in inventory',
@@ -191,7 +274,7 @@ export const activateInventoryTool = ({ entityId }: {
         event({ data: { audioName: 'inventory_tool_active' }, type: EventTypes.AUDIO_PLAY });
     }
 
-    event({ entityId, type: EventTypes.INVENTORY_TOOL_ACTIVATE });
+    event({ type: EventTypes.INVENTORY_TOOL_ACTIVATE });
 };
 
 export const checkInventory = ({ entityId, items }: {
@@ -204,6 +287,12 @@ export const checkInventory = ({ entityId, items }: {
     const inventory = getComponent({ componentId: 'Inventory', entityId });
 
     for (const item of items) {
+        if (itemIsTool({ itemName: item.name })) {
+            const inventoryTool = findInventoryTool({ inventory, toolName: item.name });
+
+            return !!(inventoryTool);
+        }
+
         const slotsWithItem = findInventorySlotsWithItem({ inventory, itemName: item.name });
         if (slotsWithItem.length === 0) {
             return false;

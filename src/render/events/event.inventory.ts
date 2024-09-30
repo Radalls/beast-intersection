@@ -2,22 +2,30 @@ import {
     activateInventoryTool,
     createInventory,
     displayInventory,
+    displayInventoryOption,
     displayInventoryToolActive,
+    selectInventorySlot,
     updateInventory,
+    updateInventoryOption,
     updateInventoryTools,
 } from '@/render/templates';
 
 //#region EVENTS
-export const onInventoryCreate = ({ entityId }: { entityId: string }) => createInventory({ entityId });
+export const onInventoryCreate = () => createInventory();
 
-export const onInventoryDisplay = ({ entityId }: { entityId: string }) => displayInventory({ entityId });
+export const onInventoryDisplay = () => displayInventory();
 
-export const onInventoryUpdate = ({ entityId }: { entityId: string }) => updateInventory({ entityId });
+export const onInventoryUpdate = () => updateInventory();
 
-export const onInventoryToolActivate = ({ entityId }: { entityId: string }) => activateInventoryTool({ entityId });
+export const onInventoryOptionDisplay = () => displayInventoryOption();
 
-export const onInventoryToolActiveDisplay
-    = ({ entityId }: { entityId: string }) => displayInventoryToolActive({ entityId });
+export const onInventoryOptionUpdate = () => updateInventoryOption();
 
-export const onInventoryToolsUpdate = ({ entityId }: { entityId: string }) => updateInventoryTools({ entityId });
+export const onInventorySelectSlot = () => selectInventorySlot();
+
+export const onInventoryToolActivate = () => activateInventoryTool();
+
+export const onInventoryToolActiveDisplay = () => displayInventoryToolActive();
+
+export const onInventoryToolsUpdate = () => updateInventoryTools();
 //#endregion

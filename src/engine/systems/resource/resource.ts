@@ -1,12 +1,14 @@
 import { startActivityBug, startActivityCraft, startActivityFish } from './activity';
+import { getResourceItem } from './resource.utils';
 
-import { ActivityTypes } from '@/engine/components/resource';
+import { ResourceTypes } from '@/engine/components/resource';
 import { getComponent, checkComponent, destroyEntity } from '@/engine/entities';
+import { setCooldown } from '@/engine/services/cycle';
 import { error } from '@/engine/services/error';
 import { EventTypes } from '@/engine/services/event';
 import { getStore } from '@/engine/services/store';
 import { destroyCollider } from '@/engine/systems/collider';
-import { addItemToInventory, playerInventoryFull } from '@/engine/systems/inventory';
+import { setEntityActive, setEntityCooldown } from '@/engine/systems/state';
 import { destroyTrigger } from '@/engine/systems/trigger';
 import { event } from '@/render/events';
 
@@ -18,13 +20,22 @@ export const useResource = ({ entityId, resourceEntityId }: {
     if (!(entityId)) entityId = getStore('playerId')
         ?? error({ message: 'Store playedId is undefined', where: useResource.name });
 
+    if (checkComponent({ componentId: 'State', entityId: resourceEntityId })) {
+        const state = getComponent({ componentId: 'State', entityId: resourceEntityId });
+
+        if (state._cooldown) throw error({
+            message: 'Resource is on cooldown',
+            where: useResource.name,
+        });
+    }
+
     const resource = getComponent({ componentId: 'Resource', entityId: resourceEntityId });
 
-    if (resource._activityType === ActivityTypes.ITEM) {
+    if (resource._type === ResourceTypes.ITEM) {
         const gotItem = getResourceItem({ resourceEntityId });
         if (!(gotItem)) {
             event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
-            event({ data: { message: 'Inventory is full' }, type: EventTypes.MAIN_ERROR });
+            event({ data: { message: 'Mon sac est plein' }, type: EventTypes.MAIN_ERROR });
 
             throw error({
                 message: 'Player inventory is full',
@@ -32,49 +43,36 @@ export const useResource = ({ entityId, resourceEntityId }: {
             });
         }
 
-        event({ data: { audioName: 'activity_pickup' }, type: EventTypes.AUDIO_PLAY });
+        if (checkComponent({ componentId: 'State', entityId: resourceEntityId })) {
+            const state = getComponent({ componentId: 'State', entityId: resourceEntityId });
 
-        if (resource._isTemporary) {
-            destroyResource({ resourceEntityId });
+            if (state._cooldown !== undefined) {
+                setEntityCooldown({ entityId: resourceEntityId, value: true });
+                setCooldown({ entityId: resourceEntityId });
+            }
+            else {
+                destroyResource({ resourceEntityId });
+            }
         }
+
+        event({ data: { audioName: 'activity_pickup' }, type: EventTypes.AUDIO_PLAY });
+    }
+    else if (resource._type === ResourceTypes.PLACE) {
+        const state = getComponent({ componentId: 'State', entityId: resourceEntityId });
+
+        setEntityActive({ entityId: resourceEntityId, gif: !(state._active), value: !(state._active) });
     }
     else {
-        if (resource._activityType === ActivityTypes.BUG && resource.activityData) {
+        if (resource._type === ResourceTypes.BUG && resource.activityData) {
             startActivityBug({ activityId: resourceEntityId });
         }
-        else if (resource._activityType === ActivityTypes.FISH && resource.activityData) {
+        else if (resource._type === ResourceTypes.FISH && resource.activityData) {
             startActivityFish({ activityId: resourceEntityId });
         }
-        else if (resource._activityType === ActivityTypes.CRAFT && resource.activityData) {
+        else if (resource._type === ResourceTypes.CRAFT && resource.activityData) {
             startActivityCraft({ activityId: resourceEntityId });
         }
     }
-};
-
-export const getResourceItem = ({ entityId, resourceEntityId }: {
-    entityId?: string | null,
-    resourceEntityId: string,
-}) => {
-    if (!(entityId)) entityId = getStore('playerId')
-        ?? error({ message: 'Store playedId is undefined', where: getResourceItem.name });
-
-    const resource = getComponent({ componentId: 'Resource', entityId: resourceEntityId });
-
-    if (!(resource.item)) {
-        throw error({ message: `Resource ${resourceEntityId} does not have an item`, where: getResourceItem.name });
-    }
-
-    if (playerInventoryFull({ item: resource.item })) {
-        return false;
-    }
-
-    addItemToInventory({
-        entityId,
-        item: resource.item,
-        itemAmount: 1,
-    });
-
-    return true;
 };
 
 export const destroyResource = ({ resourceEntityId }: {

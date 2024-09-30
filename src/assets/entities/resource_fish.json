@@ -3,24 +3,60 @@
         "type": "ResourceFish",
         "name": "Fish1",
         "data": {
-            "isTemporary": true,
             "damage": 3,
             "maxHp": 100,
             "frenzyDuration": 3,
             "frenzyInterval": 9
         },
-        "priority": 1
+        "priority": 1,
+        "cooldown": 6000
     },
     {
         "type": "ResourceFish",
-        "name": "SecretBoss",
+        "name": "Fish2",
         "data": {
-            "isTemporary": false,
-            "damage": 4,
-            "maxHp": 500,
+            "damage": 3,
+            "maxHp": 100,
             "frenzyDuration": 3,
-            "frenzyInterval": 3
+            "frenzyInterval": 9
         },
-        "priority": 1
+        "priority": 1,
+        "cooldown": 6000
+    },
+    {
+        "type": "ResourceFish",
+        "name": "Fish3",
+        "data": {
+            "damage": 4,
+            "maxHp": 100,
+            "frenzyDuration": 3,
+            "frenzyInterval": 6
+        },
+        "priority": 1,
+        "cooldown": 6000
+    },
+    {
+        "type": "ResourceFish",
+        "name": "Fish4",
+        "data": {
+            "damage": 4,
+            "maxHp": 100,
+            "frenzyDuration": 3,
+            "frenzyInterval": 6
+        },
+        "priority": 1,
+        "cooldown": 6000
+    },
+    {
+        "type": "ResourceFish",
+        "name": "Fish5",
+        "data": {
+            "damage": 4,
+            "maxHp": 150,
+            "frenzyDuration": 3,
+            "frenzyInterval": 6
+        },
+        "priority": 1,
+        "cooldown": 6000
     }
 ]

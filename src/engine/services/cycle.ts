@@ -1,13 +1,16 @@
-import { getState, setState } from './state';
-import { clearStore } from './store';
-
+import { checkComponent, getComponent } from '@/engine/entities';
+import { error } from '@/engine/services/error';
+import { getState, setState } from '@/engine/services/state';
+import { clearStore } from '@/engine/services/store';
 import { completeQuest } from '@/engine/systems/manager';
 import {
     endActivity,
     tickActivityBug,
     tickActivityFish,
     tickActivityFishFrenzy,
-} from '@/engine/systems/resource/activity';
+    generateResourceItem,
+} from '@/engine/systems/resource';
+import { setEntityCooldown } from '@/engine/systems/state';
 
 //#region TYPES
 const cycle = {
@@ -32,6 +35,8 @@ const check = {
     questCheck: () => false,
 };
 let checkInterval: NodeJS.Timeout;
+
+const cooldowns: NodeJS.Timeout[] = [];
 //#endregion
 
 //#region HELPERS
@@ -42,6 +47,36 @@ export const clearCycle = (key: keyof typeof cycle) => cycle[key] = 0;
 export const setCheck = (key: keyof typeof check, value: () => boolean) => check[key] = value;
 export const getCheck = (key: keyof typeof check) => check[key]();
 export const clearCheck = (key: keyof typeof check) => check[key] = () => false;
+
+export const setCooldown = ({ entityId, value = 10 }: {
+    entityId: string,
+    value?: number,
+}) => {
+    const state = getComponent({ componentId: 'State', entityId });
+    if (!(state._cooldown)) throw error({
+        message: 'Entity is not on cooldown',
+        where: setCooldown.name,
+    });
+
+    const entityCooldown = setInterval(() => {
+        setEntityCooldown({ entityId, value: false });
+
+        if (checkComponent({ componentId: 'Resource', entityId })) {
+            const resource = getComponent({ componentId: 'Resource', entityId });
+            if (!(resource?.items)) throw error({
+                message: 'Resource component does not have items',
+                where: setCooldown.name,
+            });
+
+            generateResourceItem({ resourceEntityId: entityId });
+        }
+
+        clearInterval(entityCooldown);
+        cooldowns.splice(cooldowns.indexOf(entityCooldown), 1);
+    }, value * 1000);
+
+    cooldowns.push(entityCooldown);
+};
 //#endregion
 
 //#region CYCLE
@@ -57,6 +92,10 @@ export const startCycle = () => {
 export const stopCycle = () => {
     clearInterval(cycleInterval);
     clearInterval(checkInterval);
+
+    for (const cooldown of cooldowns) {
+        clearInterval(cooldown);
+    }
 
     clearCycle('activityBugTickInterval');
     clearCycle('activityFishTickInterval');
@@ -74,7 +113,11 @@ export const stopCycle = () => {
 };
 
 const runCycle = () => {
-    if (getState('isInputCooldown')) {
+    if (
+        getState('isInputCooldown')
+        && !(getState('isActivityInputCooldown'))
+        && !(getState('isActivityBugInputCooldown'))
+    ) {
         const inputTickIntervalProgress = cycle.elapsedTimeSinceInputTick / cycle.inputTickInterval;
 
         if (inputTickIntervalProgress >= 1) {
@@ -83,9 +126,9 @@ const runCycle = () => {
         }
     }
 
-    if (getState('isGameRunning')) {
-        cycle.elapsedTimeSinceInputTick += cycle.deltaTime;
+    cycle.elapsedTimeSinceInputTick += cycle.deltaTime;
 
+    if (getState('isGameRunning')) {
         if (getState('isActivityRunning')) {
             if (getState('isActivityWin') && cycle.activityWinTickInterval > 0) {
                 cycle.elapsedTimeSinceActivityWinTick += cycle.deltaTime;
@@ -173,9 +216,19 @@ const runCheck = () => {
             const questCheckResult = getCheck('questCheck');
 
             if (questCheckResult) {
-                setCheck('questCheck', () => false);
-                completeQuest();
+                completeQuest({ questState: true });
             }
+        }
+        else if (getState('isQuestComplete')) {
+            const questCheckResult = getCheck('questCheck');
+
+            if (!(questCheckResult)) {
+                completeQuest({ questState: false });
+            }
+        }
+        else if (getState('isQuestEnd')) {
+            setCheck('questCheck', () => false);
+            setState('isQuestEnd', false);
         }
     }
 };

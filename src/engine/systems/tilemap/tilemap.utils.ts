@@ -1,8 +1,17 @@
 import { generateTileMap, setTile, updateTile } from './tilemap';
-import { TileMapData, loadTileMapEntityData } from './tilemap.data';
+import { TileMapData } from './tilemap.data';
 
 import { TileExit, Tile } from '@/engine/components/tilemap';
-import { destroyAllEntities, EntityTypes, findEntityByName, getComponent } from '@/engine/entities';
+import {
+    checkComponent,
+    destroyAllEntities,
+    EntityTypes,
+    findEntityByName,
+    findEntityByMapPosition,
+    getComponent,
+    loadEntityData,
+    findEntitiesByMap,
+} from '@/engine/entities';
 import {
     createEntityNpc,
     createEntityResourceItem,
@@ -14,7 +23,7 @@ import { error } from '@/engine/services/error';
 import { EventTypes } from '@/engine/services/event';
 import { getStore } from '@/engine/services/store';
 import { updatePosition } from '@/engine/systems/position';
-import { setEntityActive } from '@/engine/systems/state';
+import { setEntityLoad } from '@/engine/systems/state';
 import { randAudio } from '@/render/audio';
 import { event } from '@/render/events';
 
@@ -52,11 +61,14 @@ export const targetExit = ({ tile, exit, targetX, targetY }: {
     targetX: number,
     targetY: number,
     tile: Tile,
-}) =>
-    targetExitUp({ exit, targetX, targetY, tile })
-    || targetExitDown({ exit, targetX, targetY, tile })
-    || targetExitLeft({ exit, targetX, targetY, tile })
-    || targetExitRight({ exit, targetX, targetY, tile });
+}) => {
+    return (
+        targetExitUp({ exit, targetX, targetY, tile })
+        || targetExitDown({ exit, targetX, targetY, tile })
+        || targetExitLeft({ exit, targetX, targetY, tile })
+        || targetExitRight({ exit, targetX, targetY, tile })
+    );
+};
 
 export const tileIsGrass = ({ tile }: { tile: Tile }) => tile.sprite._image.includes('grass');
 export const tileIsSand = ({ tile }: { tile: Tile }) => tile.sprite._image.includes('sand');
@@ -75,19 +87,23 @@ export const getTargetXY = ({ target, x, y }: {
     else throw error({ message: 'Invalid target', where: getTargetXY.name });
 };
 
-export const findTileByEntityId = ({ entityId }: { entityId: string }) => {
-    const tileMapEntityId = getStore('tileMapId')
+export const findTileByEntityId = ({ entityId, tileMapEntityId }: {
+    entityId: string,
+    tileMapEntityId?: string | null
+}) => {
+    if (!(tileMapEntityId)) tileMapEntityId = getStore('tileMapId')
         ?? error({ message: 'Store tileMapId is undefined', where: findTileByEntityId.name });
 
     return getComponent({ componentId: 'TileMap', entityId: tileMapEntityId })
         .tiles.find(tile => tile._entityIds.includes(entityId));
 };
 
-export const findTileByPosition = ({ x, y }: {
+export const findTileByPosition = ({ x, y, tileMapEntityId }: {
+    tileMapEntityId?: string | null
     x: number,
     y: number,
 }) => {
-    const tileMapEntityId = getStore('tileMapId')
+    if (!(tileMapEntityId)) tileMapEntityId = getStore('tileMapId')
         ?? error({ message: 'Store tileMapId is undefined', where: findTileByPosition.name });
 
     return getComponent({ componentId: 'TileMap', entityId: tileMapEntityId })
@@ -141,80 +157,86 @@ export const generateTileMapEntities = ({ tileMapEntityId, tileMapData }: {
     if (!(tileMapEntityId)) tileMapEntityId = getStore('tileMapId')
         ?? error({ message: 'Store tileMapId is undefined', where: generateTileMap.name });
 
-    for (const entity of tileMapData.entities) {
-        const entityData = loadTileMapEntityData({ entityName: entity.name, entityType: entity.type })
-            ?? error({
-                message: `EntityData for ${entity.type} ${entity.name} not found`,
-                where: generateTileMapEntities.name,
-            });
+    for (const mapEntity of tileMapData.entities) {
+        const { entity, entityId } = (mapEntity.name)
+            ? findEntityByName({ entityName: mapEntity.name })
+            : findEntityByMapPosition({ tileMapName: tileMapData.name, x: mapEntity.x, y: mapEntity.y });
 
-        if (entity.type === EntityTypes.NPC) {
-            const { entity: npcEntity, entityId: npcEntityId } = findEntityByName({ entityName: entity.name });
+        if (entity && entityId && checkComponent({ componentId: 'State', entityId })) {
+            setEntityLoad({ entityId, value: true });
+            setTile({ entityId, tileMapEntityId });
+            continue;
+        }
+        else {
+            if (mapEntity.name) {
+                const entityData = loadEntityData({ entityName: mapEntity.name, entityType: mapEntity.type })
+                    ?? error({
+                        message: `EntityData for ${mapEntity.type} ${mapEntity.name} not found`,
+                        where: generateTileMapEntities.name,
+                    });
 
-            if (npcEntity && npcEntityId) {
-                setEntityActive({ entityId: npcEntityId, value: true });
-                setTile({ entityId: npcEntityId, tileMapEntityId });
+                if (mapEntity.type === EntityTypes.NPC) {
+                    createEntityNpc({
+                        entityName: mapEntity.name,
+                        positionX: mapEntity.x,
+                        positionY: mapEntity.y,
+                        spritePath: `npc_${mapEntity.name.toLowerCase()}`,
+                        triggerPriority: entityData.priority,
+                    });
+                }
+                else if (mapEntity.type === EntityTypes.RESOURCE_CRAFT) {
+                    createEntityResourceCraft({
+                        entityName: mapEntity.name,
+                        positionX: mapEntity.x,
+                        positionY: mapEntity.y,
+                        spritePath: `resource_${mapEntity.name.toLowerCase()}`,
+                        triggerPriority: entityData.priority,
+                    });
+                }
+            }
+            else if (mapEntity.items) {
+                if (mapEntity.type === EntityTypes.RESOURCE_ITEM) {
+                    createEntityResourceItem({
+                        entityName: mapEntity.type,
+                        positionX: mapEntity.x,
+                        positionY: mapEntity.y,
+                        resourceItems: mapEntity.items,
+                    });
+                }
+                else if (mapEntity.type === EntityTypes.RESOURCE_BUG) {
+                    createEntityResourceBug({
+                        entityName: mapEntity.type,
+                        positionX: mapEntity.x,
+                        positionY: mapEntity.y,
+                        resourceItems: mapEntity.items,
+                    });
+                }
+                else if (mapEntity.type === EntityTypes.RESOURCE_FISH) {
+                    createEntityResourceFish({
+                        entityName: mapEntity.type,
+                        positionX: mapEntity.x,
+                        positionY: mapEntity.y,
+                        resourceItems: mapEntity.items,
+                    });
+                }
             }
             else {
-                createEntityNpc({
-                    entityName: entity.name,
-                    positionX: entity.x,
-                    positionY: entity.y,
-                    spritePath: `npc_${entity.name.toLowerCase()}`,
-                    triggerPriority: entityData.priority,
-                });
+                throw error({ message: 'Invalid entity data', where: generateTileMapEntities.name });
             }
         }
-        else if (entity.type === EntityTypes.RESOURCE_ITEM) {
-            createEntityResourceItem({
-                entityName: entity.name,
-                positionX: entity.x,
-                positionY: entity.y,
-                resourceIsTemporary: entityData.data.isTemporary,
-                resoureceItemName: entityData.name,
-                spritePath: `resource_${entity.name.toLowerCase()}`,
-                triggerPriority: entityData.priority,
-            });
-        }
-        else if (entity.type === EntityTypes.RESOURCE_BUG) {
-            createEntityResourceBug({
-                entityName: entity.name,
-                positionX: entity.x,
-                positionY: entity.y,
-                resourceActivityBugMaxHp: entityData.data.maxHp,
-                resourceActivityBugMaxNbErrors: entityData.data.maxNbErrors,
-                resourceActivityBugSymbolInterval: entityData.data.symbolInterval,
-                resourceIsTemporary: entityData.data.isTemporary,
-                resoureceItemName: entityData.name,
-                spritePath: `resource_${entity.name.toLowerCase()}`,
-                triggerPriority: entityData.priority,
-            });
-        }
-        else if (entity.type === EntityTypes.RESOURCE_FISH) {
-            createEntityResourceFish({
-                entityName: entity.name,
-                positionX: entity.x,
-                positionY: entity.y,
-                resourceActivityFishDamage: entityData.data.damage,
-                resourceActivityFishFrenzyDuration: entityData.data.frenzyDuration,
-                resourceActivityFishFrenzyInterval: entityData.data.frenzyInterval,
-                resourceActivityFishMaxHp: entityData.data.maxHp,
-                resourceActivityFishRodDamage: 2, // temp
-                resourceActivityFishRodMaxTension: 100, // temp
-                resourceIsTemporary: entityData.data.isTemporary,
-                resoureceItemName: entityData.name,
-                spritePath: `resource_${entity.name.toLowerCase()}`,
-                triggerPriority: entityData.priority,
-            });
-        }
-        else if (entity.type === EntityTypes.RESOURCE_CRAFT) {
-            createEntityResourceCraft({
-                entityName: entity.name,
-                positionX: entity.x,
-                positionY: entity.y,
-                spritePath: `resource_${entity.name.toLowerCase()}`,
-                triggerPriority: entityData.priority,
-            });
+    }
+
+    const { entities, entityIds } = findEntitiesByMap({ tileMapName: tileMapData.name });
+    for (const entity of entities) {
+        const entityId = entityIds[entities.indexOf(entity)];
+
+        if (checkComponent({ componentId: 'State', entityId })) {
+            const state = getComponent({ componentId: 'State', entityId });
+            if (!(state._load)) {
+                setEntityLoad({ entityId, value: true });
+                setTile({ entityId, tileMapEntityId });
+                continue;
+            }
         }
     }
 };

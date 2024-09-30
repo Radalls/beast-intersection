@@ -1,0 +1,10 @@
+[
+    {
+        "type": "ResourcePlace",
+        "name": "Campfire"
+    },
+    {
+        "type": "ResourcePlace",
+        "name": "Tent"
+    }
+]

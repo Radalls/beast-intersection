@@ -1,8 +1,8 @@
 import itemRecipes from '../../../../assets/items/item_recipes.json';
 
-import { canPlay, checkActivityId, endActivity, loseActivity, startActivity, winActivity } from './activity';
+import { canPlay, endActivity, loseActivity, startActivity, winActivity } from './activity';
 
-import { ActivityCraftData, ActivityData } from '@/engine/components/resource';
+import { ActivityCraftData, ActivityData, ResourceTypes } from '@/engine/components/resource';
 import { getComponent } from '@/engine/entities';
 import { error } from '@/engine/services/error';
 import { EventTypes } from '@/engine/services/event';
@@ -10,55 +10,84 @@ import { getState, setState } from '@/engine/services/state';
 import { clearStore, getStore } from '@/engine/services/store';
 import {
     checkInventory,
+    itemIsTool,
     playerHasSameActivityTool,
     playerInventoryFull,
+    playerInventoryToolFull,
     removeItemFromInventory,
 } from '@/engine/systems/inventory';
+import { getKeyMoveOffset } from '@/engine/systems/manager';
+import { setEntityActive } from '@/engine/systems/state';
 import { randAudio } from '@/render/audio';
 import { event } from '@/render/events';
 
 //#region HELPERS
 const checkActivityCraftData = (activityData: ActivityData): activityData is ActivityCraftData =>
-    (activityData as ActivityCraftData)._nbErrors !== undefined;
+    (activityData as ActivityCraftData)._hitCount !== undefined;
 //#endregion
 
 //#region SERVICES
-export const onActivityCraftInput = ({ inputKey }: { inputKey: string }) => {
-    const managerEntityId = getStore('managerId')
+export const onActivityCraftInput = ({ inputKey, activityId, managerEntityId }: {
+    activityId?: string | null,
+    inputKey: string,
+    managerEntityId?: string | null,
+}) => {
+    if (!managerEntityId) managerEntityId = getStore('managerId')
         ?? error({ message: 'Store managerId is undefined', where: onActivityCraftInput.name });
 
     const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
 
-    const activityCraftEntityId = getStore('activityId')
+    if (!(activityId)) activityId = getStore('activityId')
         ?? error({ message: 'Store activityId is undefined ', where: onActivityCraftInput.name });
 
     if (getState('isActivityCraftSelecting')) {
         if (inputKey === manager.settings.keys.action._act) {
-            confirmActivityCraftRecipe({ activityId: activityCraftEntityId });
+            confirmActivityCraftRecipe({ activityId });
+            return;
         }
-        else if (inputKey === manager.settings.keys.move._up) {
-            selectActivityCraftRecipe({ activityId: activityCraftEntityId, offset: -1 });
-        }
-        else if (inputKey === manager.settings.keys.move._down) {
-            selectActivityCraftRecipe({ activityId: activityCraftEntityId, offset: 1 });
+        else if (
+            inputKey === manager.settings.keys.move._up
+            || inputKey === manager.settings.keys.move._down
+        ) {
+            const inputOffset = getKeyMoveOffset({ inputKey, managerEntityId });
+            if (!(inputOffset)) throw error({
+                message: 'Invalid input',
+                where: onActivityCraftInput.name,
+            });
+
+            selectActivityCraftRecipe({ activityId, offset: inputOffset });
+            return;
         }
         else if (inputKey === manager.settings.keys.action._back) {
-            endActivityCraft({ activityId: activityCraftEntityId });
+            endActivityCraft({ activityId });
+            return;
         }
     }
     else if (getState('isActivityCraftPlaying')) {
         if (inputKey === manager.settings.keys.action._back) {
             loseActivity();
+            return;
         }
         else {
-            playActivityCraft({ activityId: activityCraftEntityId, symbol: inputKey });
+            playActivityCraft({ activityId, symbol: inputKey });
+            return;
         }
     }
 };
 
 //#region SELECT
-export const startActivityCraft = ({ activityId }: { activityId: string }) => {
+export const startActivityCraft = ({ activityId, managerEntityId }: {
+    activityId: string,
+    managerEntityId?: string | null,
+}) => {
     startActivity({ activityId });
+
+    if (!(managerEntityId)) managerEntityId = getStore('managerId')
+        ?? error({ message: 'Store managerId is undefined', where: startActivityCraft.name });
+
+    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
+
+    manager._selectedCraftRecipe = 0;
 
     const activityResource = getComponent({ componentId: 'Resource', entityId: activityId });
     const activityCraftData = activityResource.activityData;
@@ -66,7 +95,6 @@ export const startActivityCraft = ({ activityId }: { activityId: string }) => {
         throw error({ message: 'Activity Craft data is invalid', where: startActivityCraft.name });
     }
 
-    activityCraftData._currentRecipeIndex = 0;
     activityCraftData._nbErrors = 0;
     activityCraftData._hitCount = 0;
 
@@ -78,8 +106,18 @@ export const startActivityCraft = ({ activityId }: { activityId: string }) => {
     event({ data: { audioName: 'activity_craft_start' }, type: EventTypes.AUDIO_PLAY });
 };
 
-export const selectActivityCraftRecipe = ({ activityId, offset }: { activityId?: string | null, offset: 1 | -1 }) => {
-    activityId = checkActivityId({ activityId });
+export const selectActivityCraftRecipe = ({ offset, activityId, managerEntityId }: {
+    activityId?: string | null,
+    managerEntityId?: string | null,
+    offset: 1 | -1,
+}) => {
+    if (!(activityId)) activityId = getStore('activityId')
+        ?? error({ message: 'Store activityId is undefined', where: selectActivityCraftRecipe.name });
+
+    if (!(managerEntityId)) managerEntityId = getStore('managerId')
+        ?? error({ message: 'Store managerId is undefined', where: selectActivityCraftRecipe.name });
+
+    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
 
     const activityResource = getComponent({ componentId: 'Resource', entityId: activityId });
     const activityCraftData = activityResource.activityData;
@@ -87,26 +125,22 @@ export const selectActivityCraftRecipe = ({ activityId, offset }: { activityId?:
         throw error({ message: 'Activity Craft data is invalid', where: selectActivityCraftRecipe.name });
     }
 
-    if (activityCraftData._currentRecipeIndex === undefined) {
-        throw error({ message: 'Activity Craft recipe index is invalid', where: selectActivityCraftRecipe.name });
-    }
-
     if (offset === -1) {
-        if (activityCraftData._currentRecipeIndex === 0) {
-            activityCraftData._currentRecipeIndex = itemRecipes.length - 1;
+        if (manager._selectedCraftRecipe === 0) {
+            manager._selectedCraftRecipe = itemRecipes.length - 1;
         }
         else {
-            activityCraftData._currentRecipeIndex = Math.max(0, activityCraftData._currentRecipeIndex - 1);
+            manager._selectedCraftRecipe = Math.max(0, manager._selectedCraftRecipe - 1);
         }
     }
     else if (offset === 1) {
-        if (activityCraftData._currentRecipeIndex === itemRecipes.length - 1) {
-            activityCraftData._currentRecipeIndex = 0;
+        if (manager._selectedCraftRecipe === itemRecipes.length - 1) {
+            manager._selectedCraftRecipe = 0;
         }
         else {
-            activityCraftData._currentRecipeIndex = Math.min(
+            manager._selectedCraftRecipe = Math.min(
                 itemRecipes.length - 1,
-                activityCraftData._currentRecipeIndex + 1,
+                manager._selectedCraftRecipe + 1,
             );
         }
     }
@@ -115,35 +149,51 @@ export const selectActivityCraftRecipe = ({ activityId, offset }: { activityId?:
     event({ data: { audioName: 'main_select' }, type: EventTypes.AUDIO_PLAY });
 };
 
-export const confirmActivityCraftRecipe = ({ activityId }: { activityId?: string | null }) => {
-    activityId = checkActivityId({ activityId });
+export const confirmActivityCraftRecipe = ({ activityId, managerEntityId, playerEntityId }: {
+    activityId?: string | null,
+    managerEntityId?: string | null,
+    playerEntityId?: string | null,
+}) => {
+    if (!(activityId)) activityId = getStore('activityId')
+        ?? error({ message: 'Store activityId is undefined', where: confirmActivityCraftRecipe.name });
+
+    if (!(managerEntityId)) managerEntityId = getStore('managerId')
+        ?? error({ message: 'Store managerId is undefined', where: confirmActivityCraftRecipe.name });
+
+    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
 
     const activityResource = getComponent({ componentId: 'Resource', entityId: activityId });
-
     const activityCraftData = activityResource.activityData;
     if (!(activityCraftData && checkActivityCraftData(activityCraftData))) {
         throw error({ message: 'Activity Craft data is invalid', where: confirmActivityCraftRecipe.name });
     }
 
-    if (activityCraftData._currentRecipeIndex === undefined) {
-        throw error({ message: 'Activity Craft recipe index is invalid', where: confirmActivityCraftRecipe.name });
-    }
-
-    const playerEntityId = getStore('playerId')
+    if (!(playerEntityId)) playerEntityId = getStore('playerId')
         ?? error({ message: 'Store playerId is undefined', where: confirmActivityCraftRecipe.name });
 
-    if (itemRecipes[activityCraftData._currentRecipeIndex].tool) {
+    const recipeTool = itemIsTool({ itemName: itemRecipes[manager._selectedCraftRecipe].name });
+    if (recipeTool) {
         const playerHasTool = playerHasSameActivityTool({
-            activity: itemRecipes[activityCraftData._currentRecipeIndex].tool!,
+            activity: itemRecipes[manager._selectedCraftRecipe].tool as ResourceTypes,
             playerEntityId: playerEntityId,
         });
 
         if (playerHasTool) {
             event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
-            event({ data: { message: 'Cannot craft more of the same tool' }, type: EventTypes.MAIN_ERROR });
+            event({ data: { message: 'Je ne peux pas en avoir plus' }, type: EventTypes.MAIN_ERROR });
 
             throw error({
-                message: `Player cannot craft more ${itemRecipes[activityCraftData._currentRecipeIndex].name}`,
+                message: `Player cannot craft more ${itemRecipes[manager._selectedCraftRecipe].name}`,
+                where: confirmActivityCraftRecipe.name,
+            });
+        }
+
+        if (playerInventoryToolFull({ playerEntityId })) {
+            event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
+            event({ data: { message: 'Mon sac est plein' }, type: EventTypes.MAIN_ERROR });
+
+            throw error({
+                message: 'Player inventory full',
                 where: confirmActivityCraftRecipe.name,
             });
         }
@@ -151,44 +201,45 @@ export const confirmActivityCraftRecipe = ({ activityId }: { activityId?: string
 
     if (!(canPlay({ entityId: playerEntityId, strict: false }))) {
         event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
-        event({ data: { message: 'Not enough energy' }, type: EventTypes.MAIN_ERROR });
+        event({ data: { message: 'Je suis trop fatigué pour ça' }, type: EventTypes.MAIN_ERROR });
 
         throw error({
-            message: `Not enough energy to craft ${itemRecipes[activityCraftData._currentRecipeIndex].name}`,
+            message: `Not enough energy to craft ${itemRecipes[manager._selectedCraftRecipe].name}`,
             where: confirmActivityCraftRecipe.name,
         });
     }
+
     if (!(checkInventory({
         entityId: playerEntityId,
-        items: itemRecipes[activityCraftData._currentRecipeIndex].ingredients,
+        items: itemRecipes[manager._selectedCraftRecipe].ingredients,
     }))) {
         event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
-        event({ data: { message: 'Not enough ingredients' }, type: EventTypes.MAIN_ERROR });
+        event({ data: { message: 'Je n\'ai pas ce qu\'il faut pour ça' }, type: EventTypes.MAIN_ERROR });
 
         throw error({
-            message: `Could not find all ingredients for ${itemRecipes[activityCraftData._currentRecipeIndex].name}`,
+            message: `Could not find all ingredients for ${itemRecipes[manager._selectedCraftRecipe].name}`,
             where: confirmActivityCraftRecipe.name,
         });
     }
 
-    activityCraftData._currentRecipeId = itemRecipes[activityCraftData._currentRecipeIndex].id;
-    activityResource.item = {
-        info: { _name: itemRecipes[activityCraftData._currentRecipeIndex].name },
-        sprite: { _image: `item_${itemRecipes[activityCraftData._currentRecipeIndex].name.toLowerCase()}` },
+    const recipeItem = {
+        info: { _name: itemRecipes[manager._selectedCraftRecipe].name },
+        sprite: { _image: `item_${itemRecipes[manager._selectedCraftRecipe].name.toLowerCase()}` },
     };
 
-    if (playerInventoryFull({ item: activityResource.item })) {
-        activityCraftData._currentRecipeId = undefined;
-        activityResource.item = undefined;
+    if (!(recipeTool)) {
+        if (playerInventoryFull({ item: recipeItem })) {
+            event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
+            event({ data: { message: 'Mon sac est plein' }, type: EventTypes.MAIN_ERROR });
 
-        event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
-        event({ data: { message: 'Inventory full' }, type: EventTypes.MAIN_ERROR });
-
-        throw error({
-            message: `Player will not be able to get ${itemRecipes[activityCraftData._currentRecipeIndex].name}`,
-            where: confirmActivityCraftRecipe.name,
-        });
+            throw error({
+                message: `Player will not be able to get ${itemRecipes[manager._selectedCraftRecipe].name}`,
+                where: confirmActivityCraftRecipe.name,
+            });
+        }
     }
+
+    activityResource.item = recipeItem;
 
     setState('isActivityCraftSelecting', false);
     setState('isActivityCraftPlaying', true);
@@ -200,18 +251,20 @@ export const confirmActivityCraftRecipe = ({ activityId }: { activityId?: string
 //#endregion
 
 //#region PLAY
-export const playActivityCraft = ({ activityId, symbol }: {
+export const playActivityCraft = ({ symbol, activityId, managerEntityId }: {
     activityId?: string | null,
+    managerEntityId?: string | null,
     symbol: string,
 }) => {
-    const managerEntityId = getStore('managerId')
+    if (!managerEntityId) managerEntityId = getStore('managerId')
         ?? error({ message: 'Store managerId is undefined', where: playActivityCraft.name });
 
     const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
 
     if (symbol !== manager.settings.keys.action._act) return;
 
-    activityId = checkActivityId({ activityId });
+    if (!(activityId)) activityId = getStore('activityId')
+        ?? error({ message: 'Store activityId is undefined', where: playActivityCraft.name });
 
     const activityResource = getComponent({ componentId: 'Resource', entityId: activityId });
     const activityCraftData = activityResource.activityData;
@@ -238,7 +291,13 @@ export const playActivityCraft = ({ activityId, symbol }: {
     event({ data: { audioName: `activity_craft_play${randAudio({ nb: 6 })}` }, type: EventTypes.AUDIO_PLAY });
 };
 
-export const endActivityCraft = ({ activityId }: { activityId?: string | null }) => {
+export const endActivityCraft = ({ activityId, playerEntityId }: {
+    activityId?: string | null,
+    playerEntityId?: string | null,
+}) => {
+    if (!(activityId)) activityId = getStore('activityId')
+        ?? error({ message: 'Store activityId is undefined', where: endActivityCraft.name });
+
     if (getState('isActivityCraftSelecting')) {
         setState('isActivityCraftSelecting', false);
 
@@ -251,10 +310,10 @@ export const endActivityCraft = ({ activityId }: { activityId?: string | null })
         return;
     }
     else if (getState('isActivityCraftPlaying')) {
-        const playerEntityId = getStore('playerId')
+        if (!(playerEntityId)) playerEntityId = getStore('playerId')
             ?? error({ message: 'Store playerId is undefined', where: endActivityCraft.name });
 
-        canPlay({ entityId: playerEntityId });
+        canPlay({ entityId: playerEntityId, strict: true });
 
         removeCraftIngredients({ activityId });
 
@@ -265,11 +324,23 @@ export const endActivityCraft = ({ activityId }: { activityId?: string | null })
 
     setState('isActivityCraftRunning', false);
 
+    setEntityActive({ entityId: activityId, value: false });
+
     event({ type: EventTypes.ACTIVITY_CRAFT_END });
 };
 
-const removeCraftIngredients = ({ activityId }: { activityId?: string | null }) => {
-    activityId = checkActivityId({ activityId });
+const removeCraftIngredients = ({ activityId, managerEntityId, playerEntityId }: {
+    activityId?: string | null,
+    managerEntityId?: string | null,
+    playerEntityId?: string | null,
+}) => {
+    if (!managerEntityId) managerEntityId = getStore('managerId')
+        ?? error({ message: 'Store managerId is undefined', where: removeCraftIngredients.name });
+
+    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
+
+    if (!(activityId)) activityId = getStore('activityId')
+        ?? error({ message: 'Store activityId is undefined', where: playActivityCraft.name });
 
     const activityResource = getComponent({ componentId: 'Resource', entityId: activityId });
     const activityCraftData = activityResource.activityData;
@@ -277,14 +348,14 @@ const removeCraftIngredients = ({ activityId }: { activityId?: string | null }) 
         throw error({ message: 'Activity Craft data is invalid', where: removeCraftIngredients.name });
     }
 
-    if (activityCraftData._currentRecipeIndex === undefined) {
+    if (manager._selectedCraftRecipe === undefined) {
         throw error({ message: 'Activity Craft recipe index is invalid', where: removeCraftIngredients.name });
     }
 
-    const playerEntityId = getStore('playerId')
+    if (!(playerEntityId)) playerEntityId = getStore('playerId')
         ?? error({ message: 'Store playerId is undefined', where: removeCraftIngredients.name });
 
-    for (const ingredient of itemRecipes[activityCraftData._currentRecipeIndex].ingredients) {
+    for (const ingredient of itemRecipes[manager._selectedCraftRecipe].ingredients) {
         const itemAmountRemoved = removeItemFromInventory({
             entityId: playerEntityId,
             itemAmount: ingredient.amount,

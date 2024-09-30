@@ -1,0 +1,5 @@
+{
+    "name": "quest4a",
+    "items": [{ "name": "FishRod1", "amount": 1, "keep": true }],
+    "talk": "Npc1"
+}

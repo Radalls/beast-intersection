@@ -6,18 +6,22 @@ import { ActivityData } from '@/engine/components/resource';
 import { Tile } from '@/engine/components/tilemap';
 import { getComponent } from '@/engine/entities';
 import { error, ErrorData } from '@/engine/services/error';
-import { nextDialog, selectDialogOption, startDialog } from '@/engine/systems/dialog';
-import { activateInventoryTool, closePlayerInventory, openPlayerInventory } from '@/engine/systems/inventory';
+import { nextDialog, selectDialogOption } from '@/engine/systems/dialog';
 import {
-    checkSecretDateInput,
-    checkSecretPathInput,
+    activateInventoryTool,
+    onInventoryInput,
+    openPlayerInventory,
+} from '@/engine/systems/inventory';
+import {
+    getKeyMoveDirection,
+    getKeyMoveOffset,
     onLaunchInput,
     onSettingsInput,
     openSettings,
 } from '@/engine/systems/manager';
 import { onActivityBugInput, onActivityFishInput, onActivityCraftInput } from '@/engine/systems/resource';
 import { updateTile } from '@/engine/systems/tilemap';
-import { checkTrigger, onTrigger } from '@/engine/systems/trigger';
+import { checkTrigger } from '@/engine/systems/trigger';
 import { AudioData } from '@/render/audio';
 
 //#region TYPES
@@ -68,9 +72,13 @@ export enum EventTypes {
     ENTITY_DISPLAY = 'ENTITY_DISPLAY',
     ENTITY_POSITION_UPDATE = 'ENTITY_POSITION_UPDATE',
     ENTITY_SPRITE_CREATE = 'ENTITY_SPRITE_CREATE',
+    ENTITY_SPRITE_UPDATE = 'ENTITY_SPRITE_UPDATE',
     /* Inventory */
     INVENTORY_CREATE = 'INVENTORY_CREATE',
     INVENTORY_DISPLAY = 'INVENTORY_DISPLAY',
+    INVENTORY_OPTION_DISPLAY = 'INVENTORY_OPTION_DISPLAY',
+    INVENTORY_OPTION_UPDATE = 'INVENTORY_OPTION_UPDATE',
+    INVENTORY_SELECT_SLOT = 'INVENTORY_SELECT',
     INVENTORY_TOOL_ACTIVATE = 'INVENTORY_TOOL_ACTIVATE',
     INVENTORY_TOOL_ACTIVE_DISPLAY = 'INVENTORY_TOOL_ACTIVE_DISPLAY',
     INVENTORY_TOOL_UPDATE = 'INVENTORY_TOOL_UPDATE',
@@ -91,11 +99,6 @@ export enum EventTypes {
     QUEST_DISPLAY = 'QUEST_DISPLAY',
     QUEST_END = 'QUEST_END',
     QUEST_START = 'QUEST_START',
-    /* Secret */
-    SECRET_BOSS_DISPLAY = 'SECRET_BOSS_DISPLAY',
-    SECRET_PATH_DISPLAY = 'SECRET_PATH_DISPLAY',
-    SECRET_START = 'SECRET_START',
-    SECRET_WIN_DISPLAY = 'SECRET_WIN_DISPLAY',
     /* Tilemap */
     TILEMAP_CREATE = 'TILEMAP_CREATE',
     TILEMAP_TILE_CREATE = 'TILEMAP_TILE_CREATE',
@@ -131,16 +134,6 @@ export const onInputKeyDown = (inputKey: string) => {
             return;
         }
         else if (getState('isGameLaunching')) {
-            if (getState('isGameSecretUnlocked') && !(getState('isGameSecretSaveUnlocked'))) {
-                if (!(getState('isGameSecretPathUnlocked'))) {
-                    checkSecretDateInput({ inputKey });
-                }
-                else if (getState('isGameSecretPathUnlocked')) {
-                    checkSecretPathInput({ inputKey });
-                    return;
-                }
-            }
-
             if (inputKey === manager.settings.keys.action._back) {
                 openSettings({});
                 return;
@@ -153,22 +146,12 @@ export const onInputKeyDown = (inputKey: string) => {
     }
     else {
         if (getState('isPlayerInventoryOpen')) {
-            if (
-                inputKey === manager.settings.keys.action._inventory
-                || inputKey === manager.settings.keys.action._back
-            ) {
-                closePlayerInventory({ playerEntityId });
-                return;
-            }
-            else if (inputKey === manager.settings.keys.action._tool) {
-                activateInventoryTool({ entityId: playerEntityId });
-                return;
-            }
-            else return;
+            onInventoryInput({ inputKey });
+            return;
         }
         else if (getState('isActivityRunning')) {
             if (getState('isActivityBugRunning')) {
-                if (getState('isActivityBugCooldown')) return;
+                if (getState('isActivityBugInputCooldown')) return;
 
                 onActivityBugInput({ inputKey });
                 return;
@@ -187,19 +170,16 @@ export const onInputKeyDown = (inputKey: string) => {
             const dialogEntityId = getStore('dialogId')
                 ?? error({ message: 'Store dialogId is undefined', where: onInputKeyDown.name });
 
-            if (inputKey === manager.settings.keys.move._up) {
-                selectDialogOption({ entityId: dialogEntityId, offset: -1 });
-                return;
-            }
-            else if (inputKey === manager.settings.keys.move._down) {
-                selectDialogOption({ entityId: dialogEntityId, offset: 1 });
-                return;
-            }
-            else if (inputKey === manager.settings.keys.action._act) {
+            if (inputKey === manager.settings.keys.action._act) {
                 nextDialog({ entityId: dialogEntityId });
                 return;
             }
-            else return;
+            else {
+                const inputOffset = getKeyMoveOffset({ inputKey, managerEntityId });
+                if (!(inputOffset)) return;
+
+                selectDialogOption({ entityId: dialogEntityId, offset: inputOffset });
+            }
         }
         else {
             if (inputKey === manager.settings.keys.action._back) {
@@ -214,48 +194,18 @@ export const onInputKeyDown = (inputKey: string) => {
                 activateInventoryTool({ entityId: playerEntityId });
                 return;
             }
-            else if (inputKey === manager.settings.keys.move._up) {
-                updateTile({
-                    entityId: playerEntityId,
-                    target: 'up',
-                });
-
-                return;
-            }
-            else if (inputKey === manager.settings.keys.move._left) {
-                updateTile({
-                    entityId: playerEntityId,
-                    target: 'left',
-                });
-
-                return;
-            }
-            else if (inputKey === manager.settings.keys.move._down) {
-                updateTile({
-                    entityId: playerEntityId,
-                    target: 'down',
-                });
-
-                return;
-            }
-            else if (inputKey === manager.settings.keys.move._right) {
-                updateTile({
-                    entityId: playerEntityId,
-                    target: 'right',
-                });
-
-                return;
-            }
             else if (inputKey === manager.settings.keys.action._act) {
-                const triggeredEntityId = checkTrigger({});
-                if (triggeredEntityId) {
-                    if (getState('isGameSecretSaveRunning')) {
-                        startDialog({ entityId: triggeredEntityId });
-                        return;
-                    }
+                checkTrigger({});
+                return;
+            }
+            else {
+                const targetDirection = getKeyMoveDirection({ inputKey, managerEntityId });
+                if (!(targetDirection)) return;
 
-                    onTrigger({ triggeredEntityId });
-                }
+                updateTile({
+                    entityId: playerEntityId,
+                    target: targetDirection,
+                });
 
                 return;
             }

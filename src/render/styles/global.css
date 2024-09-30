@@ -33,9 +33,17 @@
     font-style: normal;
 }
 
+* {
+    cursor: none;
+}
+
 body {
     font-family: 'Font1';
     font-weight: 600;
+}
+
+div {
+    background-size: contain;
 }
 
 /* LOADING */

@@ -1,9 +1,10 @@
 import { v4 as uuidv4 } from 'uuid';
 
-import { entities, PLAYER_ENTITY_NAME } from './entity.manager';
+import { entities, getComponent, PLAYER_ENTITY_NAME } from './entity.manager';
 
 import { Component } from '@/engine/components/@component';
 import { error } from '@/engine/services/error';
+import { getStore } from '@/engine/services/store';
 
 //#region UTILS
 export const getEntity = ({ entityId }: { entityId: string }) => entities[entityId] ? entities[entityId] : null;
@@ -12,7 +13,11 @@ export const checkEntityId = ({ entityId }: { entityId: string }) => entities[en
 
 export const generateEntityId = ({ entityName }: { entityName: string }) => `${entityName}-${uuidv4()}`;
 
-export const isPlayer = ({ entityId }: { entityId: string }) => entityId.includes(PLAYER_ENTITY_NAME);
+export const isPlayer = ({ entityId, strict }: { entityId: string, strict?: boolean }) => {
+    return (strict)
+        ? entityId === getStore('playerId')
+        : entityId.includes(PLAYER_ENTITY_NAME);
+};
 
 export const getRawEntityId = ({ entityId }: { entityId: string }) => entityId.split('-')[0];
 
@@ -24,6 +29,45 @@ export const findEntityByName = ({ entityName }: { entityName: string }) => {
         : null;
 
     return { entity: entity, entityId };
+};
+
+export const findEntityByMapPosition = ({ tileMapName, x, y }: {
+    tileMapName: string,
+    x: number,
+    y: number,
+}) => {
+    const entityId = Object.keys(entities).find(entityId => {
+        const entity = getEntity({ entityId });
+
+        if (checkComponent({ componentId: 'Position', entityId })) {
+            const position = getComponent({ componentId: 'Position', entityId });
+            return entity && position
+                && position._x === x
+                && position._y === y
+                && position._tileMapName === tileMapName;
+        }
+    });
+
+    const entity = (entityId)
+        ? getEntity({ entityId })
+        : null;
+
+    return { entity: entity, entityId };
+};
+
+export const findEntitiesByMap = ({ tileMapName }: { tileMapName: string }) => {
+    const mapEntityIds = Object.keys(entities).filter(entityId => {
+        const entity = getEntity({ entityId });
+
+        if (checkComponent({ componentId: 'Position', entityId })) {
+            const position = getComponent({ componentId: 'Position', entityId });
+            return entity && position && position._tileMapName === tileMapName;
+        }
+    });
+
+    const mapEntities = mapEntityIds.map(entityId => getEntity({ entityId })).filter(entity => !!(entity));
+
+    return { entities: mapEntities, entityIds: mapEntityIds };
 };
 
 export const checkComponent = <T extends keyof Component>({ entityId, componentId }: {

@@ -1,9 +1,10 @@
 .inventory {
     background-color: rgb(0, 0, 0);
+    border-radius: 8px;
     bottom: 32px;
     display: none;
     flex-wrap: wrap;
-    gap: 2px;
+    gap: 4px;
     justify-content: center;
     left: 50%;
     padding: 8px;
@@ -14,24 +15,34 @@
 .inventory-slot {
     background-color: rgb(245, 245, 245);
     background-repeat: no-repeat;
-    background-size: cover;
+    border-radius: 8px;
+    box-sizing: border-box;
     height: 64px;
     width: 64px;
 }
 
 .inventory-slot-amount {
-    bottom: 0px;
+    bottom: 3px;
     font-size: 12px;
     height: 16px;
     padding: 0px 0px 2px 0px;
-    right: 0px;
+    right: 3px;
     text-align: center;
-    width: 16px
+}
+
+.inventory-options {
+    background-color: rgb(245, 245, 245);
+    border: solid 8px rgb(0, 0, 0);
+    border-radius: 8px;
+    display: none;
+    flex-direction: column;
+    padding: 8px;
 }
 
 .inventory-tools {
     align-items: center;
     background-color: rgb(0, 0, 0);
+    border-radius: 8px;
     display: none;
     gap: 4px;
     justify-content: center;
@@ -43,7 +54,7 @@
 .inventory-tools-slot {
     background-color: rgb(245, 245, 245);
     background-repeat: no-repeat;
-    background-size: cover;
+    border-radius: 8px;
     border: solid 4px rgb(0, 0, 0);
     height: 64px;
     width: 64px;
@@ -53,9 +64,8 @@
     align-items: center;
     background-color: rgb(245, 245, 245);
     background-repeat: no-repeat;
-    background-size: cover;
     border: solid 4px rgb(0, 0, 0);
-    border-radius: 4px;
+    border-radius: 8px;
     bottom: 32px;
     display: none;
     height: 64px;

@@ -14,7 +14,7 @@ export type DialogTextData = {
     id: number,
     next?: number,
     nextDialog?: string,
-    options: number[],
+    options?: number[],
     questEnd?: string,
     questStart?: string,
     value: string
@@ -31,7 +31,7 @@ export const loadDialogData = ({ entityId, dialogId }: {
     const dialogData = dialogFiles[dialogPath].default
         ?? error({ message: `DialogData for ${entityId} not found`, where: loadDialogData.name });
 
-    const questDialogId = getQuestDialogId();
+    const questDialogId = getQuestDialogId({});
 
     entityDialog._currentId = dialogId ?? questDialogId ?? Object.keys(dialogData)[0];
 
@@ -58,8 +58,8 @@ export const loadQuestData = ({ questName }: { questName: string }) => {
     createQuest({ questData });
 };
 
-const getQuestDialogId = () => {
-    const managerEntityId = getStore('managerId')
+const getQuestDialogId = ({ managerEntityId }: { managerEntityId?: string | null }) => {
+    if (!(managerEntityId)) managerEntityId = getStore('managerId')
         ?? error({ message: 'Store managerId is undefined', where: loadDialogData.name });
 
     const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });

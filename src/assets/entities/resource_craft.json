@@ -1,6 +1,6 @@
 [
     {
-        "type": "Craft",
+        "type": "ResourceCraft",
         "name": "Craft1"
     }
 ]

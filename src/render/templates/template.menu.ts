@@ -43,7 +43,7 @@ export const createLaunchMenu = () => {
         elementId: 'LaunchMenuStart',
         elementParent: launch,
     });
-    launchStart.innerText = 'START';
+    launchStart.innerText = 'Commencer';
 
     const launchLoad = createElement({
         elementAbsolute: false,
@@ -51,7 +51,7 @@ export const createLaunchMenu = () => {
         elementId: 'LaunchMenuLoad',
         elementParent: launch,
     });
-    launchLoad.innerText = 'LOAD';
+    launchLoad.innerText = 'Continuer';
 
     const launchSettings = createElement({
         elementAbsolute: false,
@@ -59,7 +59,7 @@ export const createLaunchMenu = () => {
         elementId: 'LaunchMenuSettings',
         elementParent: launch,
     });
-    launchSettings.innerText = 'SETTINGS';
+    launchSettings.innerText = 'Paramètres';
 
     /* Version */
     const launchVersion = createElement({
@@ -103,7 +103,7 @@ export const createSettingsMenu = () => {
         elementClass: 'settings-edit',
         elementId: 'SettingsMenuEdit',
     });
-    edit.innerText = 'ENTER A NEW KEY';
+    edit.innerText = 'Choisir une touche';
 
     /* System */
     const systemSettings = createElement({
@@ -237,7 +237,7 @@ export const createSettingsMenu = () => {
         elementId: 'SettingsMenuKeybinds',
         elementParent: settings,
     });
-    keybindsSettings.innerText = 'KEYBINDS';
+    keybindsSettings.innerText = 'TOUCHES';
 
     /* Move UP */
     const moveUpContainer = createElement({
@@ -253,7 +253,7 @@ export const createSettingsMenu = () => {
         elementId: 'SettingsMenuKeyMoveUpLabel',
         elementParent: moveUpContainer,
     });
-    moveUpLabel.innerText = 'UP: ';
+    moveUpLabel.innerText = 'HAUT: ';
 
     const moveUpSetting = createElement({
         elementAbsolute: false,
@@ -291,7 +291,7 @@ export const createSettingsMenu = () => {
         elementId: 'SettingsMenuKeyMoveDownLabel',
         elementParent: moveDownContainer,
     });
-    moveDownLabel.innerText = 'DOWN: ';
+    moveDownLabel.innerText = 'BAS: ';
 
     const moveDownSetting = createElement({
         elementAbsolute: false,
@@ -329,7 +329,7 @@ export const createSettingsMenu = () => {
         elementId: 'SettingsMenuKeyMoveLeftLabel',
         elementParent: moveLeftContainer,
     });
-    moveLeftLabel.innerText = 'LEFT: ';
+    moveLeftLabel.innerText = 'GAUCHE: ';
 
     const moveLeftSetting = createElement({
         elementAbsolute: false,
@@ -367,7 +367,7 @@ export const createSettingsMenu = () => {
         elementId: 'SettingsMenuKeyMoveRightLabel',
         elementParent: moveRightContainer,
     });
-    moveRightLabel.innerText = 'RIGHT: ';
+    moveRightLabel.innerText = 'DROITE: ';
 
     const moveRightSetting = createElement({
         elementAbsolute: false,
@@ -405,7 +405,7 @@ export const createSettingsMenu = () => {
         elementId: 'SettingsMenuKeyActionActLabel',
         elementParent: actContainer,
     });
-    actLabel.innerText = 'ACT/SELECT: ';
+    actLabel.innerText = 'ACTION: ';
 
     const actSetting = createElement({
         elementAbsolute: false,
@@ -443,7 +443,7 @@ export const createSettingsMenu = () => {
         elementId: 'SettingsMenuKeyActionInventoryLabel',
         elementParent: inventoryContainer,
     });
-    inventoryLabel.innerText = 'INVENTORY: ';
+    inventoryLabel.innerText = 'INVENTAIRE: ';
 
     const inventorySetting = createElement({
         elementAbsolute: false,
@@ -481,7 +481,7 @@ export const createSettingsMenu = () => {
         elementId: 'SettingsMenuKeyActionToolLabel',
         elementParent: toolContainer,
     });
-    toolLabel.innerText = 'TOOL: ';
+    toolLabel.innerText = 'OUTIL: ';
 
     const toolSetting = createElement({
         elementAbsolute: false,

@@ -12,7 +12,7 @@ export type DialogText = {
     _id: number;
     _next?: DialogText['_id'];
     _nextDialog?: string;
-    _options: DialogText['_id'][];
+    _options?: DialogText['_id'][];
     _questEnd?: string;
     _questStart?: string;
     _value: string;
