@@ -1,7 +1,7 @@
 import { startCycle } from '@/engine/services/cycle';
 import { createEntityManager, createEntityPlayer, createEntityTileMap } from '@/engine/services/entity';
 import { EventTypes } from '@/engine/services/event';
-import { setState } from '@/engine/services/state';
+import { initState, setState } from '@/engine/services/state';
 import { initQuest, SaveData } from '@/engine/systems/manager';
 import { event } from '@/render/events';
 
@@ -12,8 +12,6 @@ export const main = () => {
 export const run = ({ saveData }: { saveData?: SaveData }) => {
     setState('isGameLoading', true);
     event({ type: EventTypes.MAIN_LOADING_ON });
-
-    setState('isGameRunning', true);
 
     if (saveData?.manager) {
         createEntityManager({ savedManager: saveData.manager });
@@ -38,12 +36,14 @@ export const run = ({ saveData }: { saveData?: SaveData }) => {
         savedEnergy: saveData?.playerEnergy,
         savedInventory: saveData?.playerInventory,
         savedPosition: saveData?.playerPosition,
-        spritePath: 'player_player1',
+        spritePath: 'player_player1_down',
     });
 
     startCycle();
+    initState({});
     initQuest({});
 
+    setState('isGameRunning', true);
     setState('isGameLoading', false);
     event({ type: EventTypes.MAIN_LOADING_OFF });
 };
@@ -52,4 +52,5 @@ export const launch = () => {
     setState('isGameLaunching', true);
 
     createEntityManager({});
+    initState({});
 };

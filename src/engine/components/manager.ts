@@ -15,6 +15,7 @@ export type Manager = {
 
 type ManagerSettings = {
     _audio: boolean,
+    _audioVolume: number,
     keys: ManagerSettingsKeys,
 };
 

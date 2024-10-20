@@ -3,14 +3,14 @@ import { getResourceData } from '../resource.data';
 import { canPlay, loseActivity, startActivity, winActivity } from './activity';
 
 import { ActivityFishData } from '@/engine/components/resource';
-import { checkComponent, getComponent } from '@/engine/entities';
+import { getComponent } from '@/engine/entities';
 import { clearCycle, setCooldown, setCycle } from '@/engine/services/cycle';
 import { error } from '@/engine/services/error';
 import { EventTypes } from '@/engine/services/event';
 import { setState } from '@/engine/services/state';
 import { getStore } from '@/engine/services/store';
 import { playerInventoryFull } from '@/engine/systems/inventory';
-import { setEntityActive, setEntityCooldown } from '@/engine/systems/state';
+import { setEntityCooldown } from '@/engine/systems/state';
 import { randAudio } from '@/render/audio';
 import { event } from '@/render/events';
 
@@ -70,14 +70,6 @@ export const startActivityFish = ({ activityId, playerEntityId }: {
 
     canPlay({ activity: activityResource._type, entityId: playerEntityId, strict: true });
     startActivity({ activityId });
-
-    if (checkComponent({ componentId: 'State', entityId: activityId })) {
-        const state = getComponent({ componentId: 'State', entityId: activityId });
-
-        if (state._active !== undefined) {
-            setEntityActive({ entityId: activityId, gif: true, value: true });
-        }
-    }
 
     const activityFishData = activityResource.activityData as ActivityFishData;
     activityFishData._hp = activityFishData._maxHp;
@@ -203,7 +195,6 @@ export const endActivityFish = ({ activityId }: { activityId: string }) => {
     clearCycle('activityFishTickIntervalFrenzyOn');
     clearCycle('activityFishTickIntervalFrenzyOff');
 
-    setEntityActive({ entityId: activityId, gif: true, value: false });
     setEntityCooldown({ entityId: activityId, value: true });
     setCooldown({ entityId: activityId });
 

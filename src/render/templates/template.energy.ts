@@ -1,4 +1,4 @@
-import { createElement } from './template';
+import { createElement, destroyElement } from './template';
 import { getElement } from './template.utils';
 
 import { getComponent } from '@/engine/entities';
@@ -19,7 +19,8 @@ export const createEnergy = () => {
 
     const energyElement = createElement({
         elementClass: 'energy',
-        elementId: `${playerEntityId}-energy`,
+        elementId: 'Energy',
+        elementParent: getElement({ elementId: 'UI' }),
         entityId: playerEntityId,
     });
 
@@ -32,7 +33,7 @@ export const createEnergy = () => {
         createElement({
             elementAbsolute: false,
             elementClass: 'energy-slot',
-            elementId: `${playerEntityId}-energy-slot-${i}`,
+            elementId: `EnergySlot-${i}`,
             elementParent: energyElement,
             entityId: playerEntityId,
         });
@@ -40,10 +41,7 @@ export const createEnergy = () => {
 };
 
 export const displayEnergy = () => {
-    const playerEntityId = getStore('playerId')
-        ?? error({ message: 'Store playerId is undefined', where: displayEnergy.name });
-
-    const energy = getElement({ elementId: `${playerEntityId}-energy` });
+    const energy = getElement({ elementId: 'Energy' });
 
     energy.style.display = (energy.style.display === 'flex') ? 'none' : 'flex';
 };
@@ -56,23 +54,24 @@ export const updateEnergy = () => {
 
     clearEnergy();
 
-    const energyElement = getElement({ elementId: `${playerEntityId}-energy` });
+    const energyElement = getElement({ elementId: 'Energy' });
 
     for (let i = energyElement.children.length - 1; i >= energy._max - energy._current; i--) {
-        const energySlotElement = getElement({ elementId: `${playerEntityId}-energy-slot-${i}` });
+        const energySlotElement = getElement({ elementId: `EnergySlot-${i}` });
         energySlotElement.style.backgroundColor = 'rgb(231, 210, 75)';
     }
 };
 
-const clearEnergy = () => {
-    const playerEntityId = getStore('playerId')
-        ?? error({ message: 'Store playerId is undefined', where: clearEnergy.name });
+export const destroyEnergy = () => {
+    destroyElement({ elementId: 'Energy' });
+};
 
-    const energyElement = getElement({ elementId: `${playerEntityId}-energy` });
+const clearEnergy = () => {
+    const energyElement = getElement({ elementId: 'Energy' });
 
     for (let i = 0; i < energyElement.children.length; i++) {
-        const energySlotElement = getElement({ elementId: `${playerEntityId}-energy-slot-${i}` });
-        energySlotElement.style.backgroundColor = 'rgb(70, 70, 70)';
+        const energySlotElement = getElement({ elementId: `EnergySlot-${i}` });
+        energySlotElement.style.backgroundColor = 'rgb(255, 241, 216)';
     }
 };
 //#endregion

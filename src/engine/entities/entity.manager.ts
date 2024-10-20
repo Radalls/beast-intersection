@@ -1,10 +1,10 @@
 import { Entity } from './entity';
-import { checkComponent, generateEntityId, getEntity } from './entity.utils';
+import { checkComponent, generateEntityId, getEntity, isManager, isTileMap } from './entity.utils';
 
 import { Component } from '@/engine/components/@component';
 import { error } from '@/engine/services/error';
 import { EventTypes } from '@/engine/services/event';
-import { setStore } from '@/engine/services/store';
+import { getStore, setStore } from '@/engine/services/store';
 import { setEntityLoad } from '@/engine/systems/state';
 import { event } from '@/render/events';
 
@@ -67,9 +67,7 @@ export const getComponent = <T extends keyof Component>({ entityId, componentId 
     return component;
 };
 
-export const destroyEntity = ({ entityId }: {
-    entityId: string,
-}) => {
+export const destroyEntity = ({ entityId }: { entityId: string }) => {
     delete entities[entityId];
 
     event({ entityId, type: EventTypes.ENTITY_DESTROY });
@@ -79,7 +77,8 @@ export const destroyAllEntities = ({ force }: { force?: boolean }) => {
     Object.keys(entities).forEach((entityId) => {
         if (!(entities[entityId])) return;
 
-        if (entityId.includes(MANAGER_ENTITY_NAME)) return;
+        if (isManager({ entityId })) return;
+        if (isTileMap({ entityId })) return;
 
         if (force) {
             destroyEntity({ entityId });
@@ -103,5 +102,12 @@ export const destroyAllEntities = ({ force }: { force?: boolean }) => {
 
         destroyEntity({ entityId });
     });
+
+    if (force) {
+        const tileMapEntityId = getStore('tileMapId')
+            ?? error({ message: 'Store tileMapId is undefined', where: destroyAllEntities.name });
+
+        destroyEntity({ entityId: tileMapEntityId });
+    }
 };
 //#endregion

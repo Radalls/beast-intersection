@@ -1,7 +1,7 @@
 .inventory {
-    background-color: rgb(0, 0, 0);
+    background-color: rgb(91, 48, 38);
     border-radius: 8px;
-    bottom: 32px;
+    bottom: 8px;
     display: none;
     flex-wrap: wrap;
     gap: 4px;
@@ -13,7 +13,7 @@
 }
 
 .inventory-slot {
-    background-color: rgb(245, 245, 245);
+    background-color: rgb(182, 103, 77);
     background-repeat: no-repeat;
     border-radius: 8px;
     box-sizing: border-box;
@@ -31,17 +31,20 @@
 }
 
 .inventory-options {
-    background-color: rgb(245, 245, 245);
-    border: solid 8px rgb(0, 0, 0);
+    background-color: rgb(182, 103, 77);
+    border: solid 8px rgb(91, 48, 38);
     border-radius: 8px;
+    color: rgb(255, 241, 216);
     display: none;
     flex-direction: column;
     padding: 8px;
+    right: 320px;
+    top: 484px;
 }
 
 .inventory-tools {
     align-items: center;
-    background-color: rgb(0, 0, 0);
+    background-color: rgb(91, 48, 38);
     border-radius: 8px;
     display: none;
     gap: 4px;
@@ -51,22 +54,22 @@
     z-index: 100;
 }
 
-.inventory-tools-slot {
-    background-color: rgb(245, 245, 245);
+.inventory-tool-slot {
+    background-color: rgb(182, 103, 77);
     background-repeat: no-repeat;
     border-radius: 8px;
-    border: solid 4px rgb(0, 0, 0);
+    box-sizing: border-box;
     height: 64px;
     width: 64px;
 }
 
 .inventory-tool-active {
     align-items: center;
-    background-color: rgb(245, 245, 245);
+    background-color: rgb(182, 103, 77);
     background-repeat: no-repeat;
-    border: solid 4px rgb(0, 0, 0);
+    border: solid 4px rgb(91, 48, 38);
     border-radius: 8px;
-    bottom: 32px;
+    bottom: 8px;
     display: none;
     height: 64px;
     justify-content: center;

@@ -1,7 +1,7 @@
-import { completeQuest, createQuest, destroyQuest, displayQuests } from '@/render/templates';
+import { completeQuest, createQuest, destroyQuest, displayQuestMenu } from '@/render/templates';
 
 //#region EVENTS
-export const onQuestsDisplay = () => displayQuests();
+export const onQuestsDisplay = () => displayQuestMenu();
 
 export const onQuestStart = () => {
     createQuest();

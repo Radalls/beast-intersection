@@ -1,6 +1,13 @@
 import { initAudios } from './audio';
 import { onInputKeyDown } from './events';
-import { createError, createLaunchMenu, createLoading, createQuestsMenu, createSettingsMenu } from './templates';
+import {
+    createError,
+    createFrame,
+    createLaunchMenu,
+    createLoading,
+    createQuestMenu,
+    createSettingsMenu,
+} from './templates';
 
 //#region CONSTANTS
 export const app = document.getElementById('app')!;
@@ -15,6 +22,7 @@ export const run = () => {
 };
 
 const launch = () => {
+    createFrame();
     createLoading();
     createError();
 
@@ -33,6 +41,6 @@ const initMenus = () => {
 };
 
 const initGameMenus = () => {
-    createQuestsMenu();
+    createQuestMenu();
 };
 

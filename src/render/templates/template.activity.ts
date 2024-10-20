@@ -1,5 +1,6 @@
 import itemRecipes from '../../assets/items/item_recipes.json';
 
+import { createProgress, updateProgress } from './components/progress/progress';
 import { createElement, destroyElement } from './template';
 import { getElement, checkElement, getSpritePath } from './template.utils';
 
@@ -31,11 +32,11 @@ export const startActivity = () => {
     const activity = createElement({
         elementClass: 'activity',
         elementId: `${activityEntityId}-activity`,
+        elementParent: getElement({ elementId: 'UI' }),
         entityId: activityEntityId,
     });
 
     const activityCancel = createElement({
-        elementAbsolute: false,
         elementClass: 'activity-cancel',
         elementId: `${activityEntityId}-activity-cancel`,
         elementParent: activity,
@@ -56,6 +57,7 @@ export const winActivity = () => {
     const activityWin = createElement({
         elementClass: 'activity-win',
         elementId: `${activityEntityId}-activity-win`,
+        elementParent: getElement({ elementId: 'UI' }),
         entityId: activityEntityId,
     });
 
@@ -126,58 +128,62 @@ export const startActivityBug = () => {
     const activityElement = getElement({ elementId: `${activityEntityId}-activity` });
 
     const activityBug = createElement({
-        elementAbsolute: false,
         elementClass: 'activity-bug',
-        elementId: `${activityEntityId}-activity-bug`,
+        elementId: `${activityEntityId}-ActivityBug`,
         elementParent: activityElement,
         entityId: activityEntityId,
     });
+    activityBug.style.backgroundColor = 'rgb(24, 142, 24)';
 
-    const activityBugScore = createElement({
-        elementAbsolute: false,
-        elementClass: 'activity-bug-score',
-        elementId: `${activityEntityId}-activity-bug-score`,
+    createProgress({
+        color: 'rgb(13, 193, 13)',
+        elementId: 'BugHp',
+        height: 15,
+        left: 530,
+        parent: activityBug,
+        top: 200,
+        value: 100,
+        width: 300,
+    });
+
+    const activityBugHpLabel = createElement({
+        elementClass: 'activity-bug-hp',
+        elementId: `${activityEntityId}-ActivityBugHp`,
         elementParent: activityBug,
         entityId: activityEntityId,
     });
+    activityBugHpLabel.innerText = '❤️';
 
-    createElement({
-        elementAbsolute: false,
-        elementClass: 'activity-bug-score-label',
-        elementId: `${activityEntityId}-activity-bug-score-hp`,
-        elementParent: activityBugScore,
-        entityId: activityEntityId,
+    createProgress({
+        color: 'rgb(237, 29, 29)',
+        elementId: 'BugError',
+        height: 15,
+        left: 530,
+        parent: activityBug,
+        top: 400,
+        value: 0,
+        width: 300,
     });
 
-    createElement({
-        elementAbsolute: false,
-        elementClass: 'activity-bug-score-label',
-        elementId: `${activityEntityId}-activity-bug-score-error`,
-        elementParent: activityBugScore,
-        entityId: activityEntityId,
-    });
-
-    const activityBugSymbol = createElement({
-        elementAbsolute: false,
-        elementClass: 'activity-bug-symbol',
-        elementId: `${activityEntityId}-activity-bug-symbol`,
+    const activityBugErrorLabel = createElement({
+        elementClass: 'activity-bug-error',
+        elementId: `${activityEntityId}-ActivityBugError`,
         elementParent: activityBug,
         entityId: activityEntityId,
     });
+    activityBugErrorLabel.innerText = '⚠️';
 
     createElement({
-        elementAbsolute: false,
         elementClass: 'activity-bug-symbol-value',
-        elementId: `${activityEntityId}-activity-bug-symbol-value`,
-        elementParent: activityBugSymbol,
+        elementId: `${activityEntityId}-ActivityBugSymbolValue`,
+        elementParent: activityBug,
         entityId: activityEntityId,
     });
 
     createElement({
-        elementAbsolute: false,
         elementClass: 'activity-bug-symbol-found',
-        elementId: `${activityEntityId}-activity-bug-symbol-found`,
-        elementParent: activityBugSymbol,
+        elementId: `${activityEntityId}-ActivityBugSymbolFound`,
+        elementParent: activityBug,
         entityId: activityEntityId,
     });
 
@@ -197,16 +203,20 @@ export const updateActivityBug = () => {
     }
     const activityBugData = resource.activityData;
 
-    const activityBugScoreHp = getElement({ elementId: `${activityEntityId}-activity-bug-score-hp` });
-    activityBugScoreHp.innerText = `🦋 ${activityBugData._hp}`;
+    updateProgress({
+        elementId: 'BugHp',
+        value: (activityBugData._hp / activityBugData._maxHp) * 100,
+    });
 
-    const activityBugScoreError = getElement({ elementId: `${activityEntityId}-activity-bug-score-error` });
-    activityBugScoreError.innerText = `💀 ${activityBugData._nbErrors}/${activityBugData._maxNbErrors}`;
+    updateProgress({
+        elementId: 'BugError',
+        value: (activityBugData._nbErrors / activityBugData._maxNbErrors) * 100,
+    });
 
-    const activityBugSymbolValue = getElement({ elementId: `${activityEntityId}-activity-bug-symbol-value` });
+    const activityBugSymbolValue = getElement({ elementId: `${activityEntityId}-ActivityBugSymbolValue` });
     activityBugSymbolValue.innerText = `${getActivityBugSymbol({ symbol: activityBugData._symbol }) ?? '...'}`;
 
-    const activityBugSymbolFound = getElement({ elementId: `${activityEntityId}-activity-bug-symbol-found` });
+    const activityBugSymbolFound = getElement({ elementId: `${activityEntityId}-ActivityBugSymbolFound` });
     if (activityBugData._symbolFound === undefined) {
         activityBugSymbolFound.style.backgroundImage
             = `url(${getSpritePath({ spriteName: 'activity_bug_symbol_blank' })})`;
@@ -225,7 +235,7 @@ export const endActivityBug = () => {
     const activityEntityId = getStore('activityId')
         ?? error({ message: 'Store activityId is undefined', where: endActivityBug.name });
 
-    destroyElement({ elementId: `${activityEntityId}-activity-bug` });
+    destroyElement({ elementId: `${activityEntityId}-ActivityBug` });
 };
 
 const getActivityBugSymbol = ({ symbol }: { symbol?: string }) => {
@@ -259,91 +269,62 @@ export const startActivityFish = () => {
     const activity = getElement({ elementId: `${activityEntityId}-activity` });
 
     const activityFish = createElement({
-        elementAbsolute: false,
         elementClass: 'activity-fish',
-        elementId: `${activityEntityId}-activity-fish`,
+        elementId: `${activityEntityId}-ActivityFish`,
         elementParent: activity,
         entityId: activityEntityId,
     });
+    activityFish.style.backgroundImage
+        = `url(${getSpritePath({ gif: true, spriteName: 'activity_fish_bg' })})`;
 
-    const activityFishHpBars = createElement({
-        elementAbsolute: false,
-        elementClass: 'activity-fish-hp-bars',
-        elementId: `${activityEntityId}-activity-fish-hp-bars`,
-        elementParent: activityFish,
-        entityId: activityEntityId,
-    });
-
-    const activityFishHp = createElement({
-        elementAbsolute: false,
-        elementClass: 'activity-fish-hp',
-        elementId: `${activityEntityId}-activity-fish-hp`,
-        elementParent: activityFishHpBars,
-        entityId: activityEntityId,
+    createProgress({
+        color: 'rgb(13, 193, 13)',
+        elementId: 'FishHp',
+        height: 15,
+        left: 720,
+        parent: activityFish,
+        top: 430,
+        value: 100,
+        width: 200,
     });
 
     const activityFishHpLabel = createElement({
-        elementAbsolute: false,
-        elementClass: 'activity-fish-hp-label',
-        elementId: `${activityEntityId}-activity-fish-hp-label`,
-        elementParent: activityFishHp,
-        entityId: activityEntityId,
-    });
-    activityFishHpLabel.innerText = '🐟 ';
-
-    createElement({
-        elementAbsolute: false,
-        elementClass: 'activity-fish-hp-value',
-        elementId: `${activityEntityId}-activity-fish-hp-value`,
-        elementParent: activityFishHp,
-        entityId: activityEntityId,
-    });
-
-    const activityFishRodTension = createElement({
-        elementAbsolute: false,
-        elementClass: 'activity-fish-rod-tension',
-        elementId: `${activityEntityId}-activity-fish-rod-tension`,
-        elementParent: activityFishHpBars,
-        entityId: activityEntityId,
-    });
-
-    const activityFishRodTensionLabel = createElement({
-        elementAbsolute: false,
-        elementClass: 'activity-fish-rod-tension-label',
-        elementId: `${activityEntityId}-activity-fish-rod-tension-label`,
-        elementParent: activityFishRodTension,
-        entityId: activityEntityId,
-    });
-    activityFishRodTensionLabel.innerText = '💀 ';
-
-    createElement({
-        elementAbsolute: false,
-        elementClass: 'activity-fish-rod-tension-value',
-        elementId: `${activityEntityId}-activity-fish-rod-tension-value`,
-        elementParent: activityFishRodTension,
-        entityId: activityEntityId,
-    });
-
-    const activityFishFrenzy = createElement({
-        elementAbsolute: false,
-        elementClass: 'activity-fish-frenzy',
-        elementId: `${activityEntityId}-activity-fish-frenzy`,
+        elementClass: 'activity-fish-hp',
+        elementId: `${activityEntityId}-ActivityFishHp`,
         elementParent: activityFish,
         entityId: activityEntityId,
     });
+    activityFishHpLabel.innerText = '❤️';
+
+    createProgress({
+        color: 'rgb(237, 29, 29)',
+        elementId: 'RodTension',
+        height: 250,
+        left: 270,
+        parent: activityFish,
+        top: 150,
+        value: 0,
+        width: 15,
+    });
+
+    const activityFishRodTensionLabel = createElement({
+        elementClass: 'activity-fish-rod-tension',
+        elementId: `${activityEntityId}-ActivityFishRodTension`,
+        elementParent: activityFish,
+        entityId: activityEntityId,
+    });
+    activityFishRodTensionLabel.innerText = '⚠️';
 
     createElement({
-        elementAbsolute: false,
-        elementClass: 'activity-fish-frenzy-value',
-        elementId: `${activityEntityId}-activity-fish-frenzy-value`,
-        elementParent: activityFishFrenzy,
+        elementClass: 'activity-fish-frenzy',
+        elementId: `${activityEntityId}-ActivityFishFrenzy`,
+        elementParent: activityFish,
         entityId: activityEntityId,
     });
 
     const activityFishKey = createElement({
-        elementAbsolute: false,
         elementClass: 'activity-fish-key',
-        elementId: `${activityEntityId}-activity-fish-key`,
+        elementId: `${activityEntityId}-ActivityFishKey`,
         elementParent: activityFish,
         entityId: activityEntityId,
     });
@@ -365,17 +346,14 @@ export const updateActivityFish = () => {
     }
     const activityFishData = resource.activityData;
 
-    const activityFishHpValue =
-        getElement({ elementId: `${activityEntityId}-activity-fish-hp-value` });
-    activityFishHpValue.innerHTML =
-        `<progress value="${activityFishData._hp}" max="${activityFishData._maxHp}"></progress>`;
+    updateProgress({ elementId: 'FishHp', value: activityFishData._hp * 100 / activityFishData._maxHp });
 
-    const activityFishRodTensionValue =
-        getElement({ elementId: `${activityEntityId}-activity-fish-rod-tension-value` });
-    activityFishRodTensionValue.innerHTML =
-        `<progress value="${activityFishData._rodTension}" max="${activityFishData._rodMaxTension}"></progress>`;
+    updateProgress({
+        elementId: 'RodTension',
+        value: activityFishData._rodTension * 100 / activityFishData._rodMaxTension,
+    });
 
-    const activityFishFrenzyValue = getElement({ elementId: `${activityEntityId}-activity-fish-frenzy-value` });
+    const activityFishFrenzyValue = getElement({ elementId: `${activityEntityId}-ActivityFishFrenzy` });
     activityFishFrenzyValue.style.backgroundImage = (activityFishData._isFrenzy)
         ? `url(${getSpritePath({ spriteName: 'activity_fish_frenzy_on' })})`
         : `url(${getSpritePath({ spriteName: 'activity_fish_frenzy_off' })})`;
@@ -385,7 +363,7 @@ export const endActivityFish = () => {
     const activityEntityId = getStore('activityId')
         ?? error({ message: 'Store activityId is undefined', where: endActivityFish.name });
 
-    destroyElement({ elementId: `${activityEntityId}-activity-fish` });
+    destroyElement({ elementId: `${activityEntityId}-ActivityFish` });
 };
 //#endregion
 
@@ -399,7 +377,7 @@ export const startActivityCraft = () => {
     createElement({
         elementAbsolute: false,
         elementClass: 'activity-craft',
-        elementId: `${activityEntityId}-activity-craft`,
+        elementId: `${activityEntityId}-ActivityCraft`,
         elementParent: activity,
         entityId: activityEntityId,
     });
@@ -409,12 +387,12 @@ export const startSelectActivityCraft = () => {
     const activityEntityId = getStore('activityId')
         ?? error({ message: 'Store activityId is undefined', where: startSelectActivityCraft.name });
 
-    const activityCraft = getElement({ elementId: `${activityEntityId}-activity-craft` });
+    const activityCraft = getElement({ elementId: `${activityEntityId}-ActivityCraft` });
 
     const recipes = createElement({
         elementAbsolute: false,
         elementClass: 'activity-craft-recipes',
-        elementId: `${activityEntityId}-activity-craft-recipes`,
+        elementId: `${activityEntityId}-ActivityCraftRecipes`,
         elementParent: activityCraft,
         entityId: activityEntityId,
     });
@@ -423,7 +401,7 @@ export const startSelectActivityCraft = () => {
         const recipe = createElement({
             elementAbsolute: false,
             elementClass: 'activity-craft-recipe',
-            elementId: `${activityEntityId}-activity-craft-recipe-${i}`,
+            elementId: `${activityEntityId}-ActivityCraftRecipe-${i}`,
             elementParent: recipes,
             entityId: activityEntityId,
         });
@@ -431,7 +409,7 @@ export const startSelectActivityCraft = () => {
         const recipeItem = createElement({
             elementAbsolute: false,
             elementClass: 'activity-craft-recipe-item',
-            elementId: `${activityEntityId}-activity-craft-recipe-${i}-item`,
+            elementId: `${activityEntityId}-ActivityCraftRecipe-${i}-Item`,
             elementParent: recipe,
             entityId: activityEntityId,
         });
@@ -439,7 +417,7 @@ export const startSelectActivityCraft = () => {
         const recipeItemIcon = createElement({
             elementAbsolute: false,
             elementClass: 'activity-craft-recipe-item-icon',
-            elementId: `${activityEntityId}-activity-craft-recipe-${i}-item-icon`,
+            elementId: `${activityEntityId}-ActivityCraftRecipe-${i}-ItemIcon`,
             elementParent: recipeItem,
             entityId: activityEntityId,
         });
@@ -449,7 +427,7 @@ export const startSelectActivityCraft = () => {
         const recipeIngredients = createElement({
             elementAbsolute: false,
             elementClass: 'activity-craft-recipe-ingredients',
-            elementId: `${activityEntityId}-activity-craft-recipe-${i}-ingredients`,
+            elementId: `${activityEntityId}-ActivityCraftRecipe-${i}-Ingredients`,
             elementParent: recipe,
             entityId: activityEntityId,
         });
@@ -458,7 +436,7 @@ export const startSelectActivityCraft = () => {
             const recipeIngredient = createElement({
                 elementAbsolute: false,
                 elementClass: 'activity-craft-recipe-ingredient',
-                elementId: `${activityEntityId}-activity-craft-recipe-${i}-ingredient-${j}`,
+                elementId: `${activityEntityId}-ActivityCraftRecipe-${i}-Ingredient-${j}`,
                 elementParent: recipeIngredients,
                 entityId: activityEntityId,
             });
@@ -466,7 +444,7 @@ export const startSelectActivityCraft = () => {
             const recipeIngredientIcon = createElement({
                 elementAbsolute: false,
                 elementClass: 'activity-craft-recipe-ingredient-icon',
-                elementId: `${activityEntityId}-activity-craft-recipe-${i}-ingredient-${j}-icon`,
+                elementId: `${activityEntityId}-ActivityCraftRecipe-${i}-Ingredient-${j}-Icon`,
                 elementParent: recipeIngredient,
                 entityId: activityEntityId,
             });
@@ -476,7 +454,7 @@ export const startSelectActivityCraft = () => {
             const activityCraftRecipeIngredientAmount = createElement({
                 elementAbsolute: false,
                 elementClass: 'activity-craft-recipe-ingredient-amount',
-                elementId: `${activityEntityId}-activity-craft-recipe-${i}-ingredient-${j}-amount`,
+                elementId: `${activityEntityId}-ActivityCraftRecipe-${i}-Ingredient-${j}-Amount`,
                 elementParent: recipeIngredient,
                 entityId: activityEntityId,
             });
@@ -496,61 +474,61 @@ export const updateSelectActivityCraft = () => {
     const activityEntityId = getStore('activityId')
         ?? error({ message: 'Store activityId is undefined', where: updateSelectActivityCraft.name });
 
-    const activityCraftRecipes = getElement({ elementId: `${activityEntityId}-activity-craft-recipes` });
+    const activityCraftRecipes = getElement({ elementId: `${activityEntityId}-ActivityCraftRecipes` });
 
     for (let i = 0; i < activityCraftRecipes.children.length; i++) {
-        const activityCraftRecipe = getElement({ elementId: `${activityEntityId}-activity-craft-recipe-${i}` });
-        activityCraftRecipe.style.border = 'solid 4px rgb(70, 70, 70)';
+        const activityCraftRecipe = getElement({ elementId: `${activityEntityId}-ActivityCraftRecipe-${i}` });
+        activityCraftRecipe.style.border = 'solid 4px rgb(91, 48, 38)';
     }
 
     const selectedActivityCraftRecipe =
-        getElement({ elementId: `${activityEntityId}-activity-craft-recipe-${manager._selectedCraftRecipe}` });
-    selectedActivityCraftRecipe.style.border = 'solid 4px red';
+        getElement({ elementId: `${activityEntityId}-ActivityCraftRecipe-${manager._selectedCraftRecipe}` });
+    selectedActivityCraftRecipe.style.border = 'solid 4px rgb(255, 241, 216)';
 };
 
 export const endSelectActivityCraft = () => {
     const activityEntityId = getStore('activityId')
         ?? error({ message: 'Store activityId is undefined', where: endSelectActivityCraft.name });
 
-    destroyElement({ elementId: `${activityEntityId}-activity-craft-recipes` });
+    destroyElement({ elementId: `${activityEntityId}-ActivityCraftRecipes` });
 };
 
 export const startPlayActivityCraft = () => {
     const activityEntityId = getStore('activityId')
         ?? error({ message: 'Store activityId is undefined', where: startPlayActivityCraft.name });
 
-    const activityCraft = getElement({ elementId: `${activityEntityId}-activity-craft` });
+    const activityCraft = getElement({ elementId: `${activityEntityId}-ActivityCraft` });
 
-    const activityCraftProgress = createElement({
-        elementAbsolute: false,
-        elementClass: 'activity-craft-progress',
-        elementId: `${activityEntityId}-activity-craft-progress`,
+    const activityCraftPlay = createElement({
+        elementClass: 'activity-craft-play',
+        elementId: `${activityEntityId}-ActivityCraftPlay`,
         elementParent: activityCraft,
         entityId: activityEntityId,
     });
 
-    const activityCraftProgressLabel = createElement({
-        elementAbsolute: false,
-        elementClass: 'activity-craft-progress-label',
-        elementId: `${activityEntityId}-activity-craft-progress-label`,
-        elementParent: activityCraftProgress,
-        entityId: activityEntityId,
+    createProgress({
+        color: 'rgb(13, 193, 13)',
+        elementId: 'CraftProgress',
+        height: 15,
+        left: 486,
+        parent: activityCraftPlay,
+        top: 309,
+        value: 0,
+        width: 300,
     });
-    activityCraftProgressLabel.innerText = 'Craft ';
 
-    createElement({
-        elementAbsolute: false,
-        elementClass: 'activity-craft-progress-value',
-        elementId: `${activityEntityId}-activity-craft-progress-value`,
-        elementParent: activityCraftProgress,
+    const activityFishHpLabel = createElement({
+        elementClass: 'activity-craft-progress',
+        elementId: `${activityEntityId}-ActivityCraftProgress`,
+        elementParent: activityCraftPlay,
         entityId: activityEntityId,
     });
+    activityFishHpLabel.innerText = '⚒️';
 
     const activityCraftKey = createElement({
-        elementAbsolute: false,
         elementClass: 'activity-craft-key',
-        elementId: `${activityEntityId}-activity-craft-key`,
-        elementParent: activityCraft,
+        elementId: `${activityEntityId}-ActivityCraftKey`,
+        elementParent: activityCraftPlay,
         entityId: activityEntityId,
     });
     activityCraftKey.innerText = '🖐';
@@ -571,24 +549,21 @@ export const updatePlayActivityCraft = () => {
     }
     const activityCraftData = resource.activityData;
 
-    const activityCraftProgressValue =
-        getElement({ elementId: `${activityEntityId}-activity-craft-progress-value` });
-    activityCraftProgressValue.innerHTML =
-        `<progress value="${activityCraftData._hitCount}" max="${10}"></progress>`;
+    updateProgress({ elementId: 'CraftProgress', value: (activityCraftData._hitCount ?? 0) * 10 });
 };
 
 export const endPlayActivityCraft = () => {
     const activityEntityId = getStore('activityId')
         ?? error({ message: 'Store activityId is undefined', where: endPlayActivityCraft.name });
 
-    destroyElement({ elementId: `${activityEntityId}-activity-craft-progress` });
+    destroyElement({ elementId: `${activityEntityId}-ActivityCraftPlay` });
 };
 
 export const endActivityCraft = () => {
     const activityEntityId = getStore('activityId')
         ?? error({ message: 'Store activityId is undefined', where: endActivityCraft.name });
 
-    destroyElement({ elementId: `${activityEntityId}-activity-craft` });
+    destroyElement({ elementId: `${activityEntityId}-ActivityCraft` });
 };
 //#endregion
 //#endregion

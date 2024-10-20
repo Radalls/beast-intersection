@@ -119,10 +119,10 @@
         { "type": "ResourceItem", "items": [{ "name": "Rock1", "rate": 0.6 }, { "name": "Seashell1", "rate": 0.4 }], "x": 5, "y": 2 },
         { "type": "ResourceItem", "items": [{ "name": "Rock1", "rate": 0.6 }, { "name": "Seashell1", "rate": 0.4 }], "x": 3, "y": 3 },
         { "type": "ResourceItem", "items": [{ "name": "Rock1", "rate": 0.6 }, { "name": "Seashell1", "rate": 0.4 }], "x": 7, "y": 3 },
-        { "type": "ResourceFish", "items": [{ "name": "Fish2", "rate": 0.6 }, { "name": "Fish3", "rate": 0.25 }, { "name": "Fish5", "rate": 0.1 }], "x": 2, "y": 4 },
-        { "type": "ResourceFish", "items": [{ "name": "Fish2", "rate": 0.6 }, { "name": "Fish3", "rate": 0.25 }, { "name": "Fish5", "rate": 0.1 }], "x": 7, "y": 4 },
-        { "type": "ResourceFish", "items": [{ "name": "Fish2", "rate": 0.6 }, { "name": "Fish3", "rate": 0.25 }, { "name": "Fish5", "rate": 0.1 }], "x": 7, "y": 7 },
-        { "type": "ResourceFish", "items": [{ "name": "Fish2", "rate": 0.6 }, { "name": "Fish3", "rate": 0.25 }, { "name": "Fish5", "rate": 0.1 }], "x": 1, "y": 8 },
-        { "type": "ResourceFish", "items": [{ "name": "Fish2", "rate": 0.6 }, { "name": "Fish3", "rate": 0.25 }, { "name": "Fish5", "rate": 0.1 }], "x": 5, "y": 9 }
+        { "type": "ResourceFish", "items": [{ "name": "Fish2", "rate": 0.4 }, { "name": "Fish3", "rate": 0.3 }, { "name": "Fish5", "rate": 0.3 }], "x": 2, "y": 4 },
+        { "type": "ResourceFish", "items": [{ "name": "Fish2", "rate": 0.4 }, { "name": "Fish3", "rate": 0.3 }, { "name": "Fish5", "rate": 0.3 }], "x": 7, "y": 4 },
+        { "type": "ResourceFish", "items": [{ "name": "Fish2", "rate": 0.4 }, { "name": "Fish3", "rate": 0.3 }, { "name": "Fish5", "rate": 0.3 }], "x": 7, "y": 7 },
+        { "type": "ResourceFish", "items": [{ "name": "Fish2", "rate": 0.4 }, { "name": "Fish3", "rate": 0.3 }, { "name": "Fish5", "rate": 0.3 }], "x": 1, "y": 8 },
+        { "type": "ResourceFish", "items": [{ "name": "Fish2", "rate": 0.4 }, { "name": "Fish3", "rate": 0.3 }, { "name": "Fish5", "rate": 0.3 }], "x": 5, "y": 9 }
     ]
 }

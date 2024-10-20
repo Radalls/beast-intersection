@@ -1,26 +1,44 @@
 /* MAIN ACTIVITY */
 .activity {
-    background-color: rgb(245, 245, 245);
-    border: solid 8px rgb(0, 0, 0);
-    border-radius: 8px;
+    background-color: rgb(182, 103, 77);
+    border: 12px solid rgb(91, 48, 38);
+    border-radius: 20px;
+    color: rgb(255, 241, 216);
+    display: block;
+    height: 640px;
     left: 50%;
-    padding: 16px;
+    margin-bottom: 0px;
+    margin-right: 0px;
+    overflow: hidden;
+    padding: 0px;
     top: 50%;
     transform: translate(-50%, -50%);
+    width: 1280px;
     z-index: 100;
 }
 
 .activity-cancel {
-    height: 32px;
-    width: 96px;
+    align-items: center;
+    background-color: white;
+    border-radius: 100px;
+    display: flex;
+    font-size: 32px;
+    height: 64px;
+    justify-content: center;
+    left: 8px;
+    text-align: center;
+    top: 8px;
+    width: 64px;
+    z-index: 100;
 }
 
 .activity-win {
     align-items: center;
-    background-color: rgb(245, 245, 245);
-    border: solid 8px rgb(0, 0, 0);
+    background-color: rgb(182, 103, 77);
+    border: 8px solid rgb(91, 48, 38);
     border-radius: 8px;
-    bottom: 64px;
+    bottom: 8px;
+    color: rgb(255, 241, 216);
     display: flex;
     gap: 2px;
     justify-content: center;
@@ -44,16 +62,38 @@
     align-items: center;
     display: flex;
     gap: 32px;
-    height: 128px;
+    height: 100%;
     justify-content: center;
-    padding: 0px 16px;
     text-align: center;
+    width: 100%;
 }
 
-.activity-bug-score {
+.activity-bug-hp {
+    align-items: center;
+    background-color: white;
+    border-radius: 100px;
     display: flex;
-    flex-direction: column;
-    width: 128px
+    font-size: 32px;
+    height: 64px;
+    justify-content: center;
+    left: 450px;
+    text-align: center;
+    top: 180px;
+    width: 64px;
+}
+
+.activity-bug-error {
+    align-items: center;
+    background-color: white;
+    border-radius: 100px;
+    display: flex;
+    font-size: 32px;
+    height: 64px;
+    justify-content: center;
+    left: 450px;
+    text-align: center;
+    top: 380px;
+    width: 64px;
 }
 
 .activity-bug-score-label {
@@ -70,15 +110,25 @@
 }
 
 .activity-bug-symbol-value {
+    align-items: center;
+    background-color: white;
+    border-radius: 100px;
+    color: black;
+    display: flex;
+    font-size: 32px;
     font-weight: bold;
+    height: 64px;
+    justify-content: center;
     text-align: center;
+    width: 64px;
 }
 
 .activity-bug-symbol-found {
     background-position: center center;
     background-repeat: no-repeat;
     height: 64px;
-    width: 128px
+    left: 700px;
+    width: 64px
 }
 
 /* ACTIVITY FISH */
@@ -86,72 +136,78 @@
     align-items: center;
     display: flex;
     gap: 32px;
-    height: 192px;
+    height: 100%;
     justify-content: center;
-    padding: 0px 16px;
     text-align: center;
-}
-
-.activity-fish-hp-bars {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+    width: 100%;
 }
 
 .activity-fish-hp {
     align-items: center;
+    background-color: white;
+    border-radius: 100px;
     display: flex;
-    gap: 8px;
+    font-size: 32px;
+    height: 64px;
     justify-content: center;
-}
-
-.activity-fish-hp-label {
-    font-size: 24px;
-    text-align: left;
-    width: 32px;
+    left: 650px;
+    text-align: center;
+    top: 405px;
+    width: 64px;
 }
 
 .activity-fish-rod-tension {
     align-items: center;
+    background-color: white;
+    border-radius: 100px;
     display: flex;
-    gap: 8px;
+    font-size: 32px;
+    height: 64px;
     justify-content: center;
-}
-
-.activity-fish-rod-tension-label {
-    font-size: 24px;
-    text-align: left;
-    width: 32px;
+    left: 250px;
+    text-align: center;
+    top: 70px;
+    width: 64px;
 }
 
 .activity-fish-key {
+    align-items: center;
+    background-color: white;
+    border-radius: 100px;
+    display: flex;
     font-size: 32px;
+    height: 64px;
+    justify-content: center;
+    left: 820px;
+    text-align: center;
+    top: 120px;
+    width: 64px;
 }
 
 .activity-fish-frenzy {
     align-items: center;
+    background-color: white;
+    border-radius: 100px;
     display: flex;
-    gap: 8px;
-}
-
-.activity-fish-frenzy-label {
     font-size: 32px;
-    font-weight: bold;
-}
-
-.activity-fish-frenzy-value {
     height: 64px;
+    justify-content: center;
+    left: 900px;
+    text-align: center;
+    top: 460px;
     width: 64px;
 }
 
 /* ACTIVITY CRAFT */
 .activity-craft {
     align-items: center;
+    background-color: rgb(220, 128, 15);
     display: flex;
     gap: 32px;
+    height: 100%;
     justify-content: center;
-    padding: 16px;
     text-align: center;
+    width: 100%;
 }
 
 .activity-craft-recipes {
@@ -160,18 +216,19 @@
     height: 512px;
     flex-direction: column;
     gap: 16px;
+    padding-top: 64px;
     height: 100%;
-    width: 512px;
+    width: 100%;
 }
 
 .activity-craft-recipe {
     align-items: center;
-    border: solid 4px rgb(0, 0, 0);
+    background-color: rgb(182, 103, 77);
     border-radius: 8px;
     display: flex;
     gap: 32px;
     padding: 8px;
-    width: 100%;
+    width: 33%;
 }
 
 .activity-craft-recipe-item {
@@ -202,17 +259,37 @@
     width: 32px;
 }
 
-.activity-craft-progress {
+.activity-craft-play {
     align-items: center;
     display: flex;
-    gap: 32px;
+    height: 100%;
     justify-content: center;
+    width: 100%;
 }
 
-.activity-craft-progress-label {
+.activity-craft-progress {
+    align-items: center;
+    background-color: white;
+    border-radius: 100px;
+    display: flex;
     font-size: 32px;
+    height: 64px;
+    justify-content: center;
+    left: 400px;
+    text-align: center;
+    width: 64px;
 }
 
 .activity-craft-key {
+    align-items: center;
+    background-color: white;
+    border-radius: 100px;
+    display: flex;
     font-size: 32px;
+    height: 64px;
+    justify-content: center;
+    left: 800px;
+    text-align: center;
+    top: 250px;
+    width: 64px;
 }

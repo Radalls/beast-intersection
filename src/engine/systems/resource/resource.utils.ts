@@ -4,7 +4,6 @@ import { ResourceTypes } from '@/engine/components/resource';
 import { getComponent } from '@/engine/entities';
 import { setCooldown } from '@/engine/services/cycle';
 import { error } from '@/engine/services/error';
-import { EventTypes } from '@/engine/services/event';
 import { getStore } from '@/engine/services/store';
 import {
     addItemToInventory,
@@ -12,8 +11,8 @@ import {
     playerInventoryFull,
     playerInventoryToolFull,
 } from '@/engine/systems/inventory';
+import { updateSprite } from '@/engine/systems/sprite';
 import { setEntityCooldown } from '@/engine/systems/state';
-import { event } from '@/render/events';
 
 //#region HELPERS
 const rollResourceItem = ({ resourceEntityId }: { resourceEntityId: string }) => {
@@ -66,11 +65,7 @@ export const generateResourceItem = ({ resourceEntityId, init = false }: {
 
     if (!(init)) {
         if (resource._type === ResourceTypes.ITEM) {
-            const sprite = getComponent({ componentId: 'Sprite', entityId: resourceEntityId });
-
-            sprite._image = `resource_${itemName.toLowerCase()}`;
-
-            event({ entityId: resourceEntityId, type: EventTypes.ENTITY_SPRITE_UPDATE });
+            updateSprite({ entityId: resourceEntityId, path: `resource_${itemName.toLowerCase()}` });
         }
         else if (resource._type === ResourceTypes.BUG) {
             updateActivityBug({ activityId: resourceEntityId });

@@ -8,9 +8,7 @@ export const onTileMapCreate = () => createTileMap();
 
 export const onTileMapTileCreate = ({ tile }: { tile: Tile }) => createTileMapTile({ tile });
 
-export const onTileMapTileDestroy = ({ tile }: {
-    tile: Tile,
-}) => {
+export const onTileMapTileDestroy = ({ tile }: { tile: Tile }) => {
     const tileMapEntityId = getStore('tileMapId')
         ?? error({ message: 'Store tileMapId is undefined', where: onTileMapTileDestroy.name });
 

@@ -9,6 +9,7 @@ import '@/render/styles/inventory.css';
 import '@/render/styles/menu.css';
 import '@/render/styles/quest.css';
 import '@/render/styles/tilemap.css';
+import '@/render/templates/components/progress/progress.css';
 
 renderMain();
 engineMain();

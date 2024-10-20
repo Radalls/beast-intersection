@@ -1,12 +1,26 @@
 import { Tile } from '@/engine/components/tilemap';
-import { getComponent } from '@/engine/entities';
+import { getComponent, isManager, isTileMap } from '@/engine/entities';
 import { ErrorData } from '@/engine/services/error';
 import { onInputKeyDown as engineOnInputKeyDown } from '@/engine/services/event';
 import { AudioData } from '@/render/audio';
-import { createElement, destroyElement, updatePosition, createSprite, getElement } from '@/render/templates';
+import {
+    createElement,
+    destroyElement,
+    updatePosition,
+    createSprite,
+    getElement,
+    getTileMap,
+} from '@/render/templates';
 
 //#region UTILS
-export const onEntityCreate = ({ entityId }: { entityId: string }) => createElement({ entityId });
+export const onEntityCreate = ({ entityId }: { entityId: string }) => {
+    createElement({
+        elementParent: (isManager({ entityId }) || isTileMap({ entityId }))
+            ? undefined
+            : getTileMap(),
+        entityId,
+    });
+};
 
 export const onEntityDestroy = ({ entityId }: { entityId: string }) => destroyElement({ elementId: entityId });
 

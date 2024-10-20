@@ -1,6 +1,7 @@
 import { createElement } from './template';
 import {
     getElement,
+    getSpritePath,
     searchElementsByClassName,
     searchElementsById,
 } from './template.utils';
@@ -27,21 +28,27 @@ export const createLaunchMenu = () => {
         elementClass: 'launch',
         elementId: 'LaunchMenu',
     });
+    launch.style.backgroundImage = `url(${getSpritePath({ gif: true, spriteName: 'menu_bg1' })})`;
 
     const launchTitle = createElement({
-        elementAbsolute: false,
         elementClass: 'launch-title',
         elementId: 'LaunchMenuTitle',
         elementParent: launch,
     });
-    launchTitle.innerText = 'BEAST INTERSECTION';
+    launchTitle.style.backgroundImage = `url(${getSpritePath({ spriteName: 'menu_logo' })})`;
 
     /* Options */
+    const launchOptions = createElement({
+        elementClass: 'launch-options',
+        elementId: 'LaunchMenuOptions',
+        elementParent: launch,
+    });
+
     const launchStart = createElement({
         elementAbsolute: false,
         elementClass: 'launch-option',
         elementId: 'LaunchMenuStart',
-        elementParent: launch,
+        elementParent: launchOptions,
     });
     launchStart.innerText = 'Commencer';
 
@@ -49,7 +56,7 @@ export const createLaunchMenu = () => {
         elementAbsolute: false,
         elementClass: 'launch-option',
         elementId: 'LaunchMenuLoad',
-        elementParent: launch,
+        elementParent: launchOptions,
     });
     launchLoad.innerText = 'Continuer';
 
@@ -57,7 +64,7 @@ export const createLaunchMenu = () => {
         elementAbsolute: false,
         elementClass: 'launch-option',
         elementId: 'LaunchMenuSettings',
-        elementParent: launch,
+        elementParent: launchOptions,
     });
     launchSettings.innerText = 'Paramètres';
 
@@ -65,16 +72,14 @@ export const createLaunchMenu = () => {
     const launchVersion = createElement({
         elementClass: 'launch-version',
         elementId: 'LaunchMenuVersion',
+        elementParent: launch,
     });
     launchVersion.innerText = `v${getProjectVersion()}`;
 };
 
 export const displayLaunchMenu = () => {
     const launch = getElement({ elementId: 'LaunchMenu' });
-    launch.style.display = (launch.style.display === 'flex') ? 'none' : 'flex';
-
-    const launchVersion = getElement({ elementId: 'LaunchMenuVersion' });
-    launchVersion.style.display = (launchVersion.style.display === 'flex') ? 'none' : 'flex';
+    launch.style.display = (launch.style.display === 'block') ? 'none' : 'block';
 };
 
 export const updateLaunchMenu = () => {
@@ -85,10 +90,10 @@ export const updateLaunchMenu = () => {
 
     const launchOptions = searchElementsByClassName({ className: 'launch-option' });
     for (const launchOption of launchOptions) {
-        launchOption.style.border = '5px solid rgb(180, 180, 180)';
+        launchOption.style.border = '8px solid rgb(91, 48, 38)';
     }
 
-    launchOptions[manager._selectedLaunchOption].style.border = '5px solid rgb(255, 0, 0)';
+    launchOptions[manager._selectedLaunchOption].style.border = '8px solid rgb(255, 241, 216)';
 };
 //#endregion
 
@@ -98,17 +103,28 @@ export const createSettingsMenu = () => {
         elementClass: 'settings',
         elementId: 'SettingsMenu',
     });
+    settings.style.backgroundImage = `url(${getSpritePath({ gif: true, spriteName: 'menu_bg2' })})`;
+
+    const settingsContainer = createElement({
+        elementAbsolute: false,
+        elementClass: 'settings-container',
+        elementId: 'SettingsMenuContainer',
+        elementParent: settings,
+    });
 
     const edit = createElement({
         elementClass: 'settings-edit',
         elementId: 'SettingsMenuEdit',
+        elementParent: settings,
     });
     edit.innerText = 'Choisir une touche';
 
     /* System */
     const systemSettings = createElement({
+        elementAbsolute: false,
         elementClass: 'settings-system',
         elementId: 'SettingsMenuSystem',
+        elementParent: settingsContainer,
     });
 
     /* Back */
@@ -188,7 +204,7 @@ export const createSettingsMenu = () => {
         elementAbsolute: false,
         elementClass: 'setting-header',
         elementId: 'SettingsMenuGeneral',
-        elementParent: settings,
+        elementParent: settingsContainer,
     });
     generalSettings.innerText = 'GENERAL';
 
@@ -197,7 +213,7 @@ export const createSettingsMenu = () => {
         elementAbsolute: false,
         elementClass: 'setting-container',
         elementId: 'SettingsMenuAudioContainer',
-        elementParent: settings,
+        elementParent: settingsContainer,
     });
 
     const audioLabel = createElement({
@@ -206,7 +222,7 @@ export const createSettingsMenu = () => {
         elementId: 'SettingsMenuAudioLabel',
         elementParent: audioContainer,
     });
-    audioLabel.innerText = 'AUDIO: ';
+    audioLabel.innerText = 'AUDIO';
 
     const audioSetting = createElement({
         elementAbsolute: false,
@@ -235,7 +251,7 @@ export const createSettingsMenu = () => {
         elementAbsolute: false,
         elementClass: 'setting-header',
         elementId: 'SettingsMenuKeybinds',
-        elementParent: settings,
+        elementParent: settingsContainer,
     });
     keybindsSettings.innerText = 'TOUCHES';
 
@@ -244,7 +260,7 @@ export const createSettingsMenu = () => {
         elementAbsolute: false,
         elementClass: 'setting-container',
         elementId: 'SettingsMenuKeyMoveUpContainer',
-        elementParent: settings,
+        elementParent: settingsContainer,
     });
 
     const moveUpLabel = createElement({
@@ -253,7 +269,7 @@ export const createSettingsMenu = () => {
         elementId: 'SettingsMenuKeyMoveUpLabel',
         elementParent: moveUpContainer,
     });
-    moveUpLabel.innerText = 'HAUT: ';
+    moveUpLabel.innerText = 'HAUT';
 
     const moveUpSetting = createElement({
         elementAbsolute: false,
@@ -282,7 +298,7 @@ export const createSettingsMenu = () => {
         elementAbsolute: false,
         elementClass: 'setting-container',
         elementId: 'SettingsMenuKeyMoveDownContainer',
-        elementParent: settings,
+        elementParent: settingsContainer,
     });
 
     const moveDownLabel = createElement({
@@ -291,7 +307,7 @@ export const createSettingsMenu = () => {
         elementId: 'SettingsMenuKeyMoveDownLabel',
         elementParent: moveDownContainer,
     });
-    moveDownLabel.innerText = 'BAS: ';
+    moveDownLabel.innerText = 'BAS';
 
     const moveDownSetting = createElement({
         elementAbsolute: false,
@@ -320,7 +336,7 @@ export const createSettingsMenu = () => {
         elementAbsolute: false,
         elementClass: 'setting-container',
         elementId: 'SettingsMenuKeyMoveLeftContainer',
-        elementParent: settings,
+        elementParent: settingsContainer,
     });
 
     const moveLeftLabel = createElement({
@@ -329,7 +345,7 @@ export const createSettingsMenu = () => {
         elementId: 'SettingsMenuKeyMoveLeftLabel',
         elementParent: moveLeftContainer,
     });
-    moveLeftLabel.innerText = 'GAUCHE: ';
+    moveLeftLabel.innerText = 'GAUCHE';
 
     const moveLeftSetting = createElement({
         elementAbsolute: false,
@@ -358,7 +374,7 @@ export const createSettingsMenu = () => {
         elementAbsolute: false,
         elementClass: 'setting-container',
         elementId: 'SettingsMenuKeyMoveRightContainer',
-        elementParent: settings,
+        elementParent: settingsContainer,
     });
 
     const moveRightLabel = createElement({
@@ -367,7 +383,7 @@ export const createSettingsMenu = () => {
         elementId: 'SettingsMenuKeyMoveRightLabel',
         elementParent: moveRightContainer,
     });
-    moveRightLabel.innerText = 'DROITE: ';
+    moveRightLabel.innerText = 'DROITE';
 
     const moveRightSetting = createElement({
         elementAbsolute: false,
@@ -396,7 +412,7 @@ export const createSettingsMenu = () => {
         elementAbsolute: false,
         elementClass: 'setting-container',
         elementId: 'SettingsMenuKeyActionActContainer',
-        elementParent: settings,
+        elementParent: settingsContainer,
     });
 
     const actLabel = createElement({
@@ -405,7 +421,7 @@ export const createSettingsMenu = () => {
         elementId: 'SettingsMenuKeyActionActLabel',
         elementParent: actContainer,
     });
-    actLabel.innerText = 'ACTION: ';
+    actLabel.innerText = 'ACTION';
 
     const actSetting = createElement({
         elementAbsolute: false,
@@ -434,7 +450,7 @@ export const createSettingsMenu = () => {
         elementAbsolute: false,
         elementClass: 'setting-container',
         elementId: 'SettingsMenuKeyActionInventoryContainer',
-        elementParent: settings,
+        elementParent: settingsContainer,
     });
 
     const inventoryLabel = createElement({
@@ -443,7 +459,7 @@ export const createSettingsMenu = () => {
         elementId: 'SettingsMenuKeyActionInventoryLabel',
         elementParent: inventoryContainer,
     });
-    inventoryLabel.innerText = 'INVENTAIRE: ';
+    inventoryLabel.innerText = 'INVENTAIRE';
 
     const inventorySetting = createElement({
         elementAbsolute: false,
@@ -472,7 +488,7 @@ export const createSettingsMenu = () => {
         elementAbsolute: false,
         elementClass: 'setting-container',
         elementId: 'SettingsMenuKeyActionToolContainer',
-        elementParent: settings,
+        elementParent: settingsContainer,
     });
 
     const toolLabel = createElement({
@@ -481,7 +497,7 @@ export const createSettingsMenu = () => {
         elementId: 'SettingsMenuKeyActionToolLabel',
         elementParent: toolContainer,
     });
-    toolLabel.innerText = 'OUTIL: ';
+    toolLabel.innerText = 'OUTIL';
 
     const toolSetting = createElement({
         elementAbsolute: false,
@@ -522,7 +538,7 @@ export const updateSettingsMenu = () => {
 
     const containers = searchElementsByClassName({ className: 'setting-container' });
     for (const container of containers) {
-        container.style.borderLeft = '5px solid rgb(180, 180, 180)';
+        container.style.borderLeft = '5px solid transparent';
     }
 
     const values = searchElementsByClassName({ className: 'setting-value' });
@@ -549,7 +565,7 @@ export const updateSettingsMenu = () => {
 
     const selectedSettingId = getSettingId({ settingName: SETTINGS[manager._selectedSetting] });
     const [selectedSetting] = searchElementsById({ partialElementId: selectedSettingId });
-    selectedSetting.style.borderLeft = '5px solid rgb(255, 0, 0)';
+    selectedSetting.style.borderLeft = '5px solid rgb(255, 241, 216)';
 };
 
 export const displaySettingsMenuEdit = () => {
