@@ -86,7 +86,7 @@ export const confirmLaunchOption = ({ managerEntityId }: { managerEntityId?: str
         event({ type: EventTypes.QUEST_DISPLAY });
         event({ data: { audioName: 'menu_launch_start' }, type: EventTypes.AUDIO_PLAY });
         event({ data: { audioName: 'bgm_map1', loop: true }, type: EventTypes.AUDIO_PLAY });
-        event({ data: { audioName: 'bgm_menu' }, type: EventTypes.AUDIO_STOP });
+        event({ data: { audioName: 'bgm_menu2' }, type: EventTypes.AUDIO_STOP });
 
         return;
     }
@@ -112,10 +112,11 @@ export const confirmLaunchOption = ({ managerEntityId }: { managerEntityId?: str
             run({ saveData });
 
             event({ type: EventTypes.MENU_LAUNCH_DISPLAY });
+            event({ type: EventTypes.MENU_SETTINGS_UPDATE });
             event({ type: EventTypes.QUEST_DISPLAY });
             event({ data: { audioName: 'menu_launch_start' }, type: EventTypes.AUDIO_PLAY });
             event({ data: { audioName: 'bgm_map1', loop: true }, type: EventTypes.AUDIO_PLAY });
-            event({ data: { audioName: 'bgm_menu' }, type: EventTypes.AUDIO_STOP });
+            event({ data: { audioName: 'bgm_menu2' }, type: EventTypes.AUDIO_STOP });
 
             return;
         });
@@ -143,7 +144,7 @@ export const quitToLaunch = ({ managerEntityId }: { managerEntityId?: string | n
     launch();
 
     event({ data: { audioName: 'bgm_map1' }, type: EventTypes.AUDIO_STOP });
-    event({ data: { audioName: 'bgm_menu', loop: true }, type: EventTypes.AUDIO_PLAY });
+    event({ data: { audioName: 'bgm_menu2', loop: true }, type: EventTypes.AUDIO_PLAY });
 };
 //#endregion
 
@@ -189,6 +190,17 @@ export const onSettingsInput = ({ inputKey, managerEntityId }: {
 
         selectSetting({ offset: inputOffset });
         return;
+    }
+    else if (
+        inputKey === manager.settings.keys.move._left
+        || inputKey === manager.settings.keys.move._right
+    ) {
+        if (SETTINGS[manager._selectedSetting] === SETTINGS[0]) {
+            editSettingAudio({ editKey: inputKey, managerEntityId });
+        }
+        else {
+            //TODO: change settings page
+        }
     }
     else if (inputKey === manager.settings.keys.action._save) {
         if (getState('isGameLaunching')) return;

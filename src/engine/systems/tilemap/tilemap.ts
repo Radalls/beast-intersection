@@ -15,6 +15,7 @@ import { EventTypes } from '@/engine/services/event';
 import { getStore } from '@/engine/services/store';
 import { setCollider, checkCollider } from '@/engine/systems/collider';
 import { updatePosition } from '@/engine/systems/position';
+import { updateSpriteDirection } from '@/engine/systems/sprite';
 import { setTrigger } from '@/engine/systems/trigger';
 import { event } from '@/render/events';
 
@@ -91,6 +92,8 @@ export const updateTile = ({ tileMapEntityId, entityId, target }: {
 
         if (isExit) return;
     }
+
+    updateSpriteDirection({ entityId, target });
 
     const targetTile = findTileByPosition({
         x: targetX,

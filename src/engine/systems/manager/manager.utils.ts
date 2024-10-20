@@ -5,6 +5,7 @@ import { error } from '@/engine/services/error';
 import { EventTypes } from '@/engine/services/event';
 import { setState, getState } from '@/engine/services/state';
 import { getStore } from '@/engine/services/store';
+import { setVolumeAudio as setAudioVolume } from '@/render/audio';
 import { event } from '@/render/events';
 
 //#region CONSTANTS
@@ -89,29 +90,49 @@ export const settingKeyAlreadyInUse = ({ key, managerEntityId }: {
     ].includes(key);
 };
 
-export const editSettingAudio = ({ managerEntityId }: { managerEntityId?: string | null }) => {
+export const editSettingAudio = ({ editKey, managerEntityId }: {
+    editKey?: string,
+    managerEntityId?: string | null,
+}) => {
     if (!(managerEntityId)) managerEntityId = getStore('managerId')
         ?? error({ message: 'Store managerId is undefined', where: editSettingAudio.name });
 
     const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
 
-    manager.settings._audio = !(manager.settings._audio);
+    if (!(editKey)) {
+        manager.settings._audio = !(manager.settings._audio);
+        setState('isSettingAudioAllowed', manager.settings._audio);
 
-    setState('isSettingAudioAllowed', manager.settings._audio);
+        event({
+            data: { // temp
+                audioName: (getState('isGameLaunching'))
+                    ? 'bgm_menu2'
+                    : 'bgm_map1',
+                loop: (manager.settings._audio)
+                    ? true
+                    : undefined,
+            },
+            type: (manager.settings._audio)
+                ? EventTypes.AUDIO_PLAY
+                : EventTypes.AUDIO_STOP,
+        });
+    }
+    else if (editKey === manager.settings.keys.move._left) {
+        manager.settings._audioVolume = Math.max(0, manager.settings._audioVolume - 0.1);
 
-    event({
-        data: { // temp
-            audioName: (getState('isGameLaunching'))
-                ? 'bgm_menu'
-                : 'bgm_map1',
-            loop: (manager.settings._audio)
-                ? true
-                : undefined,
-        },
-        type: (manager.settings._audio)
-            ? EventTypes.AUDIO_PLAY
-            : EventTypes.AUDIO_STOP,
-    });
+        setState('isSettingAudioAllowed', manager.settings._audioVolume > 0);
+        setAudioVolume({ volume: manager.settings._audioVolume });
+
+        event({ data: { audioName: 'main_select' }, type: EventTypes.AUDIO_PLAY });
+    }
+    else if (editKey === manager.settings.keys.move._right) {
+        manager.settings._audioVolume = Math.min(1, manager.settings._audioVolume + 0.1);
+
+        setState('isSettingAudioAllowed', manager.settings._audioVolume < 1);
+        setAudioVolume({ volume: manager.settings._audioVolume });
+
+        event({ data: { audioName: 'main_select' }, type: EventTypes.AUDIO_PLAY });
+    }
 };
 
 export const editSettingKey = ({ editKey, managerEntityId }: {

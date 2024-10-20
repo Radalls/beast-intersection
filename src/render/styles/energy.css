@@ -1,8 +1,8 @@
 .energy {
     align-items: center;
-    background-color: rgb(0, 0, 0);
+    background-color: rgb(91, 48, 38);
     border-radius: 8px;
-    bottom: 32px;
+    bottom: 8px;
     display: none;
     flex-direction: column;
     gap: 2px;

@@ -2,8 +2,31 @@ import { createElement } from './template';
 import { getElement } from './template.utils';
 
 import { ErrorData } from '@/engine/services/error';
+import { app } from '@/render/main';
 
 //#region TEMPLATES
+//#region FRAME
+export const createFrame = () => {
+    const frame = createElement({
+        elementClass: 'frame',
+        elementId: 'Frame',
+        elementParent: app,
+    });
+
+    createElement({
+        elementClass: 'ui',
+        elementId: 'UI',
+        elementParent: frame,
+    });
+};
+
+// export const displayUI = () => {
+//     const ui = getElement({ elementId: 'UI' });
+
+//     ui.style.display = (ui.style.display === 'block') ? 'none' : 'block';
+// };
+//#endregion
+
 //#region LOADING
 export const createLoading = () => {
     const loading = createElement({
@@ -36,6 +59,7 @@ export const createError = () => {
     createElement({
         elementClass: 'error',
         elementId: 'Error',
+        elementParent: app,
     });
 };
 

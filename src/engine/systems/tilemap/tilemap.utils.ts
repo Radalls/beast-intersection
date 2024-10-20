@@ -257,10 +257,14 @@ export const exitTile = ({ tileMapEntityId, entityId, targetX, targetY }: {
 
     for (const exit of entityTile.exits) {
         if (targetExit({ exit, targetX, targetY, tile: entityTile })) {
+            setEntityLoad({ entityId, value: false });
+
             destroyTileMap({ tileMapEntityId });
             generateTileMap({ tileMapName: exit._targetMap });
-            updatePosition({ entityId, x: exit.targetPosition._x, y: exit.targetPosition._y });
+            updatePosition({ entityId, target: exit._direction, x: exit.targetPosition._x, y: exit.targetPosition._y });
             setTile({ entityId, tileMapEntityId });
+
+            setEntityLoad({ entityId, value: true });
 
             return true;
         }
@@ -269,9 +273,7 @@ export const exitTile = ({ tileMapEntityId, entityId, targetX, targetY }: {
     return false;
 };
 
-export const destroyTileMap = ({ tileMapEntityId }: {
-    tileMapEntityId?: string | null
-}) => {
+export const destroyTileMap = ({ tileMapEntityId }: { tileMapEntityId?: string | null }) => {
     if (!(tileMapEntityId)) tileMapEntityId = getStore('tileMapId')
         ?? error({ message: 'Store tileMapId is undefined', where: exitTile.name });
 

@@ -6,17 +6,22 @@ import { error } from '@/engine/services/error';
 import { getStore } from '@/engine/services/store';
 
 //#region TEMPLATES
-export const createQuestsMenu = () => {
+export const createQuestMenu = () => {
     createElement({
         elementClass: 'quests',
-        elementId: 'PlayerQuestsMenu',
+        elementId: 'QuestMenu',
+        elementParent: getElement({ elementId: 'UI' }),
     });
 };
 
-export const displayQuests = () => {
-    const quests = getElement({ elementId: 'PlayerQuestsMenu' });
+export const displayQuestMenu = () => {
+    const quests = getElement({ elementId: 'QuestMenu' });
 
     quests.style.display = (quests.style.display === 'block') ? 'none' : 'block';
+};
+
+export const destroyQuestMenu = () => {
+    destroyElement({ elementId: 'QuestMenu' });
 };
 
 export const createQuest = () => {
@@ -25,7 +30,7 @@ export const createQuest = () => {
 
     const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
 
-    const quests = getElement({ elementId: 'PlayerQuestsMenu' });
+    const quests = getElement({ elementId: 'QuestMenu' });
     const questData = manager.quests[manager._selectedQuest];
 
     if (checkElement({ elementId: `Quest${manager._selectedQuest}` })) {

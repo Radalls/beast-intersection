@@ -17,7 +17,6 @@ import {
     removeItemFromInventory,
 } from '@/engine/systems/inventory';
 import { getKeyMoveOffset } from '@/engine/systems/manager';
-import { setEntityActive } from '@/engine/systems/state';
 import { randAudio } from '@/render/audio';
 import { event } from '@/render/events';
 
@@ -323,8 +322,6 @@ export const endActivityCraft = ({ activityId, playerEntityId }: {
     }
 
     setState('isActivityCraftRunning', false);
-
-    setEntityActive({ entityId: activityId, value: false });
 
     event({ type: EventTypes.ACTIVITY_CRAFT_END });
 };

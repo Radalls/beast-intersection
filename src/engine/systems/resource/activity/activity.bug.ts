@@ -3,14 +3,14 @@ import { getResourceData } from '../resource.data';
 import { canPlay, loseActivity, startActivity, winActivity } from './activity';
 
 import { ActivityBugData } from '@/engine/components/resource';
-import { checkComponent, getComponent } from '@/engine/entities';
+import { getComponent } from '@/engine/entities';
 import { clearCycle, setCooldown, setCycle } from '@/engine/services/cycle';
 import { error } from '@/engine/services/error';
 import { EventTypes } from '@/engine/services/event';
 import { getState, setState } from '@/engine/services/state';
 import { getStore } from '@/engine/services/store';
 import { playerInventoryFull } from '@/engine/systems/inventory';
-import { setEntityActive, setEntityCooldown } from '@/engine/systems/state';
+import { setEntityCooldown } from '@/engine/systems/state';
 import { event } from '@/render/events';
 
 //#region SERVICES
@@ -70,14 +70,6 @@ export const startActivityBug = ({ activityId, playerEntityId }: {
     canPlay({ activity: activityResource._type, entityId: playerEntityId, strict: true });
     startActivity({ activityId });
 
-    if (checkComponent({ componentId: 'State', entityId: activityId })) {
-        const state = getComponent({ componentId: 'State', entityId: activityId });
-
-        if (state._active !== undefined) {
-            setEntityActive({ entityId: activityId, gif: true, value: true });
-        }
-    }
-
     const activityBugData = activityResource.activityData as ActivityBugData;
     activityBugData._hp = activityBugData._maxHp;
     activityBugData._nbErrors = 0;
@@ -103,8 +95,8 @@ export const updateActivityBug = ({ activityId }: { activityId: string }) => {
         _symbolInterval: activityResourceData.data.symbolInterval,
     };
 
-    const activityResourceSprite = getComponent({ componentId: 'Sprite', entityId: activityId });
-    activityResourceSprite._image = `resource_${activityResource.item?.info._name.toLowerCase()}`;
+    // const activityResourceSprite = getComponent({ componentId: 'Sprite', entityId: activityId });
+    // activityResourceSprite._image = `resource_${activityResource.item?.info._name.toLowerCase()}`;
 
     const activityResourceTrigger = getComponent({ componentId: 'Trigger', entityId: activityId });
     activityResourceTrigger._priority = activityResourceData.priority ?? 1;
@@ -196,7 +188,6 @@ export const endActivityBug = ({ activityId }: { activityId: string }) => {
     setState('isActivityBugInputCooldown', false);
     clearCycle('activityBugTickInterval');
 
-    setEntityActive({ entityId: activityId, gif: true, value: false });
     setEntityCooldown({ entityId: activityId, value: true });
     setCooldown({ entityId: activityId });
 

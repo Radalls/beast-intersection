@@ -1,8 +1,10 @@
-import { getElement, getSpritePath, searchElementsById } from './template.utils';
+import { destroyEnergy } from './template.energy';
+import { destroyInventory } from './template.inventory';
+import { destroyQuestMenu } from './template.quest';
+import { getElement, getSpritePath } from './template.utils';
 
 import { getComponent, getRawEntityId, isPlayer } from '@/engine/entities';
 import { error } from '@/engine/services/error';
-import { app } from '@/render/main';
 
 //#region CONSTANTS
 export const TILE_PIXEL_SIZE = 64;
@@ -47,7 +49,7 @@ export const createElement = ({
 
     element.style.position = elementAbsolute ? 'absolute' : 'relative';
 
-    const parent = elementParent ?? app;
+    const parent = elementParent ?? getElement({ elementId: 'Frame' });
     parent.appendChild(element);
 
     return element;
@@ -60,8 +62,10 @@ export const destroyElement = ({ elementId }: { elementId: string }) => {
         element.removeChild(element.firstChild);
     }
 
-    if (isPlayer({ entityId: elementId, strict: true })) {
-        searchElementsById({ partialElementId: 'Player' }).map((el) => el.remove());
+    if (isPlayer({ entityId: elementId })) {
+        destroyInventory();
+        destroyQuestMenu();
+        destroyEnergy();
     }
 
     element.remove();
@@ -72,11 +76,11 @@ export const updatePosition = ({ elementId }: { elementId: string }) => {
 
     const element = getElement({ elementId });
 
-    element.style.left = `${position._x * TILE_PIXEL_SIZE + TILE_PIXEL_SIZE}px`;
-    element.style.top = `${position._y * TILE_PIXEL_SIZE + TILE_PIXEL_SIZE
+    element.style.left = `${position._x * TILE_PIXEL_SIZE}px`;
+    element.style.top = `${position._y * TILE_PIXEL_SIZE
         - (((parseInt(element.style.height) / TILE_PIXEL_SIZE) - 1) * TILE_PIXEL_SIZE)}px`;
 
-    element.style.zIndex = `${position._y}`;
+    element.style.zIndex = `${position._y + 1}`;
 };
 
 export const createSprite = ({ elementId }: { elementId: string }) => {

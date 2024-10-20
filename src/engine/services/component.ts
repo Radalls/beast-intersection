@@ -111,6 +111,7 @@ export const addManager = ({ entityId, savedManager }: {
         questsDone: [],
         settings: {
             _audio: false,
+            _audioVolume: 1,
             keys: {
                 action: {
                     _act: ' ',

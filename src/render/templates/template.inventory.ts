@@ -1,5 +1,10 @@
 import { createElement, destroyElement } from './template';
-import { checkElement, getElement, getSpritePath, searchElementsByClassName } from './template.utils';
+import {
+    checkElement,
+    getElement,
+    getSpritePath,
+    searchElementsByClassName,
+} from './template.utils';
 
 import { getComponent } from '@/engine/entities';
 import { error } from '@/engine/services/error';
@@ -29,7 +34,8 @@ export const createInventory = () => {
 
     const inventoryElement = createElement({
         elementClass: 'inventory',
-        elementId: `${playerEntityId}-inventory`,
+        elementId: 'Inventory',
+        elementParent: getElement({ elementId: 'UI' }),
         entityId: playerEntityId,
     });
 
@@ -40,7 +46,7 @@ export const createInventory = () => {
         createElement({
             elementAbsolute: false,
             elementClass: 'inventory-slot',
-            elementId: `${playerEntityId}-inventory-slot-${i}`,
+            elementId: `InventorySlot-${i}`,
             elementParent: inventoryElement,
             entityId: playerEntityId,
         });
@@ -48,7 +54,8 @@ export const createInventory = () => {
 
     const entityInventoryTools = createElement({
         elementClass: 'inventory-tools',
-        elementId: `${playerEntityId}-inventory-tools`,
+        elementId: 'InventoryTools',
+        elementParent: getElement({ elementId: 'UI' }),
         entityId: playerEntityId,
     });
     const inventoryToolsWidth = (INVENTORY_TOOL_SLOT_SIZE * (inventory._maxTools + 1)) + INVENTORY_TOOL_SLOT_SIZE;
@@ -59,8 +66,8 @@ export const createInventory = () => {
     for (let i = 0; i < inventory._maxTools + 1; i++) {
         createElement({
             elementAbsolute: false,
-            elementClass: 'inventory-tools-slot',
-            elementId: `${playerEntityId}-inventory-tools-slot-${i}`,
+            elementClass: 'inventory-tool-slot',
+            elementId: `InventoryToolsSlot-${i}`,
             elementParent: entityInventoryTools,
             entityId: playerEntityId,
         });
@@ -68,25 +75,24 @@ export const createInventory = () => {
 
     createElement({
         elementClass: 'inventory-tool-active',
-        elementId: `${playerEntityId}-inventory-tool-active`,
+        elementId: 'InventoryToolActive',
+        elementParent: getElement({ elementId: 'UI' }),
         entityId: playerEntityId,
     });
 
     createElement({
         elementClass: 'inventory-options',
-        elementId: `${playerEntityId}-inventory-options`,
+        elementId: 'InventoryOptions',
+        elementParent: getElement({ elementId: 'UI' }),
         entityId: playerEntityId,
     });
 };
 
 export const displayInventory = () => {
-    const playerEntityId = getStore('playerId')
-        ?? error({ message: 'Store playerId is undefined', where: displayInventory.name });
-
-    const inventory = getElement({ elementId: `${playerEntityId}-inventory` });
+    const inventory = getElement({ elementId: 'Inventory' });
     inventory.style.display = (inventory.style.display === 'flex') ? 'none' : 'flex';
 
-    const inventoryTools = getElement({ elementId: `${playerEntityId}-inventory-tools` });
+    const inventoryTools = getElement({ elementId: 'InventoryTools' });
     inventoryTools.style.display = (inventoryTools.style.display === 'flex') ? 'none' : 'flex';
     inventoryTools.style.bottom
         = `${parseFloat(getComputedStyle(inventory).bottom) + inventory.getBoundingClientRect().height}px`;
@@ -102,17 +108,17 @@ export const updateInventory = () => {
 
     for (const slot of inventory.slots) {
         const inventorySlot = getElement({
-            elementId: `${playerEntityId}-inventory-slot-${inventory.slots.indexOf(slot)}`,
+            elementId: `InventorySlot-${inventory.slots.indexOf(slot)}`,
         });
         inventorySlot.style.backgroundImage = `url(${getSpritePath({ spriteName: slot.item.sprite._image })})`;
 
         const inventorySlotAmount = checkElement({
-            elementId: `${playerEntityId}-inventory-slot-${inventory.slots.indexOf(slot)}-amount`,
+            elementId: `InventorySlot-${inventory.slots.indexOf(slot)}-amount`,
         })
-            ? getElement({ elementId: `${playerEntityId}-inventory-slot-${inventory.slots.indexOf(slot)}-amount` })
+            ? getElement({ elementId: `InventorySlot-${inventory.slots.indexOf(slot)}-amount` })
             : createElement({
                 elementClass: 'inventory-slot-amount',
-                elementId: `${playerEntityId}-inventory-slot-${inventory.slots.indexOf(slot)}-amount`,
+                elementId: `InventorySlot-${inventory.slots.indexOf(slot)}-amount`,
                 elementParent: inventorySlot,
                 entityId: playerEntityId,
             });
@@ -121,19 +127,21 @@ export const updateInventory = () => {
     }
 };
 
+export const destroyInventory = () => {
+    destroyElement({ elementId: 'Inventory' });
+    destroyElement({ elementId: 'InventoryTools' });
+    destroyElement({ elementId: 'InventoryToolActive' });
+    destroyElement({ elementId: 'InventoryOptions' });
+};
+
 export const displayInventoryOption = () => {
     const playerEntityId = getStore('playerId')
         ?? error({ message: 'Store playerId is undefined', where: displayInventoryOption.name });
 
-    const inventory = getElement({ elementId: `${playerEntityId}-inventory` });
-
-    const inventoryOptionsElement = getElement({ elementId: `${playerEntityId}-inventory-options` });
+    const inventoryOptionsElement = getElement({ elementId: 'InventoryOptions' });
     inventoryOptionsElement.style.display = (inventoryOptionsElement.style.display === 'flex') ? 'none' : 'flex';
 
     if (inventoryOptionsElement.style.display === 'flex') {
-        inventoryOptionsElement.style.top = `${inventory.getBoundingClientRect().top}px`;
-        inventoryOptionsElement.style.left = `${inventory.getBoundingClientRect().right}px`;
-
         const selectedSlotItem = getPlayerInventorySelectedSlotItem({});
 
         let inventoryOptions = INVENTORY_SLOT_OPTIONS;
@@ -146,7 +154,7 @@ export const displayInventoryOption = () => {
             const inventoryOptionElement = createElement({
                 elementAbsolute: false,
                 elementClass: 'inventory-option',
-                elementId: `${playerEntityId}-inventory-option-${i}`,
+                elementId: `InventoryOption-${i}`,
                 elementParent: inventoryOptionsElement,
                 entityId: playerEntityId,
             });
@@ -169,18 +177,15 @@ export const updateInventoryOption = () => {
 
     const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
 
-    const playerEntityId = getStore('playerId')
-        ?? error({ message: 'Store playerId is undefined', where: displayInventoryOption.name });
-
-    const inventoryOptionsElement = getElement({ elementId: `${playerEntityId}-inventory-options` });
+    const inventoryOptionsElement = getElement({ elementId: 'InventoryOptions' });
 
     for (let i = 0; i < inventoryOptionsElement.children.length; i++) {
-        const inventoryOptionElement = getElement({ elementId: `${playerEntityId}-inventory-option-${i}` });
+        const inventoryOptionElement = getElement({ elementId: `InventoryOption-${i}` });
         inventoryOptionElement.style.fontWeight = 'normal';
     }
 
     const selectedInventoryOption
-        = getElement({ elementId: `${playerEntityId}-inventory-option-${manager._selectedInventorySlotOption}` });
+        = getElement({ elementId: `InventoryOption-${manager._selectedInventorySlotOption}` });
     selectedInventoryOption.style.fontWeight = 'bold';
 };
 
@@ -196,13 +201,13 @@ export const selectInventorySlot = () => {
     const inventory = getComponent({ componentId: 'Inventory', entityId: playerEntityId });
 
     for (let i = 0; i < inventory._maxSlots; i++) {
-        const inventorySlot = getElement({ elementId: `${playerEntityId}-inventory-slot-${i}` });
+        const inventorySlot = getElement({ elementId: `InventorySlot-${i}` });
         inventorySlot.style.border = 'none';
     }
 
     const selectedInventorySlot
-        = getElement({ elementId: `${playerEntityId}-inventory-slot-${manager._selectedInventorySlot}` });
-    selectedInventorySlot.style.border = 'solid 2px red';
+        = getElement({ elementId: `InventorySlot-${manager._selectedInventorySlot}` });
+    selectedInventorySlot.style.border = 'solid 2px rgb(255, 241, 216)';
 };
 
 export const updateInventoryTools = () => {
@@ -213,13 +218,13 @@ export const updateInventoryTools = () => {
 
     clearInventoryTools();
 
-    const inventoryToolsFirstSlot = getElement({ elementId: `${playerEntityId}-inventory-tools-slot-0` });
+    const inventoryToolsFirstSlot = getElement({ elementId: 'InventoryToolsSlot-0' });
     inventoryToolsFirstSlot.style.backgroundImage = `url(${getSpritePath({ spriteName: 'item_hand' })})`;
 
     for (const tool of inventory.tools) {
         const inventoryToolSlotIndex = inventory.tools.indexOf(tool) + 1;
         const inventoryToolSlot
-            = getElement({ elementId: `${playerEntityId}-inventory-tools-slot-${inventoryToolSlotIndex}` });
+            = getElement({ elementId: `InventoryToolsSlot-${inventoryToolSlotIndex}` });
         inventoryToolSlot.style.backgroundImage = `url(${getSpritePath({ spriteName: tool.tool.item.sprite._image })})`;
     }
 };
@@ -237,67 +242,55 @@ export const activateInventoryTool = () => {
     if (tool) {
         const inventoryToolActiveSlotIndex = inventory.tools.indexOf(tool) + 1;
         const inventoryToolActiveSlot
-            = getElement({ elementId: `${playerEntityId}-inventory-tools-slot-${inventoryToolActiveSlotIndex}` });
-        inventoryToolActiveSlot.style.border = 'solid 4px red';
+            = getElement({ elementId: `InventoryToolsSlot-${inventoryToolActiveSlotIndex}` });
+        inventoryToolActiveSlot.style.border = 'solid 4px rgb(255, 241, 216)';
     }
     else {
-        const inventoryToolActiveSlot = getElement({ elementId: `${playerEntityId}-inventory-tools-slot-0` });
-        inventoryToolActiveSlot.style.border = 'solid 4px red';
+        const inventoryToolActiveSlot = getElement({ elementId: 'InventoryToolsSlot-0' });
+        inventoryToolActiveSlot.style.border = 'solid 4px rgb(255, 241, 216)';
     }
 
-    const inventoryToolActive = getElement({ elementId: `${playerEntityId}-inventory-tool-active` });
+    const inventoryToolActive = getElement({ elementId: 'InventoryToolActive' });
     inventoryToolActive.style.backgroundImage = (tool)
         ? `url(${getSpritePath({ spriteName: tool.tool.item.sprite._image })})`
         : `url(${getSpritePath({ spriteName: 'item_hand' })})`;
 };
 
 export const displayInventoryToolActive = () => {
-    const playerEntityId = getStore('playerId')
-        ?? error({ message: 'Store playerId is undefined', where: displayInventoryToolActive.name });
-
-    const inventoryToolActive = getElement({ elementId: `${playerEntityId}-inventory-tool-active` });
+    const inventoryToolActive = getElement({ elementId: 'InventoryToolActive' });
 
     inventoryToolActive.style.display = (inventoryToolActive.style.display === 'flex') ? 'none' : 'flex';
 };
 
 const clearInventory = () => {
-    const playerEntityId = getStore('playerId')
-        ?? error({ message: 'Store playerId is undefined', where: clearInventory.name });
-
-    const inventory = getElement({ elementId: `${playerEntityId}-inventory` });
+    const inventory = getElement({ elementId: 'Inventory' });
 
     for (let i = 0; i < inventory.children.length; i++) {
-        const inventorySlot = getElement({ elementId: `${playerEntityId}-inventory-slot-${i}` });
+        const inventorySlot = getElement({ elementId: `InventorySlot-${i}` });
         inventorySlot.style.backgroundImage = '';
 
-        if (checkElement({ elementId: `${playerEntityId}-inventory-slot-${i}-amount` })) {
-            const inventorySlotAmount = getElement({ elementId: `${playerEntityId}-inventory-slot-${i}-amount` });
+        if (checkElement({ elementId: `InventorySlot-${i}-amount` })) {
+            const inventorySlotAmount = getElement({ elementId: `InventorySlot-${i}-amount` });
             inventorySlotAmount.innerText = '';
         }
     }
 };
 
 const clearInventoryTools = () => {
-    const playerEntityId = getStore('playerId')
-        ?? error({ message: 'Store playerId is undefined', where: clearInventoryTools.name });
-
-    const inventoryTools = getElement({ elementId: `${playerEntityId}-inventory-tools` });
+    const inventoryTools = getElement({ elementId: 'InventoryTools' });
 
     for (let i = 0; i < inventoryTools.children.length; i++) {
-        const inventoryToolSlot = getElement({ elementId: `${playerEntityId}-inventory-tools-slot-${i}` });
+        const inventoryToolSlot = getElement({ elementId: `InventoryToolsSlot-${i}` });
         inventoryToolSlot.style.backgroundImage = '';
     }
 };
 
 const clearInventoryToolsActive = () => {
-    const playerEntityId = getStore('playerId')
-        ?? error({ message: 'Store playerId is undefined', where: clearInventoryToolsActive.name });
-
-    const inventoryTools = getElement({ elementId: `${playerEntityId}-inventory-tools` });
+    const inventoryTools = getElement({ elementId: 'InventoryTools' });
 
     for (let i = 0; i < inventoryTools.children.length; i++) {
-        const inventoryToolSlot = getElement({ elementId: `${playerEntityId}-inventory-tools-slot-${i}` });
-        inventoryToolSlot.style.border = 'solid 4px rgb(0, 0, 0)';
+        const inventoryToolSlot = getElement({ elementId: `InventoryToolsSlot-${i}` });
+        inventoryToolSlot.style.border = 'none';
     }
 };
 //#endregion

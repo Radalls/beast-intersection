@@ -1,4 +1,6 @@
+import { getComponent } from '@/engine/entities';
 import { error } from '@/engine/services/error';
+import { getStore } from '@/engine/services/store';
 
 //#region CONSTANTS
 export type AudioData = {
@@ -58,7 +60,8 @@ export const initAudios = () => {
     createAudio({ audioName: 'activity_craft_win' });
     /* BGM */
     createAudio({ audioName: 'bgm_map1' });
-    createAudio({ audioName: 'bgm_menu' });
+    createAudio({ audioName: 'bgm_menu1' });
+    createAudio({ audioName: 'bgm_menu2' });
     /* ENERGY */
     createAudio({ audioName: 'energy_gain' });
     /* INVENTORY */
@@ -106,12 +109,17 @@ export const playAudio = ({ audioName, loop = false, volume = 1 }: {
     loop?: boolean,
     volume?: number
 }) => {
+    const managerEntityId = getStore('managerId')
+        ?? error({ message: 'Store managerId is undefined', where: playAudio.name });
+
+    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
+
     const audio = audios.find(audio => audio.src.includes(audioName))
         ?? error({ message: `Audio ${audioName} not found`, where: playAudio.name });
 
     audio.currentTime = 0;
     audio.loop = loop;
-    audio.volume = volume;
+    audio.volume = volume * manager.settings._audioVolume;
 
     audio.play();
 };
@@ -129,5 +137,19 @@ export const stopAudio = ({ audioName }: { audioName: string }) => {
 
     audio.pause();
     audio.currentTime = 0;
+};
+
+export const setVolumeAudio = ({ audioName, volume }: { audioName?: string, volume: number }) => {
+    if (audioName) {
+        const audio = audios.find(audio => audio.src.includes(audioName))
+            ?? error({ message: `Audio ${audioName} not found`, where: playAudio.name });
+
+        audio.volume = volume;
+    }
+    else {
+        const audioLoops = audios.filter(audio => audio.loop);
+
+        audioLoops.forEach(audio => audio.volume = volume);
+    }
 };
 //#endregion

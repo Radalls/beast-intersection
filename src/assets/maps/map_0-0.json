@@ -118,14 +118,14 @@
         { "type": "ResourceItem", "items": [{ "name": "Flower2", "rate": 1 }], "x": 4, "y": 0 },
         { "type": "ResourceItem", "items": [{ "name": "Flower2", "rate": 1 }], "x": 7, "y": 1 },
         { "type": "ResourceItem", "items": [{ "name": "Flower2", "rate": 1 }], "x": 8, "y": 2 },
-        { "type": "ResourceFish", "items": [{ "name": "Fish2", "rate": 0.6 }, { "name": "Fish3", "rate": 0.25 }, { "name": "Fish5", "rate": 0.1 }], "x": 0, "y": 3 },
+        { "type": "ResourceFish", "items": [{ "name": "Fish2", "rate": 0.4 }, { "name": "Fish3", "rate": 0.3 }, { "name": "Fish5", "rate": 0.3 }], "x": 0, "y": 3 },
         { "type": "ResourceItem", "items": [{ "name": "Rock1", "rate": 0.6 }, { "name": "Seashell1", "rate": 0.4 }], "x": 1, "y": 4 },
         { "type": "ResourceItem", "items": [{ "name": "Rock1", "rate": 0.6 }, { "name": "Seashell1", "rate": 0.4 }], "x": 2, "y": 6 },
         { "type": "ResourceItem", "items": [{ "name": "Rock1", "rate": 0.6 }, { "name": "Seashell1", "rate": 0.4 }], "x": 3, "y": 7 },
         { "type": "ResourceItem", "items": [{ "name": "Rock1", "rate": 0.6 }, { "name": "Seashell1", "rate": 0.4 }], "x": 8, "y": 7 },
-        { "type": "ResourceFish", "items": [{ "name": "Fish2", "rate": 0.6 }, { "name": "Fish3", "rate": 0.25 }, { "name": "Fish5", "rate": 0.1 }], "x": 5, "y": 7 },
-        { "type": "ResourceFish", "items": [{ "name": "Fish2", "rate": 0.6 }, { "name": "Fish3", "rate": 0.25 }, { "name": "Fish5", "rate": 0.1 }], "x": 8, "y": 8 },
+        { "type": "ResourceFish", "items": [{ "name": "Fish2", "rate": 0.4 }, { "name": "Fish3", "rate": 0.3 }, { "name": "Fish5", "rate": 0.3 }], "x": 5, "y": 7 },
+        { "type": "ResourceFish", "items": [{ "name": "Fish2", "rate": 0.4 }, { "name": "Fish3", "rate": 0.3 }, { "name": "Fish5", "rate": 0.3 }], "x": 8, "y": 8 },
         { "type": "ResourceItem", "items": [{ "name": "Rock1", "rate": 0.6 }, { "name": "Seashell1", "rate": 0.4 }], "x": 2, "y": 9 },
-        { "type": "ResourceFish", "items": [{ "name": "Fish2", "rate": 0.6 }, { "name": "Fish3", "rate": 0.25 }, { "name": "Fish5", "rate": 0.1 }], "x": 4, "y": 9 }
+        { "type": "ResourceFish", "items": [{ "name": "Fish2", "rate": 0.4 }, { "name": "Fish3", "rate": 0.3 }, { "name": "Fish5", "rate": 0.3 }], "x": 4, "y": 9 }
     ]
 }

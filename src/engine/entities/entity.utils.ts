@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 
-import { entities, getComponent, PLAYER_ENTITY_NAME } from './entity.manager';
+import { entities, getComponent, MANAGER_ENTITY_NAME, PLAYER_ENTITY_NAME, TILEMAP_ENTITY_NAME } from './entity.manager';
 
 import { Component } from '@/engine/components/@component';
 import { error } from '@/engine/services/error';
@@ -17,6 +17,18 @@ export const isPlayer = ({ entityId, strict }: { entityId: string, strict?: bool
     return (strict)
         ? entityId === getStore('playerId')
         : entityId.includes(PLAYER_ENTITY_NAME);
+};
+
+export const isManager = ({ entityId, strict }: { entityId: string, strict?: boolean }) => {
+    return (strict)
+        ? entityId === getStore('managerId')
+        : entityId.includes(MANAGER_ENTITY_NAME);
+};
+
+export const isTileMap = ({ entityId, strict }: { entityId: string, strict?: boolean }) => {
+    return (strict)
+        ? entityId === getStore('tileMapId')
+        : entityId.includes(TILEMAP_ENTITY_NAME);
 };
 
 export const getRawEntityId = ({ entityId }: { entityId: string }) => entityId.split('-')[0];

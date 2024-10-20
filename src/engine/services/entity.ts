@@ -68,6 +68,7 @@ export const createEntityPlayer = ({
 }) => {
     const entityId = createEntity({ entityName: PLAYER_ENTITY_NAME });
 
+    addState({ entityId, load: true });
     addSprite({ entityId, height: spriteHeight, image: spritePath, width: spriteWidth });
     addPosition({ entityId, savedPosition, x: positionX, y: positionY });
     addInventory({ entityId, maxSlots: inventoryMaxSlots, savedInventory });
