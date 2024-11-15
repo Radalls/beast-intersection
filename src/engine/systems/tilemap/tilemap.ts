@@ -7,6 +7,8 @@ import {
     getTargetXY,
     exitTile,
     soundTile,
+    loadTileMapEntities,
+    generateTileMapPlaceEntities,
 } from './tilemap.utils';
 
 import { getComponent, checkComponent } from '@/engine/entities';
@@ -14,16 +16,21 @@ import { error } from '@/engine/services/error';
 import { EventTypes } from '@/engine/services/event';
 import { getStore } from '@/engine/services/store';
 import { setCollider, checkCollider } from '@/engine/systems/collider';
+import { getTileMapState } from '@/engine/systems/manager';
 import { updatePosition } from '@/engine/systems/position';
 import { updateSpriteDirection } from '@/engine/systems/sprite';
 import { setTrigger } from '@/engine/systems/trigger';
 import { event } from '@/render/events';
 
 //#region SYSTEMS
-export const generateTileMap = ({ tileMapEntityId, tileMapName }: {
+export const generateTileMap = ({ tileMapEntityId, managerEntityId, tileMapName }: {
+    managerEntityId?: string | null
     tileMapEntityId?: string | null
     tileMapName: string,
 }) => {
+    if (!(managerEntityId)) managerEntityId = getStore('managerId')
+        ?? error({ message: 'Store managerId is undefined', where: generateTileMap.name });
+
     if (!(tileMapEntityId)) tileMapEntityId = getStore('tileMapId')
         ?? error({ message: 'Store tileMapId is undefined', where: generateTileMap.name });
 
@@ -38,8 +45,23 @@ export const generateTileMap = ({ tileMapEntityId, tileMapName }: {
 
     event({ type: EventTypes.TILEMAP_CREATE });
 
-    generateTileMapTiles({ tileMapData, tileMapEntityId });
-    generateTileMapEntities({ tileMapData });
+    const tileMapState = getTileMapState({ managerEntityId, tileMapName });
+    if (tileMapState) {
+        if (tileMapState.source === 'game') {
+            tileMap.tiles = tileMapState.tiles;
+
+            loadTileMapEntities({ tileMapEntityId });
+        }
+        else if (tileMapState.source === 'save') {
+            generateTileMapTiles({ tileMapEntityId });
+            generateTileMapEntities({ tileMapEntityId });
+            generateTileMapPlaceEntities({ managerEntityId, tileMapEntityId });
+        }
+    }
+    else {
+        generateTileMapTiles({ tileMapEntityId });
+        generateTileMapEntities({ tileMapEntityId });
+    }
 };
 
 export const setTile = ({ tileMapEntityId, entityId }: {
@@ -55,6 +77,8 @@ export const setTile = ({ tileMapEntityId, entityId }: {
         x: entityPosition._x,
         y: entityPosition._y,
     }) ?? error({ message: `Tile (${entityPosition._x}-${entityPosition._y}) does not exist`, where: setTile.name });
+
+    if (targetTile._entityIds.includes(entityId)) return;
 
     targetTile._entityIds.push(entityId);
 

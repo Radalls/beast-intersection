@@ -21,7 +21,7 @@ import {
 import { onAudioPlay, onAudioStop } from './event.audio';
 import { onDialogEnd, onDialogNext, onDialogStart } from './event.dialog';
 import { onEnergyCreate, onEnergyDisplay, onEnergyUpdate } from './event.energy';
-import { onError, onLoadingDisplay } from './event.global';
+import { onCameraUpdate, onError, onLoadingDisplay } from './event.global';
 import {
     onInventoryCreate,
     onInventoryDisplay,
@@ -41,11 +41,10 @@ import {
     onSettingsMenuUpdate,
 } from './event.menu';
 import { onQuestComplete, onQuestEnd, onQuestsDisplay, onQuestStart } from './event.quest';
-import { onTileMapCreate, onTileMapTileCreate, onTileMapTileDestroy } from './event.tilemap';
+import { onTileMapCreate } from './event.tilemap';
 import {
     checkAudioData,
     checkErrorData,
-    checkTileData,
     onEntityCreate,
     onEntityDestroy,
     onEntityDisplay,
@@ -125,6 +124,7 @@ export const event = <T extends keyof Component>(event: Event<T>) => {
         onLoadingDisplay({ display: event.type === EventTypes.MAIN_LOADING_ON });
     }
     else if (event.type === EventTypes.MAIN_ERROR && checkErrorData(event.data)) onError({ error: event.data });
+    else if (event.type === EventTypes.MAIN_CAMERA_UPDATE) onCameraUpdate();
     /* Menu */
     else if (event.type === EventTypes.MENU_LAUNCH_DISPLAY) onLaunchMenuDisplay();
     else if (event.type === EventTypes.MENU_LAUNCH_UPDATE) onLaunchMenuUpdate();
@@ -138,12 +138,8 @@ export const event = <T extends keyof Component>(event: Event<T>) => {
     else if (event.type === EventTypes.QUEST_START) onQuestStart();
     /* Tilemap */
     else if (event.type === EventTypes.TILEMAP_CREATE) onTileMapCreate();
-    else if (event.type === EventTypes.TILEMAP_TILE_CREATE && checkTileData(event.data)) {
-        onTileMapTileCreate({ tile: event.data });
-    }
-    else if (event.type === EventTypes.TILEMAP_TILE_DESTROY && checkTileData(event.data)) {
-        onTileMapTileDestroy({ tile: event.data });
-    }
+    // else if (event.type === EventTypes.TILEMAP_TILE_CREATE) onTileMapTileCreate();
+    // else if (event.type === EventTypes.TILEMAP_TILE_DESTROY) onTileMapTileDestroy();
     else error({ message: `Unknown Event type: ${event.type}`, where: 'event' });
 };
 //#endregion

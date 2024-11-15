@@ -13,9 +13,7 @@ export const setEntityLoad = ({ entityId, value }: {
     state._load = value;
 
     if (state._load) {
-        setTimeout(() => {
-            event({ entityId, type: EventTypes.ENTITY_DISPLAY });
-        }, 1);
+        setTimeout(() => { event({ entityId, type: EventTypes.ENTITY_DISPLAY }); }, 1);
     }
     else {
         event({ entityId, type: EventTypes.ENTITY_DISPLAY });

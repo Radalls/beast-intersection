@@ -1,3 +1,4 @@
+import { createTileMapState, saveTileMapStates } from './manager';
 import { getProjectVersion } from './manager.utils';
 
 import { Energy } from '@/engine/components/energy';
@@ -44,6 +45,9 @@ export const createSave = ({ managerEntityId, playerEntityId, tileMapEntityId }:
 
     const tileMapName = getComponent({ componentId: 'TileMap', entityId: tileMapEntityId })._name
         ?? error({ message: 'TileMap name is undefined', where: createSave.name });
+
+    createTileMapState({ managerEntityId, tileMapEntityId });
+    saveTileMapStates({ managerEntityId });
 
     const saveData: SaveData = {
         manager,

@@ -5,11 +5,14 @@ const entityFiles: Record<string, { default: EntityData[] }>
 
 //#region TYPES
 export type EntityData = {
+    collider?: { x: number, y: number }[],
     cooldown?: number,
     data?: any,
+    height?: number,
     name?: string,
-    priority?: number,
-    type: string
+    trigger?: { x: number, y: number }[],
+    type: string,
+    width?: number,
 };
 //#endregion
 

@@ -2,7 +2,7 @@ import itemRecipes from '../../assets/items/item_recipes.json';
 
 import { createProgress, updateProgress } from './components/progress/progress';
 import { createElement, destroyElement } from './template';
-import { getElement, checkElement, getSpritePath } from './template.utils';
+import { getElement, checkElement, getSpritePath, searchElementsByClassName } from './template.utils';
 
 import {
     ActivityBugData,
@@ -13,6 +13,7 @@ import {
 import { getComponent } from '@/engine/entities';
 import { error } from '@/engine/services/error';
 import { getStore } from '@/engine/services/store';
+import { checkInventory } from '@/engine/systems/inventory';
 
 //#region CONSTANTS
 //#endregion
@@ -387,56 +388,66 @@ export const startSelectActivityCraft = () => {
     const activityEntityId = getStore('activityId')
         ?? error({ message: 'Store activityId is undefined', where: startSelectActivityCraft.name });
 
-    const activityCraft = getElement({ elementId: `${activityEntityId}-ActivityCraft` });
+    const activityElement = getElement({ elementId: `${activityEntityId}-ActivityCraft` });
 
-    const recipes = createElement({
+    const managerEntityId = getStore('managerId')
+        ?? error({ message: 'Store managerId is undefined', where: startSelectActivityCraft.name });
+
+    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
+
+    const recipesElement = createElement({
         elementAbsolute: false,
         elementClass: 'activity-craft-recipes',
         elementId: `${activityEntityId}-ActivityCraftRecipes`,
-        elementParent: activityCraft,
+        elementParent: activityElement,
         entityId: activityEntityId,
     });
 
-    for (let i = 0; i < itemRecipes.length; i++) {
-        const recipe = createElement({
+    if (!(manager.itemRecipes.length)) return;
+
+    for (const recipeName of manager.itemRecipes) {
+        const itemRecipe = itemRecipes.find((itemRecipe) => itemRecipe.name === recipeName)
+            ?? error({ message: 'Item recipe not found', where: startSelectActivityCraft.name });
+
+        const recipeElement = createElement({
             elementAbsolute: false,
             elementClass: 'activity-craft-recipe',
-            elementId: `${activityEntityId}-ActivityCraftRecipe-${i}`,
-            elementParent: recipes,
+            elementId: `${activityEntityId}-ActivityCraftRecipe-${itemRecipe.name}`,
+            elementParent: recipesElement,
             entityId: activityEntityId,
         });
 
         const recipeItem = createElement({
             elementAbsolute: false,
             elementClass: 'activity-craft-recipe-item',
-            elementId: `${activityEntityId}-ActivityCraftRecipe-${i}-Item`,
-            elementParent: recipe,
+            elementId: `${activityEntityId}-ActivityCraftRecipe-${itemRecipe.name}-Item`,
+            elementParent: recipeElement,
             entityId: activityEntityId,
         });
 
         const recipeItemIcon = createElement({
             elementAbsolute: false,
             elementClass: 'activity-craft-recipe-item-icon',
-            elementId: `${activityEntityId}-ActivityCraftRecipe-${i}-ItemIcon`,
+            elementId: `${activityEntityId}-ActivityCraftRecipe-${itemRecipe.name}-ItemIcon`,
             elementParent: recipeItem,
             entityId: activityEntityId,
         });
         recipeItemIcon.style.backgroundImage
-            = `url(${getSpritePath({ spriteName: `item_${itemRecipes[i].name.toLowerCase()}` })})`;
+            = `url(${getSpritePath({ spriteName: `item_${itemRecipe.name.toLowerCase()}` })})`;
 
         const recipeIngredients = createElement({
             elementAbsolute: false,
             elementClass: 'activity-craft-recipe-ingredients',
-            elementId: `${activityEntityId}-ActivityCraftRecipe-${i}-Ingredients`,
-            elementParent: recipe,
+            elementId: `${activityEntityId}-ActivityCraftRecipe-${itemRecipe.name}-Ingredients`,
+            elementParent: recipeElement,
             entityId: activityEntityId,
         });
 
-        for (let j = 0; j < itemRecipes[i].ingredients.length; j++) {
+        for (const ingredient of itemRecipe.ingredients) {
             const recipeIngredient = createElement({
                 elementAbsolute: false,
                 elementClass: 'activity-craft-recipe-ingredient',
-                elementId: `${activityEntityId}-ActivityCraftRecipe-${i}-Ingredient-${j}`,
+                elementId: `${activityEntityId}-ActivityCraftRecipe-${itemRecipe.name}-Ingredient-${ingredient.name}`,
                 elementParent: recipeIngredients,
                 entityId: activityEntityId,
             });
@@ -444,21 +455,39 @@ export const startSelectActivityCraft = () => {
             const recipeIngredientIcon = createElement({
                 elementAbsolute: false,
                 elementClass: 'activity-craft-recipe-ingredient-icon',
-                elementId: `${activityEntityId}-ActivityCraftRecipe-${i}-Ingredient-${j}-Icon`,
+                elementId: `${activityEntityId}-ActivityCraftRecipe-
+                    ${itemRecipe.name}-Ingredient-${ingredient.name}-Icon`,
                 elementParent: recipeIngredient,
                 entityId: activityEntityId,
             });
             recipeIngredientIcon.style.backgroundImage
-                = `url(${getSpritePath({ spriteName: `item_${itemRecipes[i].ingredients[j].name.toLowerCase()}` })})`;
+                = `url(${getSpritePath({ spriteName: `item_${ingredient.name.toLowerCase()}` })})`;
+
+            const recipeIngredientCheck = createElement({
+                elementClass: 'activity-craft-recipe-ingredient-check',
+                elementId: `${activityEntityId}-ActivityCraftRecipe-
+                    ${itemRecipe.name}-Ingredient-${ingredient.name}-Check`,
+                elementParent: recipeIngredientIcon,
+                entityId: activityEntityId,
+            });
+            recipeIngredientCheck.innerText = (checkInventory({
+                items: [{
+                    amount: ingredient.amount,
+                    name: ingredient.name,
+                }],
+            }))
+                ? '✔️'
+                : '';
 
             const activityCraftRecipeIngredientAmount = createElement({
                 elementAbsolute: false,
                 elementClass: 'activity-craft-recipe-ingredient-amount',
-                elementId: `${activityEntityId}-ActivityCraftRecipe-${i}-Ingredient-${j}-Amount`,
+                elementId: `${activityEntityId}-ActivityCraftRecipe-
+                    ${itemRecipe.name}-Ingredient-${ingredient.name}-Amount`,
                 elementParent: recipeIngredient,
                 entityId: activityEntityId,
             });
-            activityCraftRecipeIngredientAmount.innerText = `x${itemRecipes[i].ingredients[j].amount}`;
+            activityCraftRecipeIngredientAmount.innerText = `x${ingredient.amount}`;
         }
     }
 
@@ -471,19 +500,12 @@ export const updateSelectActivityCraft = () => {
 
     const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
 
-    const activityEntityId = getStore('activityId')
-        ?? error({ message: 'Store activityId is undefined', where: updateSelectActivityCraft.name });
-
-    const activityCraftRecipes = getElement({ elementId: `${activityEntityId}-ActivityCraftRecipes` });
-
-    for (let i = 0; i < activityCraftRecipes.children.length; i++) {
-        const activityCraftRecipe = getElement({ elementId: `${activityEntityId}-ActivityCraftRecipe-${i}` });
-        activityCraftRecipe.style.border = 'solid 4px rgb(91, 48, 38)';
+    const activityCraftRecipes = searchElementsByClassName({ className: 'activity-craft-recipe' });
+    for (const recipe of activityCraftRecipes) {
+        recipe.style.border = 'solid 4px rgb(91, 48, 38)';
     }
 
-    const selectedActivityCraftRecipe =
-        getElement({ elementId: `${activityEntityId}-ActivityCraftRecipe-${manager._selectedCraftRecipe}` });
-    selectedActivityCraftRecipe.style.border = 'solid 4px rgb(255, 241, 216)';
+    activityCraftRecipes[manager._selectedCraftRecipe].style.border = 'solid 4px rgb(255, 241, 216)';
 };
 
 export const endSelectActivityCraft = () => {

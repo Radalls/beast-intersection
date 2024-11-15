@@ -3,11 +3,12 @@ import { destroyInventory } from './template.inventory';
 import { destroyQuestMenu } from './template.quest';
 import { getElement, getSpritePath } from './template.utils';
 
-import { getComponent, getRawEntityId, isPlayer } from '@/engine/entities';
+import { getComponent, getRawEntityId, isPlace, isPlayer } from '@/engine/entities';
 import { error } from '@/engine/services/error';
+import { getStore } from '@/engine/services/store';
 
 //#region CONSTANTS
-export const TILE_PIXEL_SIZE = 64;
+export const TILE_PIXEL_SIZE = 96;
 
 type ElementData =
     | {
@@ -71,6 +72,27 @@ export const destroyElement = ({ elementId }: { elementId: string }) => {
     element.remove();
 };
 
+export const updateCamera = () => {
+    const playerEntityId = getStore('playerId')
+        ?? error({ message: 'Store playerId is undefined', where: updateCamera.name });
+
+    const playerPosition = getComponent({ componentId: 'Position', entityId: playerEntityId });
+
+    const tileMapEntityId = getStore('tileMapId')
+        ?? error({ message: 'Store tileMapId is undefined', where: updateCamera.name });
+
+    const tilemapElement = getElement({ elementId: tileMapEntityId });
+
+    const offsetX = -(playerPosition._x * TILE_PIXEL_SIZE + TILE_PIXEL_SIZE / 2);
+    const offsetY = -(playerPosition._y * TILE_PIXEL_SIZE);
+
+    updatePosition({ elementId: playerEntityId });
+
+    setTimeout(() => {
+        tilemapElement.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+    }, 1);
+};
+
 export const updatePosition = ({ elementId }: { elementId: string }) => {
     const position = getComponent({ componentId: 'Position', entityId: elementId });
 
@@ -80,7 +102,9 @@ export const updatePosition = ({ elementId }: { elementId: string }) => {
     element.style.top = `${position._y * TILE_PIXEL_SIZE
         - (((parseInt(element.style.height) / TILE_PIXEL_SIZE) - 1) * TILE_PIXEL_SIZE)}px`;
 
-    element.style.zIndex = `${position._y + 1}`;
+    element.style.zIndex = (isPlayer({ entityId: elementId }) || isPlace({ entityId: elementId }))
+        ? `${position._y - 1}`
+        : `${position._y}`;
 };
 
 export const createSprite = ({ elementId }: { elementId: string }) => {

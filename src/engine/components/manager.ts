@@ -1,3 +1,5 @@
+import { TileMapState } from './tilemap';
+
 import { Quest } from '@/engine/systems/manager';
 
 export type Manager = {
@@ -8,9 +10,11 @@ export type Manager = {
     _selectedLaunchOption: number,
     _selectedQuest: number,
     _selectedSetting: number,
+    itemRecipes: string[],
     quests: Quest[],
     questsDone: Quest[],
     settings: ManagerSettings,
+    tileMapStates: TileMapState[],
 };
 
 type ManagerSettings = {

@@ -184,10 +184,11 @@ export const addItemToInventory = ({ entityId, item, itemAmount }: {
     return { amountRemaining: itemAmount, success: false };
 };
 
-export const removeItemFromInventory = ({ entityId, itemName, itemAmount }: {
+export const removeItemFromInventory = ({ entityId, itemName, itemAmount, slotIndex }: {
     entityId?: string | null,
     itemAmount: number,
-    itemName: string
+    itemName: string,
+    slotIndex?: number,
 }): boolean => {
     if (!(entityId)) entityId = getStore('playerId')
         ?? error({ message: 'Store playerId is undefined', where: removeItemFromInventory.name });
@@ -197,35 +198,47 @@ export const removeItemFromInventory = ({ entityId, itemName, itemAmount }: {
     }
 
     const inventory = getComponent({ componentId: 'Inventory', entityId });
-    const slotsWithItem = findInventorySlotsWithItem({ inventory, itemName });
-    if (slotsWithItem.length === 0) {
-        return false;
-    }
 
-    const itemAmountInInventory = slotsWithItem.reduce((acc, slot) => acc + slot._amount, 0);
-    if (itemAmountInInventory < itemAmount) {
-        return false;
-    }
-
-    const slotsToRemove: number[] = [];
-    for (const slot of slotsWithItem) {
-        if (itemAmount === 0) {
-            break;
-        }
+    if (slotIndex) {
+        const slot = inventory.slots[slotIndex];
         if (slot._amount <= itemAmount) {
-            itemAmount -= slot._amount;
-            slotsToRemove.push(inventory.slots.indexOf(slot));
-        } else {
+            removeInventorySlots({ inventory, slotsToRemove: [slotIndex] });
+        }
+        else {
             slot._amount -= itemAmount;
-            itemAmount = 0;
         }
     }
+    else {
+        const slotsWithItem = findInventorySlotsWithItem({ inventory, itemName });
+        if (slotsWithItem.length === 0) {
+            return false;
+        }
 
-    if (itemAmount !== 0) {
-        return false;
+        const itemAmountInInventory = slotsWithItem.reduce((acc, slot) => acc + slot._amount, 0);
+        if (itemAmountInInventory < itemAmount) {
+            return false;
+        }
+
+        const slotsToRemove: number[] = [];
+        for (const slot of slotsWithItem) {
+            if (itemAmount === 0) {
+                break;
+            }
+            if (slot._amount <= itemAmount) {
+                itemAmount -= slot._amount;
+                slotsToRemove.push(inventory.slots.indexOf(slot));
+            } else {
+                slot._amount -= itemAmount;
+                itemAmount = 0;
+            }
+        }
+
+        if (itemAmount !== 0) {
+            return false;
+        }
+
+        removeInventorySlots({ inventory, slotsToRemove });
     }
-
-    removeInventorySlots({ inventory, slotsToRemove });
 
     event({ type: EventTypes.INVENTORY_UPDATE });
 
@@ -241,8 +254,8 @@ export const activateInventoryTool = ({ entityId }: {
     const inventory = getComponent({ componentId: 'Inventory', entityId });
 
     if (!(inventory.tools.length)) {
-        event({ data: { audioName: 'inventory_tool_empty' }, type: EventTypes.AUDIO_PLAY });
         event({ data: { message: 'Je n\'ai pas d\'outils' }, type: EventTypes.MAIN_ERROR });
+        event({ data: { audioName: 'inventory_tool_empty' }, type: EventTypes.AUDIO_PLAY });
 
         throw error({
             message: 'No tools in inventory',

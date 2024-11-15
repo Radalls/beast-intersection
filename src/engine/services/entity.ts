@@ -15,6 +15,7 @@ import {
     addState,
     addResourcePlace,
 } from './component';
+import { EventTypes } from './event';
 
 import { Energy } from '@/engine/components/energy';
 import { Inventory } from '@/engine/components/inventory';
@@ -23,6 +24,7 @@ import { Position } from '@/engine/components/position';
 import { createEntity, MANAGER_ENTITY_NAME, PLAYER_ENTITY_NAME, TILEMAP_ENTITY_NAME } from '@/engine/entities';
 import { getStore } from '@/engine/services/store';
 import { generateTileMap, setTile } from '@/engine/systems/tilemap';
+import { event } from '@/render/events';
 
 //#region SERVICES
 export const createEntityTileMap = ({ tileMapName }: { tileMapName: string }) => {
@@ -69,12 +71,14 @@ export const createEntityPlayer = ({
     const entityId = createEntity({ entityName: PLAYER_ENTITY_NAME });
 
     addState({ entityId, load: true });
-    addSprite({ entityId, height: spriteHeight, image: spritePath, width: spriteWidth });
+    addSprite({ direction: 'down', entityId, height: spriteHeight, image: spritePath, width: spriteWidth });
     addPosition({ entityId, savedPosition, x: positionX, y: positionY });
     addInventory({ entityId, maxSlots: inventoryMaxSlots, savedInventory });
     addEnergy({ current: energyMax, entityId, max: energyMax, savedEnergy });
 
     setTile({ entityId });
+
+    event({ entityId, type: EventTypes.MAIN_CAMERA_UPDATE });
 };
 
 export const createEntityNpc = ({
@@ -84,15 +88,17 @@ export const createEntityNpc = ({
     spritePath,
     positionX,
     positionY,
-    triggerPriority = 0,
+    trigger,
+    collider,
 }: {
+    collider?: { x: number, y: number }[],
     entityName: string,
     positionX: number,
     positionY: number,
     spriteHeight?: number,
     spritePath: string,
     spriteWidth?: number,
-    triggerPriority?: number,
+    trigger?: { x: number, y: number }[],
 }) => {
     const entityId = createEntity({ entityName });
 
@@ -100,16 +106,11 @@ export const createEntityNpc = ({
     addSprite({ entityId, height: spriteHeight, image: spritePath, width: spriteWidth });
     addPosition({ entityId, x: positionX, y: positionY });
     addDialog({ entityId });
-    addCollider({ entityId });
+    addCollider({ entityId, points: collider });
     addTrigger({
         entityId,
-        points: [
-            { x: -1, y: 0 },
-            { x: 0, y: -1 },
-            { x: 1, y: 0 },
-            { x: 0, y: 1 },
-        ],
-        priority: triggerPriority,
+        points: trigger,
+        priority: 3,
     });
 
     setTile({ entityId });
@@ -141,7 +142,7 @@ export const createEntityResourceItem = ({
         entityId,
         load: true,
     });
-    const { resource, resourceData } = addResourceItem({
+    const { resource } = addResourceItem({
         entityId,
         items: resourceItems,
     });
@@ -153,7 +154,7 @@ export const createEntityResourceItem = ({
         width: spriteWidth,
     });
     addPosition({ entityId, x: positionX, y: positionY });
-    addTrigger({ entityId, priority: resourceData.priority });
+    addTrigger({ entityId, priority: 2 });
 
     setTile({ entityId });
 };
@@ -176,20 +177,17 @@ export const createEntityResourceBug = ({
     const entityId = createEntity({ entityName });
 
     addState({ cooldown: false, entityId, load: true });
-    const { resourceData } = addResourceBug({
-        entityId,
-        items: resourceItems,
-    });
+    addResourceBug({ entityId, items: resourceItems });
 
     addSprite({
         entityId,
         gif: true,
         height: spriteHeight,
-        image: 'resource_bug',
+        image: 'resource_bug', //TODO: temp
         width: spriteWidth,
     });
     addPosition({ entityId, x: positionX, y: positionY });
-    addTrigger({ entityId, priority: resourceData.priority });
+    addTrigger({ entityId, priority: 1 });
 
     setTile({ entityId });
 };
@@ -212,12 +210,15 @@ export const createEntityResourceFish = ({
     const entityId = createEntity({ entityName });
 
     addState({ cooldown: false, entityId, load: true });
-    const { resourceData } = addResourceFish({
-        entityId,
-        items: resourceItems,
-    });
+    addResourceFish({ entityId, items: resourceItems });
 
-    addSprite({ entityId, gif: true, height: spriteHeight, image: 'resource_fish', width: spriteWidth });
+    addSprite({
+        entityId,
+        gif: true,
+        height: spriteHeight,
+        image: 'resource_fish', //TODO: temp
+        width: spriteWidth,
+    });
     addPosition({ entityId, x: positionX, y: positionY });
     addCollider({ entityId });
     addTrigger({
@@ -228,7 +229,7 @@ export const createEntityResourceFish = ({
             { x: 1, y: 0 },
             { x: 0, y: 1 },
         ],
-        priority: resourceData.priority,
+        priority: 1,
     });
 
     setTile({ entityId });
@@ -241,15 +242,17 @@ export const createEntityResourceCraft = ({
     spritePath,
     positionX,
     positionY,
-    triggerPriority = 0,
+    trigger,
+    collider,
 }: {
+    collider?: { x: number, y: number }[],
     entityName: string,
     positionX: number,
     positionY: number,
     spriteHeight?: number,
     spritePath: string,
     spriteWidth?: number,
-    triggerPriority?: number,
+    trigger?: { x: number, y: number }[],
 }) => {
     const entityId = createEntity({ entityName });
 
@@ -258,17 +261,8 @@ export const createEntityResourceCraft = ({
 
     addSprite({ entityId, height: spriteHeight, image: spritePath, width: spriteWidth });
     addPosition({ entityId, x: positionX, y: positionY });
-    addCollider({ entityId });
-    addTrigger({
-        entityId,
-        points: [
-            { x: -1, y: 0 },
-            { x: 0, y: -1 },
-            { x: 1, y: 0 },
-            { x: 0, y: 1 },
-        ],
-        priority: triggerPriority,
-    });
+    addCollider({ entityId, points: collider });
+    addTrigger({ entityId, points: trigger, priority: 1 });
 
     setTile({ entityId });
 };
@@ -282,8 +276,10 @@ export const createEntityResourcePlace = ({
     positionX,
     positionY,
     stateActive = false,
-    triggerPriority = 0,
+    trigger,
+    collider,
 }: {
+    collider?: { x: number, y: number }[],
     entityName: string,
     itemName: string,
     positionX: number,
@@ -292,7 +288,7 @@ export const createEntityResourcePlace = ({
     spritePath: string,
     spriteWidth?: number,
     stateActive?: boolean
-    triggerPriority?: number,
+    trigger?: { x: number, y: number }[],
 }) => {
     const entityId = createEntity({ entityName });
 
@@ -307,17 +303,38 @@ export const createEntityResourcePlace = ({
 
     addSprite({ entityId, height: spriteHeight, image: spritePath, width: spriteWidth });
     addPosition({ entityId, x: positionX, y: positionY });
-    addCollider({ entityId });
-    addTrigger({
-        entityId,
-        points: [
-            { x: -1, y: 0 },
-            { x: 0, y: -1 },
-            { x: 1, y: 0 },
-            { x: 0, y: 1 },
-        ],
-        priority: triggerPriority,
-    });
+    addCollider({ entityId, points: collider });
+    addTrigger({ entityId, points: trigger, priority: 1 });
+
+    setTile({ entityId });
+};
+
+export const createEntityAsset = ({
+    entityName,
+    spriteHeight = 1,
+    spriteWidth = 1,
+    spritePath,
+    positionX,
+    positionY,
+    collider,
+}: {
+    collider?: { x: number, y: number }[],
+    entityName: string,
+    positionX: number,
+    positionY: number,
+    spriteHeight?: number,
+    spritePath: string,
+    spriteWidth?: number,
+}) => {
+    const entityId = createEntity({ entityName });
+
+    addState({ entityId, load: true });
+    addSprite({ entityId, height: spriteHeight, image: spritePath, width: spriteWidth });
+    addPosition({ entityId, x: positionX, y: positionY });
+
+    if (collider) {
+        addCollider({ entityId, points: collider });
+    }
 
     setTile({ entityId });
 };

@@ -31,6 +31,10 @@ export const isTileMap = ({ entityId, strict }: { entityId: string, strict?: boo
         : entityId.includes(TILEMAP_ENTITY_NAME);
 };
 
+export const isPlace = ({ entityId }: { entityId: string }) => {
+    return entityId.includes('Place');
+};
+
 export const getRawEntityId = ({ entityId }: { entityId: string }) => entityId.split('-')[0];
 
 export const findEntityByName = ({ entityName }: { entityName: string }) => {

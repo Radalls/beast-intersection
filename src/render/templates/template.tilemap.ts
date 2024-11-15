@@ -1,7 +1,6 @@
 import { createElement, TILE_PIXEL_SIZE } from './template';
 import { getElement, getSpritePath } from './template.utils';
 
-import { Tile } from '@/engine/components/tilemap';
 import { getComponent } from '@/engine/entities';
 import { error } from '@/engine/services/error';
 import { getStore } from '@/engine/services/store';
@@ -24,23 +23,21 @@ export const createTileMap = () => {
 
     tileMapElement.style.width = `${tileMap._width * TILE_PIXEL_SIZE}px`;
     tileMapElement.style.height = `${tileMap._height * TILE_PIXEL_SIZE}px`;
-};
 
-export const createTileMapTile = ({ tile }: { tile: Tile }) => {
-    const tileMapEntityId = getStore('tileMapId')
-        ?? error({ message: 'Store tileMapId is undefined', where: createTileMapTile.name });
+    for (let y = 0; y < tileMap._height; y += 10) {
+        for (let x = 0; x < tileMap._width; x += 10) {
+            const tileMapChunkElement = createElement({
+                elementAbsolute: false,
+                elementClass: 'tilemap-chunk',
+                elementId: `${tileMapEntityId}-${x}-${y}`,
+                elementParent: tileMapElement,
+                entityId: tileMapEntityId,
+            });
 
-    const tileMapElement = getElement({ elementId: tileMapEntityId });
-
-    const tileElement = createElement({
-        elementClass: 'tile',
-        elementId: `${tileMapEntityId}-tile-${tile.position._x}-${tile.position._y}`,
-        elementParent: tileMapElement,
-        entityId: tileMapEntityId,
-    });
-
-    tileElement.style.left = `${tile.position._x * TILE_PIXEL_SIZE}px`;
-    tileElement.style.top = `${tile.position._y * TILE_PIXEL_SIZE}px`;
-    tileElement.style.backgroundImage = `url(${getSpritePath({ spriteName: tile.sprite._image })})`;
+            tileMapChunkElement.style.backgroundImage = `url(${getSpritePath({
+                spriteName: `${tileMap._name}_${y / 10}-${x / 10}`,
+            })})`;
+        }
+    }
 };
 //#endregion

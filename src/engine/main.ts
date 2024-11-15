@@ -5,6 +5,12 @@ import { initState, setState } from '@/engine/services/state';
 import { initQuest, SaveData } from '@/engine/systems/manager';
 import { event } from '@/render/events';
 
+const playerInit = {
+    initMap: 'map_plains',
+    initPositionX: 58,
+    initPositionY: 31,
+};
+
 export const main = () => {
     launch();
 };
@@ -23,16 +29,16 @@ export const run = ({ saveData }: { saveData?: SaveData }) => {
     createEntityTileMap({
         tileMapName: (saveData?.tileMapName)
             ? saveData.tileMapName
-            : 'map_0-0',
+            : playerInit.initMap,
     });
 
     createEntityPlayer({
         positionX: (saveData?.playerPosition)
             ? undefined
-            : 3,
+            : playerInit.initPositionX,
         positionY: (saveData?.playerPosition)
             ? undefined
-            : 3,
+            : playerInit.initPositionY,
         savedEnergy: saveData?.playerEnergy,
         savedInventory: saveData?.playerInventory,
         savedPosition: saveData?.playerPosition,

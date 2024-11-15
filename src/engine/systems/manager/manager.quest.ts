@@ -31,6 +31,7 @@ export type QuestData = {
         amount: number,
         name: string,
     }[],
+    recipes?: string[],
     talk?: string,
 };
 
@@ -67,6 +68,14 @@ export const createQuest = ({ questData, managerEntityId }: {
         ?? error({ message: 'Store managerId is undefined', where: createQuest.name });
 
     const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
+
+    if (questData.recipes) {
+        for (const recipe of questData.recipes) {
+            if (!(manager.itemRecipes.find((itemRecipe) => itemRecipe === recipe))) {
+                manager.itemRecipes.push(recipe);
+            }
+        }
+    }
 
     const quest: Quest = {
         completed: false,

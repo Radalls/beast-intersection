@@ -23,7 +23,7 @@ export type TileMapData = {
             y: number
         }[],
         solid?: boolean,
-        sprite: string,
+        sound?: string,
         x: number,
         y: number
     }[],

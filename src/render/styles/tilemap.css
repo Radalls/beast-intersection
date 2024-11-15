@@ -1,10 +1,12 @@
 .tilemap {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
     left: 50%;
     top: 50%;
-    transform: translate(-50%, -50%);
+    transition: 0.2s transform;
 }
 
-.tile {
-    height: 64px;
-    width: 64px;
+.tilemap-chunk {
+    width: 960px;
+    height: 960px;
 }

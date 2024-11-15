@@ -4,12 +4,12 @@ import { findItemRule, itemIsEnergy, itemIsPlace } from './inventory.data';
 import { Inventory, Item, Tool } from '@/engine/components/inventory';
 import { ResourceTypes } from '@/engine/components/resource';
 import { getComponent } from '@/engine/entities';
-import { createEntityResourcePlace, createEntityResourceItem } from '@/engine/services/entity';
 import { error } from '@/engine/services/error';
 import { EventTypes } from '@/engine/services/event';
 import { setState } from '@/engine/services/state';
 import { getStore } from '@/engine/services/store';
 import { gainEnergy } from '@/engine/systems/energy';
+import { placeResource } from '@/engine/systems/resource';
 import { event } from '@/render/events';
 
 //#region CONSTANTS
@@ -289,55 +289,10 @@ export const confirmPlayerInventorySlotOption = ({ managerEntityId, playerEntity
     else if (itemIsPlace({ itemName: selectedItem.info._name })) inventoryOptions = INVENTORY_SLOT_OPTIONS_PLACE;
 
     if (inventoryOptions[manager._selectedInventorySlotOption] === INVENTORY_SLOT_OPTIONS_ENERGY[0]) {
-        if (!(itemIsEnergy({ itemName: selectedItem.info._name }))) throw error({
-            message: `Item ${selectedItem.info._name} is not an energy item`,
-            where: confirmPlayerInventorySlotOption.name,
-        });
-
-        const itemRule = findItemRule({ itemName: selectedItem.info._name });
-
-        gainEnergy({ amount: itemRule.energy ?? 1 });
-
-        removeItemFromInventory({
-            entityId: playerEntityId,
-            itemAmount: 1,
-            itemName: selectedItem.info._name,
-        });
+        useItemEnergy({ itemName: selectedItem.info._name, playerEntityId });
     }
     else if (inventoryOptions[manager._selectedInventorySlotOption] === INVENTORY_SLOT_OPTIONS_PLACE[0]) {
-        if (!(itemIsPlace({ itemName: selectedItem.info._name }))) throw error({
-            message: `Item ${selectedItem.info._name} is not a place item`,
-            where: confirmPlayerInventorySlotOption.name,
-        });
-
-        const itemRule = findItemRule({ itemName: selectedItem.info._name });
-        const playerPosition = getComponent({ componentId: 'Position', entityId: playerEntityId });
-
-        if (itemRule.resource === ResourceTypes.ITEM) {
-            createEntityResourceItem({
-                entityName: itemRule.name,
-                positionX: playerPosition._x,
-                positionY: playerPosition._y,
-                resourceItems: [{ name: itemRule.name, rate: 1 }],
-                stateCooldown: false,
-            });
-        }
-        else if (itemRule.resource === ResourceTypes.PLACE) {
-            createEntityResourcePlace({
-                entityName: itemRule.name,
-                itemName: itemRule.name,
-                positionX: playerPosition._x,
-                positionY: playerPosition._y,
-                spritePath: `resource_${itemRule.name.toLowerCase()}`,
-                stateActive: itemRule.active,
-            });
-        }
-
-        removeItemFromInventory({
-            entityId: playerEntityId,
-            itemAmount: 1,
-            itemName: selectedItem.info._name,
-        });
+        useItemPlace({ itemName: selectedItem.info._name, playerEntityId });
     }
     else if (
         inventoryOptions[manager._selectedInventorySlotOption]
@@ -347,6 +302,7 @@ export const confirmPlayerInventorySlotOption = ({ managerEntityId, playerEntity
             entityId: playerEntityId,
             itemAmount: 1,
             itemName: selectedItem.info._name,
+            slotIndex: manager._selectedInventorySlot,
         });
     }
     else if (
@@ -357,6 +313,7 @@ export const confirmPlayerInventorySlotOption = ({ managerEntityId, playerEntity
             entityId: playerEntityId,
             itemAmount: selectedSlot._amount,
             itemName: selectedItem.info._name,
+            slotIndex: manager._selectedInventorySlot,
         });
     }
 
@@ -365,6 +322,71 @@ export const confirmPlayerInventorySlotOption = ({ managerEntityId, playerEntity
     event({ type: EventTypes.INVENTORY_OPTION_DISPLAY });
     event({ type: EventTypes.INVENTORY_UPDATE });
     event({ data: { audioName: 'main_select' }, type: EventTypes.AUDIO_PLAY });
+};
+
+const useItemEnergy = ({ playerEntityId, managerEntityId, itemName }: {
+    itemName: string,
+    managerEntityId?: string | null,
+    playerEntityId?: string | null,
+}) => {
+    if (!(playerEntityId)) playerEntityId = getStore('playerId')
+        ?? error({ message: 'Store playerId is undefined', where: useItemEnergy.name });
+
+    if (!(managerEntityId)) managerEntityId = getStore('managerId')
+        ?? error({ message: 'Store managerId is undefined', where: useItemEnergy.name });
+
+    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
+
+    if (!(itemIsEnergy({ itemName }))) throw error({
+        message: `Item ${itemName} is not an energy item`,
+        where: useItemEnergy.name,
+    });
+
+    const itemRule = findItemRule({ itemName });
+
+    gainEnergy({ amount: itemRule.energy ?? 1 });
+
+    removeItemFromInventory({
+        entityId: playerEntityId,
+        itemAmount: 1,
+        itemName,
+        slotIndex: manager._selectedInventorySlot,
+    });
+};
+
+const useItemPlace = ({ playerEntityId, managerEntityId, itemName }: {
+    itemName: string,
+    managerEntityId?: string | null,
+    playerEntityId?: string | null,
+}) => {
+    if (!(playerEntityId)) playerEntityId = getStore('playerId')
+        ?? error({ message: 'Store playerId is undefined', where: useItemPlace.name });
+
+    if (!(managerEntityId)) managerEntityId = getStore('managerId')
+        ?? error({ message: 'Store managerId is undefined', where: useItemPlace.name });
+
+    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
+
+    if (!(itemIsPlace({ itemName }))) throw error({
+        message: `Item ${itemName} is not a place item`,
+        where: useItemPlace.name,
+    });
+
+    const itemRule = findItemRule({ itemName });
+
+    placeResource({
+        playerEntityId,
+        resourceActive: itemRule.active,
+        resourceName: itemRule.name,
+        resourceType: itemRule.resource,
+    });
+
+    removeItemFromInventory({
+        entityId: playerEntityId,
+        itemAmount: 1,
+        itemName,
+        slotIndex: manager._selectedInventorySlot,
+    });
 };
 
 export const closePlayerInventory = ({ playerEntityId }: { playerEntityId?: string | null }) => {

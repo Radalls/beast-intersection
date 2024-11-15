@@ -23,6 +23,7 @@
 
 .inventory-slot-amount {
     bottom: 3px;
+    color: rgb(255, 241, 216);
     font-size: 12px;
     height: 16px;
     padding: 0px 0px 2px 0px;
@@ -38,8 +39,9 @@
     display: none;
     flex-direction: column;
     padding: 8px;
-    right: 320px;
+    right: 330px;
     top: 484px;
+    z-index: 100;
 }
 
 .inventory-tools {

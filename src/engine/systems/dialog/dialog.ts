@@ -48,8 +48,8 @@ export const nextDialog = ({ entityId }: { entityId: string }) => {
             where: nextDialog.name,
         });
 
-    if (dialogPreviousText._value.includes('☕')) fillEnergy({}); // temp
-    if (dialogPreviousText._value.includes('🕵️‍♂️')) emptyPlayerInventory({}); // temp
+    if (dialogPreviousText._value.includes('☕')) fillEnergy({}); //TODO: temp
+    if (dialogPreviousText._value.includes('🕵️‍♂️')) emptyPlayerInventory({}); //TODO: temp
 
     if (entityDialog._currentOptionIndex !== undefined && isDialogTextOptionsSet(dialogPreviousText)) {
         entityDialog._currentTextId = dialogPreviousText._options?.[entityDialog._currentOptionIndex];
