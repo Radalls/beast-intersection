@@ -6,9 +6,7 @@
             "maxHp": 2,
             "maxNbErrors": 3,
             "symbolInterval": 2
-        },
-        "priority": 1,
-        "cooldown": 6000
+        }
     },
     {
         "type": "ResourceBug",
@@ -17,9 +15,7 @@
             "maxHp": 3,
             "maxNbErrors": 3,
             "symbolInterval": 2
-        },
-        "priority": 1,
-        "cooldown": 6000
+        }
     },
     {
         "type": "ResourceBug",
@@ -28,9 +24,7 @@
             "maxHp": 3,
             "maxNbErrors": 3,
             "symbolInterval": 1.5
-        },
-        "priority": 1,
-        "cooldown": 6000
+        }
     },
     {
         "type": "ResourceBug",
@@ -39,9 +33,7 @@
             "maxHp": 4,
             "maxNbErrors": 2,
             "symbolInterval": 1.5
-        },
-        "priority": 1,
-        "cooldown": 6000
+        }
     },
     {
         "type": "ResourceBug",
@@ -50,8 +42,6 @@
             "maxHp": 4,
             "maxNbErrors": 1,
             "symbolInterval": 1
-        },
-        "priority": 1,
-        "cooldown": 6000
+        }
     }
 ]

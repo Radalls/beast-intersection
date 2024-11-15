@@ -50,8 +50,8 @@ export const startActivityFish = ({ activityId, playerEntityId }: {
         ?? error({ message: 'Store playerId is undefined', where: startActivityFish.name });
 
     if (!(canPlay({ activity: activityResource._type, entityId: playerEntityId, strict: false }))) {
-        event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
         event({ data: { message: 'Je ne peux pas faire ça maintenant' }, type: EventTypes.MAIN_ERROR });
+        event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
 
         throw error({
             message: `Player can't play activity ${activityResource._type}`,
@@ -59,8 +59,8 @@ export const startActivityFish = ({ activityId, playerEntityId }: {
         });
     }
     if (playerInventoryFull({ item: activityResource.item })) {
-        event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
         event({ data: { message: 'Mon sac est plein' }, type: EventTypes.MAIN_ERROR });
+        event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
 
         throw error({
             message: `Player will not be able to get ${activityResource.item?.info._name}`,
@@ -90,19 +90,21 @@ export const updateActivityFish = ({ activityId }: { activityId: string }) => {
     const activityResource = getComponent({ componentId: 'Resource', entityId: activityId });
     const activityResourceData = getResourceData({ resourceEntityId: activityId });
 
+    //TODO: handle fishrod data
     activityResource.activityData = {
         _damage: activityResourceData.data.damage,
         _frenzyDuration: activityResourceData.data.frenzyDuration,
         _frenzyInterval: activityResourceData.data.frenzyInterval,
         _hp: activityResourceData.data.maxHp,
         _maxHp: activityResourceData.data.maxHp,
-        _rodDamage: 2, // temp
-        _rodMaxTension: 100, // temp
-        _rodTension: 0, // temp
+        _rodDamage: 2,
+        _rodMaxTension: 100,
+        _rodTension: 0,
     };
 
     const activityResourceTrigger = getComponent({ componentId: 'Trigger', entityId: activityId });
-    activityResourceTrigger._priority = activityResourceData.priority ?? 1;
+    //TODO: temp
+    activityResourceTrigger._priority = 1;
 };
 
 export const tickActivityFish = ({ activityId }: { activityId?: string | null }) => {

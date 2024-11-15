@@ -31,6 +31,7 @@ export const updateSpriteDirection = ({ entityId, target }: {
 
     const sprite = getComponent({ componentId: 'Sprite', entityId });
     sprite._image = `${getBaseSprite({ path: sprite._image })}_${target}`;
+    sprite._direction = target;
 
     event({ entityId, type: EventTypes.ENTITY_SPRITE_UPDATE });
 };

@@ -126,19 +126,19 @@ export const selectActivityCraftRecipe = ({ offset, activityId, managerEntityId 
 
     if (offset === -1) {
         if (manager._selectedCraftRecipe === 0) {
-            manager._selectedCraftRecipe = itemRecipes.length - 1;
+            manager._selectedCraftRecipe = manager.itemRecipes.length - 1;
         }
         else {
             manager._selectedCraftRecipe = Math.max(0, manager._selectedCraftRecipe - 1);
         }
     }
     else if (offset === 1) {
-        if (manager._selectedCraftRecipe === itemRecipes.length - 1) {
+        if (manager._selectedCraftRecipe === manager.itemRecipes.length - 1) {
             manager._selectedCraftRecipe = 0;
         }
         else {
             manager._selectedCraftRecipe = Math.min(
-                itemRecipes.length - 1,
+                manager.itemRecipes.length - 1,
                 manager._selectedCraftRecipe + 1,
             );
         }
@@ -178,8 +178,8 @@ export const confirmActivityCraftRecipe = ({ activityId, managerEntityId, player
         });
 
         if (playerHasTool) {
-            event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
             event({ data: { message: 'Je ne peux pas en avoir plus' }, type: EventTypes.MAIN_ERROR });
+            event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
 
             throw error({
                 message: `Player cannot craft more ${itemRecipes[manager._selectedCraftRecipe].name}`,
@@ -188,8 +188,8 @@ export const confirmActivityCraftRecipe = ({ activityId, managerEntityId, player
         }
 
         if (playerInventoryToolFull({ playerEntityId })) {
-            event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
             event({ data: { message: 'Mon sac est plein' }, type: EventTypes.MAIN_ERROR });
+            event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
 
             throw error({
                 message: 'Player inventory full',
@@ -199,8 +199,8 @@ export const confirmActivityCraftRecipe = ({ activityId, managerEntityId, player
     }
 
     if (!(canPlay({ entityId: playerEntityId, strict: false }))) {
-        event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
         event({ data: { message: 'Je suis trop fatigué pour ça' }, type: EventTypes.MAIN_ERROR });
+        event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
 
         throw error({
             message: `Not enough energy to craft ${itemRecipes[manager._selectedCraftRecipe].name}`,
@@ -212,8 +212,8 @@ export const confirmActivityCraftRecipe = ({ activityId, managerEntityId, player
         entityId: playerEntityId,
         items: itemRecipes[manager._selectedCraftRecipe].ingredients,
     }))) {
-        event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
         event({ data: { message: 'Je n\'ai pas ce qu\'il faut pour ça' }, type: EventTypes.MAIN_ERROR });
+        event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
 
         throw error({
             message: `Could not find all ingredients for ${itemRecipes[manager._selectedCraftRecipe].name}`,
@@ -228,8 +228,8 @@ export const confirmActivityCraftRecipe = ({ activityId, managerEntityId, player
 
     if (!(recipeTool)) {
         if (playerInventoryFull({ item: recipeItem })) {
-            event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
             event({ data: { message: 'Mon sac est plein' }, type: EventTypes.MAIN_ERROR });
+            event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
 
             throw error({
                 message: `Player will not be able to get ${itemRecipes[manager._selectedCraftRecipe].name}`,

@@ -49,8 +49,8 @@ export const startActivityBug = ({ activityId, playerEntityId }: {
         ?? error({ message: 'Store playerId is undefined', where: startActivityBug.name });
 
     if (!(canPlay({ activity: activityResource._type, entityId: playerEntityId, strict: false }))) {
-        event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
         event({ data: { message: 'Je ne peux pas faire ça maintenant' }, type: EventTypes.MAIN_ERROR });
+        event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
 
         throw error({
             message: `Player can't play activity ${activityResource._type}`,
@@ -58,8 +58,8 @@ export const startActivityBug = ({ activityId, playerEntityId }: {
         });
     }
     if (playerInventoryFull({ item: activityResource.item })) {
-        event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
         event({ data: { message: 'Mon sac est plein' }, type: EventTypes.MAIN_ERROR });
+        event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
 
         throw error({
             message: `Player will not be able to get ${activityResource.item?.info._name}`,
@@ -95,11 +95,13 @@ export const updateActivityBug = ({ activityId }: { activityId: string }) => {
         _symbolInterval: activityResourceData.data.symbolInterval,
     };
 
+    //TODO: temp
     // const activityResourceSprite = getComponent({ componentId: 'Sprite', entityId: activityId });
     // activityResourceSprite._image = `resource_${activityResource.item?.info._name.toLowerCase()}`;
 
     const activityResourceTrigger = getComponent({ componentId: 'Trigger', entityId: activityId });
-    activityResourceTrigger._priority = activityResourceData.priority ?? 1;
+    //TODO: temp
+    activityResourceTrigger._priority = 1;
 };
 
 export const tickActivityBug = ({ activityId, managerEntityId }: {

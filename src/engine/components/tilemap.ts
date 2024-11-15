@@ -1,5 +1,4 @@
 import { Position } from './position';
-import { Sprite } from './sprite';
 
 export type TileMap = {
     _: 'TileMap',
@@ -9,14 +8,19 @@ export type TileMap = {
     tiles: Tile[],
 };
 
+export type TileMapState = TileMap & {
+    source: 'game' | 'save',
+};
+
 export type Tile = {
     _entityColliderIds: string[],
     _entityIds: string[],
     _entityTriggerIds: string[],
     _solid?: boolean,
+    _sound?: string,
     exits?: TileExit[],
     position: TilePosition,
-    sprite: TileSprite,
+    // sprite: TileSprite,
 };
 
 export type TileExit = {
@@ -26,5 +30,3 @@ export type TileExit = {
 };
 
 type TilePosition = Pick<Position, '_x' | '_y'>;
-
-type TileSprite = Pick<Sprite, '_image'>;

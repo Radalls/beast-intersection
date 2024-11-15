@@ -7,9 +7,7 @@
             "maxHp": 100,
             "frenzyDuration": 3,
             "frenzyInterval": 9
-        },
-        "priority": 1,
-        "cooldown": 6000
+        }
     },
     {
         "type": "ResourceFish",
@@ -19,9 +17,7 @@
             "maxHp": 100,
             "frenzyDuration": 3,
             "frenzyInterval": 9
-        },
-        "priority": 1,
-        "cooldown": 6000
+        }
     },
     {
         "type": "ResourceFish",
@@ -31,9 +27,7 @@
             "maxHp": 100,
             "frenzyDuration": 3,
             "frenzyInterval": 6
-        },
-        "priority": 1,
-        "cooldown": 6000
+        }
     },
     {
         "type": "ResourceFish",
@@ -43,9 +37,7 @@
             "maxHp": 100,
             "frenzyDuration": 3,
             "frenzyInterval": 6
-        },
-        "priority": 1,
-        "cooldown": 6000
+        }
     },
     {
         "type": "ResourceFish",
@@ -55,8 +47,6 @@
             "maxHp": 150,
             "frenzyDuration": 3,
             "frenzyInterval": 6
-        },
-        "priority": 1,
-        "cooldown": 6000
+        }
     }
 ]

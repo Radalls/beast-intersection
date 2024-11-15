@@ -2,6 +2,7 @@ import { checkComponent, getComponent } from '@/engine/entities';
 import { error } from '@/engine/services/error';
 import { getStore } from '@/engine/services/store';
 import { startDialog } from '@/engine/systems/dialog';
+import { isFacingPosition, samePosition } from '@/engine/systems/position';
 import { useResource } from '@/engine/systems/resource';
 import { findTileByPosition } from '@/engine/systems/tilemap/tilemap.utils';
 
@@ -13,7 +14,7 @@ const sortTriggersByPriority = ({ triggerEntityIds }: { triggerEntityIds: string
         return bTrigger._priority - aTrigger._priority;
     });
 
-const findPriorityTriggerEntityId = ({ triggerEntityIds }: { triggerEntityIds: string[] }) => {
+const findPriorityTriggerEntityId = ({ triggerEntityIds }: { triggerEntityIds: string[] }): string | null => {
     if (triggerEntityIds.length === 0) return null;
 
     const triggerEntityId = triggerEntityIds[0];
@@ -72,7 +73,21 @@ export const checkTrigger = ({ entityId }: { entityId?: string | null }) => {
 
     const triggerEntityId = findPriorityTriggerEntityId({ triggerEntityIds: entityTile._entityTriggerIds });
     if (triggerEntityId) {
-        onTrigger({ entityId, triggerEntityId: triggerEntityId });
+        const triggerEntityPosition = getComponent({ componentId: 'Position', entityId: triggerEntityId });
+
+        if (
+            isFacingPosition({
+                entityId,
+                targetPosition: { x: triggerEntityPosition._x, y: triggerEntityPosition._y },
+            })
+            ||
+            samePosition({
+                entityPosition: { x: entityPosition._x, y: entityPosition._y },
+                targetPosition: { x: triggerEntityPosition._x, y: triggerEntityPosition._y },
+            })
+        ) {
+            onTrigger({ entityId, triggerEntityId: triggerEntityId });
+        }
     }
 };
 

@@ -54,7 +54,7 @@ export const generateResourceItem = ({ resourceEntityId, init = false }: {
     }
     else if (!(itemName)) {
         setEntityCooldown({ entityId: resourceEntityId, value: true });
-        setCooldown({ entityId: resourceEntityId, value: 1 });
+        setCooldown({ entityId: resourceEntityId, value: 1 }); //TODO: remove hardcoded value
         return;
     }
 

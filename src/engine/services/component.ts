@@ -99,7 +99,7 @@ export const addManager = ({ entityId, savedManager }: {
     entityId: string,
     savedManager?: Manager,
 }) => {
-    const manager: Manager = savedManager ?? {
+    const manager: Manager = (savedManager) ?? {
         _: 'Manager',
         _selectedCraftRecipe: 0,
         _selectedInventorySlot: 0,
@@ -107,6 +107,7 @@ export const addManager = ({ entityId, savedManager }: {
         _selectedLaunchOption: 0,
         _selectedQuest: 0,
         _selectedSetting: 0,
+        itemRecipes: [],
         quests: [],
         questsDone: [],
         settings: {
@@ -129,6 +130,7 @@ export const addManager = ({ entityId, savedManager }: {
                 },
             },
         },
+        tileMapStates: [],
     };
 
     addComponent({ component: manager, entityId });
@@ -226,15 +228,16 @@ export const addResourceFish = ({
 
     resource._cooldown = resourceData.cooldown;
 
+    //TODO: handle fishrod data
     const activityFishData: ActivityFishData = {
         _damage: resourceData.data.damage,
         _frenzyDuration: resourceData.data.frenzyDuration,
         _frenzyInterval: resourceData.data.frenzyInterval,
         _hp: resourceData.data.maxHp,
         _maxHp: resourceData.data.maxHp,
-        _rodDamage: 2, // temp
-        _rodMaxTension: 100, // temp
-        _rodTension: 0, // temp
+        _rodDamage: 2,
+        _rodMaxTension: 100,
+        _rodTension: 0,
     };
     resource.activityData = activityFishData;
 
@@ -280,7 +283,8 @@ export const addResourcePlace = ({ entityId, itemName }: {
     addComponent({ component: resource, entityId });
 };
 
-export const addSprite = ({ entityId, gif = false, height = 1, image, width = 1 }: {
+export const addSprite = ({ direction, entityId, gif = false, height = 1, image, width = 1 }: {
+    direction?: 'up' | 'down' | 'left' | 'right',
     entityId: string,
     gif?: boolean,
     height?: number,
@@ -289,6 +293,7 @@ export const addSprite = ({ entityId, gif = false, height = 1, image, width = 1 
 }) => {
     const sprite: Sprite = {
         _: 'Sprite',
+        _direction: direction,
         _gif: gif,
         _height: height,
         _image: image,

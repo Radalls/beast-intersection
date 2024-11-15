@@ -15,6 +15,7 @@ import { error } from '@/engine/services/error';
 import { EventTypes } from '@/engine/services/event';
 import { getState, setState } from '@/engine/services/state';
 import { getStore, resetStore } from '@/engine/services/store';
+import { findTileByEntityId } from '@/engine/systems/tilemap';
 import { event } from '@/render/events';
 
 //#region SYSTEMS
@@ -93,11 +94,11 @@ export const confirmLaunchOption = ({ managerEntityId }: { managerEntityId?: str
     else if (LAUNCH_OPTIONS[manager._selectedLaunchOption] === LAUNCH_OPTIONS[1]) {
         loadSave().then((saveData) => {
             if (saveData.version !== getProjectVersion()) {
-                event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
                 event({
                     data: { message: 'La version de cette sauvegarde est invalide' },
                     type: EventTypes.MAIN_ERROR,
                 });
+                event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
 
                 throw error({
                     message: 'Invalid save, project version does not match',
@@ -296,6 +297,61 @@ export const selectSetting = ({ managerEntityId, offset }: {
 
     event({ type: EventTypes.MENU_SETTINGS_UPDATE });
     event({ data: { audioName: 'main_select' }, type: EventTypes.AUDIO_PLAY });
+};
+//#endregion
+
+//#region MAPSTATE
+export const createTileMapState = ({ managerEntityId, tileMapEntityId }: {
+    managerEntityId?: string | null,
+    tileMapEntityId?: string | null,
+}) => {
+    const playerEntityId = getStore('playerId')
+        ?? error({ message: 'Store playerId is undefined', where: createTileMapState.name });
+
+    if (!(managerEntityId)) managerEntityId = getStore('managerId')
+        ?? error({ message: 'Store managerId is undefined', where: createTileMapState.name });
+
+    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
+
+    if (!(tileMapEntityId)) tileMapEntityId = getStore('tileMapId')
+        ?? error({ message: 'Store tileMapId is undefined', where: createTileMapState.name });
+
+    const tileMap = getComponent({ componentId: 'TileMap', entityId: tileMapEntityId });
+
+    const existingTileMapState = manager.tileMapStates.find(state => state._name === tileMap._name);
+    if (existingTileMapState) {
+        manager.tileMapStates = manager.tileMapStates.filter(state => state._name !== tileMap._name);
+    }
+
+    const playerTile = findTileByEntityId({ entityId: playerEntityId })
+        ?? error({ message: 'Player tile not found', where: createTileMapState.name });
+
+    playerTile._entityIds = playerTile._entityIds.filter(entityId => entityId !== playerEntityId);
+
+    manager.tileMapStates.push({ ...tileMap, source: 'game' });
+};
+
+export const getTileMapState = ({ tileMapName, managerEntityId }: {
+    managerEntityId?: string | null,
+    tileMapName: string,
+}) => {
+    if (!(managerEntityId)) managerEntityId = getStore('managerId')
+        ?? error({ message: 'Store managerId is undefined', where: getTileMapState.name });
+
+    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
+
+    return manager.tileMapStates.find(mapState => mapState._name === tileMapName);
+};
+
+export const saveTileMapStates = ({ managerEntityId }: { managerEntityId?: string | null }) => {
+    if (!(managerEntityId)) managerEntityId = getStore('managerId')
+        ?? error({ message: 'Store managerId is undefined', where: saveTileMapStates.name });
+
+    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
+
+    for (const state of manager.tileMapStates) {
+        state.source = 'save';
+    }
 };
 //#endregion
 //#endregion

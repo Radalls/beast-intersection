@@ -5,6 +5,7 @@ export type Entity = {
 };
 
 export enum EntityTypes {
+    ASSET = 'Asset',
     NPC = 'Npc',
     PLAYER = 'Player',
     RESOURCE_BUG = 'ResourceBug',

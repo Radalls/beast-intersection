@@ -239,24 +239,31 @@
 }
 
 .activity-craft-recipe-item-icon {
-    height: 64px;
-    width: 64px;
+    height: 72px;
+    width: 72px;
 }
 
 .activity-craft-recipe-ingredients {
     display: flex;
+    flex-wrap: wrap;
     gap: 16px;
 }
 
 .activity-craft-recipe-ingredient {
     align-items: center;
     display: flex;
-    gap: 4px;
+    gap: 6px;
 }
 
 .activity-craft-recipe-ingredient-icon {
-    height: 32px;
-    width: 32px;
+    height: 48px;
+    width: 48px;
+}
+
+.activity-craft-recipe-ingredient-check {
+    bottom: 0px;
+    right: 0px;
+    font-size: 12px;
 }
 
 .activity-craft-play {

@@ -103,8 +103,9 @@ export const editSettingAudio = ({ editKey, managerEntityId }: {
         manager.settings._audio = !(manager.settings._audio);
         setState('isSettingAudioAllowed', manager.settings._audio);
 
+        //TODO: handle bgm data
         event({
-            data: { // temp
+            data: {
                 audioName: (getState('isGameLaunching'))
                     ? 'bgm_menu2'
                     : 'bgm_map1',
@@ -159,11 +160,11 @@ export const editSettingKey = ({ editKey, managerEntityId }: {
             return;
         }
         if (settingKeyAlreadyInUse({ key: editKey })) {
-            event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
             event({
                 data: { message: `La touche ${editKey.toUpperCase()} est déjà utilisée ailleurs` },
                 type: EventTypes.MAIN_ERROR,
             });
+            event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
 
             throw error({ message: `Key ${editKey} already in use`, where: editSettingKey.name });
         }

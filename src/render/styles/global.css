@@ -128,5 +128,5 @@ div {
 
 /* GAME */
 .player {
-    transition: all 0.1s;
+    transition: 0.1s all;
 }
