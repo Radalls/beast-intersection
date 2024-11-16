@@ -1,6 +1,8 @@
 import { startCycle } from '@/engine/services/cycle';
 import { createEntityManager, createEntityPlayer, createEntityTileMap } from '@/engine/services/entity';
+import { error } from '@/engine/services/error';
 import { EventTypes } from '@/engine/services/event';
+import { createLoadingManager, LoadingManager } from '@/engine/services/load';
 import { initState, setState } from '@/engine/services/state';
 import { initQuest, SaveData } from '@/engine/systems/manager';
 import { event } from '@/render/events';
@@ -11,11 +13,22 @@ const playerInit = {
     initPositionY: 31,
 };
 
+let loadingManager: LoadingManager;
+
 export const main = () => {
+    loadingManager = createLoadingManager();
+    loadingManager.startLoading();
     launch();
 };
 
 export const run = ({ saveData }: { saveData?: SaveData }) => {
+    if (!(loadingManager.isLoadingComplete())) {
+        error({
+            message: 'Loading manager is not complete',
+            where: run.name,
+        });
+    }
+
     setState('isGameLoading', true);
     event({ type: EventTypes.MAIN_LOADING_ON });
 
@@ -50,8 +63,11 @@ export const run = ({ saveData }: { saveData?: SaveData }) => {
     initQuest({});
 
     setState('isGameRunning', true);
-    setState('isGameLoading', false);
-    event({ type: EventTypes.MAIN_LOADING_OFF });
+
+    setTimeout(() => {
+        setState('isGameLoading', false);
+        event({ type: EventTypes.MAIN_LOADING_OFF });
+    }, 1000);
 };
 
 export const launch = () => {

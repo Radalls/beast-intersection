@@ -1,21 +1,22 @@
-import { createSave, loadSave } from './manager.data';
+import { createSave } from './manager.data';
 import {
-    LAUNCH_OPTIONS,
     SETTINGS,
+    closeSettings,
+    confirmLaunchOption,
+    confirmSetting,
     editSettingAudio,
-    editSettingKey,
     getKeyMoveOffset,
-    getProjectVersion,
+    selectLaunchOption,
+    selectSetting,
 } from './manager.utils';
 
 import { destroyAllEntities, getComponent } from '@/engine/entities';
-import { launch, run } from '@/engine/main';
+import { launch } from '@/engine/main';
 import { stopCycle } from '@/engine/services/cycle';
 import { error } from '@/engine/services/error';
 import { EventTypes } from '@/engine/services/event';
 import { getState, setState } from '@/engine/services/state';
 import { getStore, resetStore } from '@/engine/services/store';
-import { findTileByEntityId } from '@/engine/systems/tilemap';
 import { event } from '@/render/events';
 
 //#region SYSTEMS
@@ -45,87 +46,6 @@ export const onLaunchInput = ({ inputKey, managerEntityId }: {
 
         selectLaunchOption({ managerEntityId, offset: inputOffset });
         return;
-    }
-};
-
-export const selectLaunchOption = ({ managerEntityId, offset }: {
-    managerEntityId?: string | null,
-    offset: 1 | -1,
-}) => {
-    if (!(managerEntityId)) managerEntityId = getStore('managerId')
-        ?? error({ message: 'Store managerId is undefined', where: selectLaunchOption.name });
-
-    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
-
-    if (offset === -1) {
-        manager._selectedLaunchOption = Math.max(0, manager._selectedLaunchOption - 1);
-    }
-    else if (offset === 1) {
-        manager._selectedLaunchOption = Math.min(
-            LAUNCH_OPTIONS.length - 1,
-            manager._selectedLaunchOption + 1,
-        );
-    }
-
-    event({ type: EventTypes.MENU_LAUNCH_UPDATE });
-    event({ data: { audioName: 'main_select' }, type: EventTypes.AUDIO_PLAY });
-};
-
-export const confirmLaunchOption = ({ managerEntityId }: { managerEntityId?: string | null }) => {
-    if (!(managerEntityId)) managerEntityId = getStore('managerId')
-        ?? error({ message: 'Store managerId is undefined', where: confirmLaunchOption.name });
-
-    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
-
-    if (LAUNCH_OPTIONS[manager._selectedLaunchOption] === LAUNCH_OPTIONS[0]) {
-        setState('isGameLaunching', false);
-
-        event({ type: EventTypes.MAIN_RUN });
-
-        run({});
-
-        event({ type: EventTypes.QUEST_DISPLAY });
-        event({ data: { audioName: 'menu_launch_start' }, type: EventTypes.AUDIO_PLAY });
-        event({ data: { audioName: 'bgm_map1', loop: true }, type: EventTypes.AUDIO_PLAY });
-        event({ data: { audioName: 'bgm_menu2' }, type: EventTypes.AUDIO_STOP });
-
-        return;
-    }
-    else if (LAUNCH_OPTIONS[manager._selectedLaunchOption] === LAUNCH_OPTIONS[1]) {
-        loadSave().then((saveData) => {
-            if (saveData.version !== getProjectVersion()) {
-                event({
-                    data: { message: 'La version de cette sauvegarde est invalide' },
-                    type: EventTypes.MAIN_ERROR,
-                });
-                event({ data: { audioName: 'main_fail' }, type: EventTypes.AUDIO_PLAY });
-
-                throw error({
-                    message: 'Invalid save, project version does not match',
-                    where: confirmLaunchOption.name,
-                });
-            }
-
-            setState('isGameLaunching', false);
-
-            event({ type: EventTypes.MAIN_RUN });
-
-            run({ saveData });
-
-            event({ type: EventTypes.MENU_LAUNCH_DISPLAY });
-            event({ type: EventTypes.MENU_SETTINGS_UPDATE });
-            event({ type: EventTypes.QUEST_DISPLAY });
-            event({ data: { audioName: 'menu_launch_start' }, type: EventTypes.AUDIO_PLAY });
-            event({ data: { audioName: 'bgm_map1', loop: true }, type: EventTypes.AUDIO_PLAY });
-            event({ data: { audioName: 'bgm_menu2' }, type: EventTypes.AUDIO_STOP });
-
-            return;
-        });
-
-        return;
-    }
-    else if (LAUNCH_OPTIONS[manager._selectedLaunchOption] === LAUNCH_OPTIONS[2]) {
-        openSettings({});
     }
 };
 
@@ -237,121 +157,6 @@ export const openSettings = ({ managerEntityId }: { managerEntityId?: string | n
     event({ type: EventTypes.MENU_SETTINGS_DISPLAY });
     event({ type: EventTypes.MENU_SETTINGS_UPDATE });
     event({ data: { audioName: 'menu_settings_open' }, type: EventTypes.AUDIO_PLAY });
-};
-
-export const closeSettings = () => {
-    setState('isGamePaused', false);
-    if (!(getState('isGameRunning')) && !(getState('isGameLaunching'))) {
-        setState('isGameRunning', true);
-
-        event({ type: EventTypes.ENERGY_DISPLAY });
-        event({ type: EventTypes.INVENTORY_TOOL_ACTIVE_DISPLAY });
-        event({ type: EventTypes.QUEST_DISPLAY });
-    }
-
-    event({ type: EventTypes.MENU_SETTINGS_DISPLAY });
-    event({ data: { audioName: 'menu_settings_close' }, type: EventTypes.AUDIO_PLAY });
-};
-
-export const confirmSetting = ({ managerEntityId, editKey }: {
-    editKey?: string
-    managerEntityId?: string | null,
-}) => {
-    if (!(managerEntityId)) managerEntityId = getStore('managerId')
-        ?? error({ message: 'Store managerId is undefined', where: confirmSetting.name });
-
-    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
-
-    if (SETTINGS[manager._selectedSetting] === SETTINGS[0]) {
-        editSettingAudio({ managerEntityId });
-    }
-    else if (SETTINGS[manager._selectedSetting]) {
-        editSettingKey({ editKey, managerEntityId });
-    }
-    else {
-        throw error({ message: 'Setting not yet implemented', where: confirmSetting.name });
-    }
-
-    event({ type: EventTypes.MENU_SETTINGS_UPDATE });
-    event({ data: { audioName: 'main_confirm' }, type: EventTypes.AUDIO_PLAY });
-};
-
-export const selectSetting = ({ managerEntityId, offset }: {
-    managerEntityId?: string | null,
-    offset: 1 | -1,
-}) => {
-    if (!(managerEntityId)) managerEntityId = getStore('managerId')
-        ?? error({ message: 'Store managerId is undefined', where: selectSetting.name });
-
-    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
-
-    if (offset === -1) {
-        manager._selectedSetting = Math.max(0, manager._selectedSetting - 1);
-    }
-    else if (offset === 1) {
-        manager._selectedSetting = Math.min(
-            SETTINGS.length - 1,
-            manager._selectedSetting + 1,
-        );
-    }
-
-    event({ type: EventTypes.MENU_SETTINGS_UPDATE });
-    event({ data: { audioName: 'main_select' }, type: EventTypes.AUDIO_PLAY });
-};
-//#endregion
-
-//#region MAPSTATE
-export const createTileMapState = ({ managerEntityId, tileMapEntityId }: {
-    managerEntityId?: string | null,
-    tileMapEntityId?: string | null,
-}) => {
-    const playerEntityId = getStore('playerId')
-        ?? error({ message: 'Store playerId is undefined', where: createTileMapState.name });
-
-    if (!(managerEntityId)) managerEntityId = getStore('managerId')
-        ?? error({ message: 'Store managerId is undefined', where: createTileMapState.name });
-
-    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
-
-    if (!(tileMapEntityId)) tileMapEntityId = getStore('tileMapId')
-        ?? error({ message: 'Store tileMapId is undefined', where: createTileMapState.name });
-
-    const tileMap = getComponent({ componentId: 'TileMap', entityId: tileMapEntityId });
-
-    const existingTileMapState = manager.tileMapStates.find(state => state._name === tileMap._name);
-    if (existingTileMapState) {
-        manager.tileMapStates = manager.tileMapStates.filter(state => state._name !== tileMap._name);
-    }
-
-    const playerTile = findTileByEntityId({ entityId: playerEntityId })
-        ?? error({ message: 'Player tile not found', where: createTileMapState.name });
-
-    playerTile._entityIds = playerTile._entityIds.filter(entityId => entityId !== playerEntityId);
-
-    manager.tileMapStates.push({ ...tileMap, source: 'game' });
-};
-
-export const getTileMapState = ({ tileMapName, managerEntityId }: {
-    managerEntityId?: string | null,
-    tileMapName: string,
-}) => {
-    if (!(managerEntityId)) managerEntityId = getStore('managerId')
-        ?? error({ message: 'Store managerId is undefined', where: getTileMapState.name });
-
-    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
-
-    return manager.tileMapStates.find(mapState => mapState._name === tileMapName);
-};
-
-export const saveTileMapStates = ({ managerEntityId }: { managerEntityId?: string | null }) => {
-    if (!(managerEntityId)) managerEntityId = getStore('managerId')
-        ?? error({ message: 'Store managerId is undefined', where: saveTileMapStates.name });
-
-    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
-
-    for (const state of manager.tileMapStates) {
-        state.source = 'save';
-    }
 };
 //#endregion
 //#endregion
