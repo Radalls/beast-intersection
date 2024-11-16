@@ -8,7 +8,7 @@ import { error } from '@/engine/services/error';
 import { getStore } from '@/engine/services/store';
 
 //#region CONSTANTS
-export const TILE_PIXEL_SIZE = 96;
+export const TILE_PIXEL_SIZE = 72;
 
 type ElementData =
     | {
