@@ -19,6 +19,7 @@ import { error } from '@/engine/services/error';
 import { EventTypes } from '@/engine/services/event';
 import { getStore } from '@/engine/services/store';
 import { loadDialogData } from '@/engine/systems/dialog/dialog.data';
+import { DayTimes } from '@/engine/systems/manager';
 import { getResourceData, generateResourceItem } from '@/engine/systems/resource';
 import { event } from '@/render/events';
 
@@ -101,6 +102,8 @@ export const addManager = ({ entityId, savedManager }: {
 }) => {
     const manager: Manager = (savedManager) ?? {
         _: 'Manager',
+        _actionCount: 0,
+        _dayTime: DayTimes.NOON,
         _selectedCraftRecipe: 0,
         _selectedInventorySlot: 0,
         _selectedInventorySlotOption: 0,

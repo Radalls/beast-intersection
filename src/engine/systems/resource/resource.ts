@@ -9,7 +9,7 @@ import { error } from '@/engine/services/error';
 import { EventTypes } from '@/engine/services/event';
 import { getStore } from '@/engine/services/store';
 import { destroyCollider } from '@/engine/systems/collider';
-import { getFacingPosition, validItemPosition, validPlacePosition } from '@/engine/systems/position';
+import { getOriginPlacePosition, validItemPosition, validPlacePosition } from '@/engine/systems/position';
 import { setEntityActive, setEntityCooldown } from '@/engine/systems/state';
 import { findTileByEntityId } from '@/engine/systems/tilemap';
 import { destroyTrigger } from '@/engine/systems/trigger';
@@ -160,9 +160,16 @@ export const placeResource = ({ resourceType, resourceName, resourceActive, play
                 trigger: resourceData.trigger,
             });
         }
-        else if (validPlacePosition({ entityId: playerEntityId })) {
-            const placePosition = getFacingPosition({ entityId: playerEntityId })
-                ?? error({ message: 'Place position is undefined', where: placeResource.name });
+        else if (validPlacePosition({
+            entityId: playerEntityId,
+            placeHeight: resourceData.height,
+            placeWidth: resourceData.width,
+        })) {
+            const placePosition = getOriginPlacePosition({
+                entityId: playerEntityId,
+                placeHeight: resourceData.height,
+                placeWidth: resourceData.width,
+            }) ?? error({ message: 'Place position is undefined', where: placeResource.name });
 
             createEntityResourcePlace({
                 collider: resourceData.collider,

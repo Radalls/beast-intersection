@@ -151,6 +151,7 @@ export const openSettings = ({ managerEntityId }: { managerEntityId?: string | n
 
         event({ type: EventTypes.ENERGY_DISPLAY });
         event({ type: EventTypes.INVENTORY_TOOL_ACTIVE_DISPLAY });
+        event({ type: EventTypes.TIME_DAY_DISPLAY });
         event({ type: EventTypes.QUEST_DISPLAY });
     }
 

@@ -42,6 +42,7 @@ import {
 } from './event.menu';
 import { onQuestComplete, onQuestEnd, onQuestsDisplay, onQuestStart } from './event.quest';
 import { onTileMapCreate } from './event.tilemap';
+import { onTimeDayDisplay, onTimeDayUpdate } from './event.time';
 import {
     checkAudioData,
     checkErrorData,
@@ -138,8 +139,9 @@ export const event = <T extends keyof Component>(event: Event<T>) => {
     else if (event.type === EventTypes.QUEST_START) onQuestStart();
     /* Tilemap */
     else if (event.type === EventTypes.TILEMAP_CREATE) onTileMapCreate();
-    // else if (event.type === EventTypes.TILEMAP_TILE_CREATE) onTileMapTileCreate();
-    // else if (event.type === EventTypes.TILEMAP_TILE_DESTROY) onTileMapTileDestroy();
+    /* Time */
+    else if (event.type === EventTypes.TIME_DAY_DISPLAY) onTimeDayDisplay();
+    else if (event.type === EventTypes.TIME_DAY_UPDATE) onTimeDayUpdate();
     else error({ message: `Unknown Event type: ${event.type}`, where: 'event' });
 };
 //#endregion

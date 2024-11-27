@@ -1,9 +1,11 @@
 import { TileMapState } from './tilemap';
 
-import { Quest } from '@/engine/systems/manager';
+import { Quest, DayTimes } from '@/engine/systems/manager';
 
 export type Manager = {
     _: 'Manager',
+    _actionCount: number,
+    _dayTime: DayTimes,
     _selectedCraftRecipe: number,
     _selectedInventorySlot: number,
     _selectedInventorySlotOption: number,
