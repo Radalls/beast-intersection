@@ -1,6 +1,7 @@
 import { initAudios } from './audio';
 import { onInputKeyDown } from './events';
 import {
+    createDayTime,
     createError,
     createFrame,
     createLaunchMenu,
@@ -42,5 +43,6 @@ const initMenus = () => {
 
 const initGameMenus = () => {
     createQuestMenu();
+    createDayTime();
 };
 

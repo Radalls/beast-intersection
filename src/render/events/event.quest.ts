@@ -3,15 +3,9 @@ import { completeQuest, createQuest, destroyQuest, displayQuestMenu } from '@/re
 //#region EVENTS
 export const onQuestsDisplay = () => displayQuestMenu();
 
-export const onQuestStart = () => {
-    createQuest();
-};
+export const onQuestStart = () => createQuest();
 
-export const onQuestEnd = () => {
-    destroyQuest();
-};
+export const onQuestEnd = () => destroyQuest();
 
-export const onQuestComplete = () => {
-    completeQuest();
-};
+export const onQuestComplete = () => completeQuest();
 //#endregion

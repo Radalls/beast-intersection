@@ -67,21 +67,79 @@ export const validItemPosition = ({ entityId }: { entityId?: string | null }) =>
     return tile._entityIds.length === 1 && tile._entityIds[0] === entityId;
 };
 
-export const validPlacePosition = ({ entityId }: { entityId?: string | null }) => {
+export const validPlacePosition = ({
+    entityId,
+    placeWidth = 1,
+    placeHeight = 1,
+}: {
+    entityId?: string | null,
+    placeHeight?: number,
+    placeWidth?: number,
+}) => {
     if (!(entityId)) entityId = getStore('playerId')
         ?? error({ message: 'Store playerId is undefined', where: validPlacePosition.name });
 
-    const placePosition = getFacingPosition({ entityId })
-        ?? error({ message: 'Place position is undefined', where: validPlacePosition.name });
+    const originPlacePosition = getOriginPlacePosition({ entityId, placeHeight, placeWidth });
 
-    const placeTile = findTileByPosition({ x: placePosition.x, y: placePosition.y })
-        ?? error({ message: 'Place tile is undefined', where: validPlacePosition.name });
+    for (let dx = 0; dx < placeWidth; dx++) {
+        for (let dy = 0; dy < placeHeight; dy++) {
+            const checkTile = findTileByPosition({
+                x: originPlacePosition.x + dx,
+                y: originPlacePosition.y - dy,
+            });
 
-    return (
-        !(placeTile._solid)
-        && placeTile._entityIds.length === 0
-        && placeTile._entityColliderIds.length === 0
-    );
+            if (
+                !(checkTile)
+                || checkTile._solid
+                || checkTile._entityIds.length > 0
+                || checkTile._entityColliderIds.length > 0
+            ) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+};
+
+export const getOriginPlacePosition = ({
+    entityId,
+    placeWidth = 1,
+    placeHeight = 1,
+}: {
+    entityId?: string | null,
+    placeHeight?: number,
+    placeWidth?: number,
+}) => {
+    if (!(entityId)) entityId = getStore('playerId')
+        ?? error({ message: 'Store playerId is undefined', where: getOriginPlacePosition.name });
+
+    const playerPosition = getComponent({ componentId: 'Position', entityId });
+
+    const playerSprite = getComponent({ componentId: 'Sprite', entityId });
+
+    const originPlacePosition = {
+        x: playerPosition._x,
+        y: playerPosition._y,
+    };
+    switch (playerSprite._direction) {
+        case 'up':
+            originPlacePosition.y -= 1;
+            break;
+        case 'down':
+            originPlacePosition.y += placeHeight;
+            break;
+        case 'left':
+            originPlacePosition.x -= placeWidth;
+            break;
+        case 'right':
+            originPlacePosition.x += 1;
+            break;
+        default:
+            error({ message: 'Invalid player orientation', where: getOriginPlacePosition.name });
+    }
+
+    return originPlacePosition;
 };
 //#endregion
 

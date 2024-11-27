@@ -103,6 +103,9 @@ export enum EventTypes {
     QUEST_START = 'QUEST_START',
     /* Tilemap */
     TILEMAP_CREATE = 'TILEMAP_CREATE',
+    /* Time */
+    TIME_DAY_DISPLAY = 'TIME_DISPLAY',
+    TIME_DAY_UPDATE = 'TIME_UPDATE',
 }
 //#endregion
 
