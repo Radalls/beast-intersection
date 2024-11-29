@@ -4,7 +4,6 @@ import {
     generateTileMapEntities,
     findTileByPosition,
     findTileByEntityId,
-    getTargetXY,
     exitTile,
     soundTile,
     loadTileMapEntities,
@@ -17,7 +16,7 @@ import { EventTypes } from '@/engine/services/event';
 import { getStore } from '@/engine/services/store';
 import { setCollider, checkCollider } from '@/engine/systems/collider';
 import { getTileMapState } from '@/engine/systems/manager';
-import { updatePosition } from '@/engine/systems/position';
+import { getTargetPosition, updatePosition } from '@/engine/systems/position';
 import { updateSpriteDirection } from '@/engine/systems/sprite';
 import { setTrigger } from '@/engine/systems/trigger';
 import { event } from '@/render/events';
@@ -93,8 +92,9 @@ export const setTile = ({ tileMapEntityId, entityId }: {
     }
 };
 
-export const updateTile = ({ tileMapEntityId, entityId, target }: {
+export const updateTile = ({ tileMapEntityId, entityId, target, step = 0.2 }: {
     entityId?: string | null,
+    step?: number,
     target: 'up' | 'down' | 'left' | 'right',
     tileMapEntityId?: string | null
 }) => {
@@ -109,7 +109,14 @@ export const updateTile = ({ tileMapEntityId, entityId, target }: {
     const entityTile = findTileByEntityId({ entityId })
         ?? error({ message: `Tile for entity ${entityId} not found`, where: updateTile.name });
 
-    const { targetX, targetY } = getTargetXY({ target, x: entityPosition._x, y: entityPosition._y });
+    const { targetX, targetY, targetSubX, targetSubY } = getTargetPosition({
+        step,
+        subX: entityPosition._subX,
+        subY: entityPosition._subY,
+        target,
+        x: entityPosition._x,
+        y: entityPosition._y,
+    });
 
     if (entityTile.exits) {
         const isExit = exitTile({ entityId, targetX, targetY, tileMapEntityId });
@@ -119,20 +126,27 @@ export const updateTile = ({ tileMapEntityId, entityId, target }: {
 
     updateSpriteDirection({ entityId, target });
 
-    const targetTile = findTileByPosition({
+    if (targetX !== entityTile.position._x || targetY !== entityTile.position._y) {
+        const targetTile = findTileByPosition({
+            x: targetX,
+            y: targetY,
+        }) ?? error({ message: `Tile (${targetX}-${targetY}) does not exist`, where: updateTile.name });
+        if (targetTile._solid) return;
+
+        const isTargetCollider = checkCollider({ x: targetX, y: targetY });
+        if (isTargetCollider) return;
+
+        targetTile._entityIds.push(entityId);
+        entityTile._entityIds = entityTile._entityIds.filter(id => id !== entityId);
+    }
+
+    updatePosition({
+        entityId,
+        subX: targetSubX,
+        subY: targetSubY,
         x: targetX,
         y: targetY,
-    }) ?? error({ message: `Tile (${targetX}-${targetY}) does not exist`, where: updateTile.name });
-
-    if (targetTile._solid) error({ message: `Tile (${targetX}-${targetY}) is not accessible`, where: updateTile.name });
-
-    const isTargetCollider = checkCollider({ x: targetX, y: targetY });
-    if (isTargetCollider) error({ message: `Tile (${targetX}-${targetY}) is not accessible`, where: updateTile.name });
-
-    targetTile._entityIds.push(entityId);
-    entityTile._entityIds = entityTile._entityIds.filter(id => id !== entityId);
-
-    updatePosition({ entityId, x: targetTile.position._x, y: targetTile.position._y });
+    });
     soundTile({ entityId });
 };
 //#endregion

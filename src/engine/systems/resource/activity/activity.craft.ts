@@ -4,8 +4,10 @@ import { canPlay, endActivity, loseActivity, startActivity, winActivity } from '
 
 import { ActivityCraftData, ActivityData, ResourceTypes } from '@/engine/components/resource';
 import { getComponent } from '@/engine/entities';
+import { randAudio } from '@/engine/services/audio';
 import { error } from '@/engine/services/error';
 import { EventTypes } from '@/engine/services/event';
+import { consumeFirstKeyPress } from '@/engine/services/input';
 import { getState, setState } from '@/engine/services/state';
 import { clearStore, getStore } from '@/engine/services/store';
 import {
@@ -17,7 +19,6 @@ import {
     removeItemFromInventory,
 } from '@/engine/systems/inventory';
 import { getKeyMoveOffset } from '@/engine/systems/manager';
-import { randAudio } from '@/render/audio';
 import { event } from '@/render/events';
 
 //#region HELPERS
@@ -35,6 +36,8 @@ export const onActivityCraftInput = ({ inputKey, activityId, managerEntityId }: 
         ?? error({ message: 'Store managerId is undefined', where: onActivityCraftInput.name });
 
     const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
+
+    if (!(consumeFirstKeyPress(inputKey))) return;
 
     if (!(activityId)) activityId = getStore('activityId')
         ?? error({ message: 'Store activityId is undefined ', where: onActivityCraftInput.name });

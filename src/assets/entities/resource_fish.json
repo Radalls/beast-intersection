@@ -3,8 +3,8 @@
         "type": "ResourceFish",
         "name": "Fish1",
         "data": {
-            "damage": 3,
-            "maxHp": 100,
+            "damage": 12,
+            "maxHp": 1000,
             "frenzyDuration": 3,
             "frenzyInterval": 9
         }
@@ -13,8 +13,8 @@
         "type": "ResourceFish",
         "name": "Fish2",
         "data": {
-            "damage": 3,
-            "maxHp": 100,
+            "damage": 12,
+            "maxHp": 1000,
             "frenzyDuration": 3,
             "frenzyInterval": 9
         }
@@ -23,8 +23,8 @@
         "type": "ResourceFish",
         "name": "Fish3",
         "data": {
-            "damage": 4,
-            "maxHp": 100,
+            "damage": 16,
+            "maxHp": 1000,
             "frenzyDuration": 3,
             "frenzyInterval": 6
         }
@@ -33,8 +33,8 @@
         "type": "ResourceFish",
         "name": "Fish4",
         "data": {
-            "damage": 4,
-            "maxHp": 100,
+            "damage": 16,
+            "maxHp": 1000,
             "frenzyDuration": 3,
             "frenzyInterval": 6
         }
@@ -43,8 +43,8 @@
         "type": "ResourceFish",
         "name": "Fish5",
         "data": {
-            "damage": 4,
-            "maxHp": 150,
+            "damage": 16,
+            "maxHp": 1500,
             "frenzyDuration": 3,
             "frenzyInterval": 6
         }

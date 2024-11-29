@@ -23,6 +23,7 @@ import { ResourceTypes } from '@/engine/components/resource';
 import { getComponent } from '@/engine/entities';
 import { error } from '@/engine/services/error';
 import { EventTypes } from '@/engine/services/event';
+import { consumeFirstKeyPress } from '@/engine/services/input';
 import { getState } from '@/engine/services/state';
 import { getStore } from '@/engine/services/store';
 import { getKeyMoveDirection, getKeyMoveOffset } from '@/engine/systems/manager';
@@ -41,6 +42,8 @@ export const onInventoryInput = ({ inputKey, managerEntityId, playerEntityId }: 
 
     if (!(playerEntityId)) playerEntityId = getStore('playerId')
         ?? error({ message: 'Store playerId is undefined', where: onInventoryInput.name });
+
+    if (!(consumeFirstKeyPress(inputKey))) return;
 
     if (inputKey === manager.settings.keys.action._inventory) {
         if (getState('isPlayerInventorySlotSelected')) {

@@ -1,8 +1,7 @@
 import { Tile } from '@/engine/components/tilemap';
 import { getComponent, isManager, isTileMap } from '@/engine/entities';
+import { AudioData } from '@/engine/services/audio';
 import { ErrorData } from '@/engine/services/error';
-import { onInputKeyDown as engineOnInputKeyDown } from '@/engine/services/event';
-import { AudioData } from '@/render/audio';
 import {
     createElement,
     destroyElement,
@@ -39,8 +38,6 @@ export const onEntityPositionUpdate = ({ entityId }: { entityId: string }) => up
 export const onEntitySpriteCreate = ({ entityId }: { entityId: string }) => createSprite({ elementId: entityId });
 
 export const onEntitySpriteUpdate = ({ entityId }: { entityId: string }) => createSprite({ elementId: entityId });
-
-export const onInputKeyDown = (e: any) => engineOnInputKeyDown(e.key);
 
 export const checkAudioData = (data: any): data is AudioData => data;
 

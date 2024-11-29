@@ -10,7 +10,7 @@ export type AudioData = {
 };
 
 const audioFiles: Record<string, { default: string }>
-    = import.meta.glob('../../src/assets/audio/**/*.mp3', { eager: true });
+    = import.meta.glob('../../../src/assets/audio/**/*.mp3', { eager: true });
 
 const audios: HTMLAudioElement[] = [];
 //#endregion
@@ -18,7 +18,7 @@ const audios: HTMLAudioElement[] = [];
 //#region HELPERS
 export const getAudioPath = ({ audioName }: { audioName: string }) => {
     const audioKey = audioName.replace(/^(.*?)(\/[^/]+)?(\.[^./]+)?$/, '$1').split('_')[0];
-    const audioPath = `../assets/audio/${audioKey}/${audioName}.mp3`;
+    const audioPath = `../../assets/audio/${audioKey}/${audioName}.mp3`;
 
     return audioFiles[audioPath].default
         ?? error({ message: `Audio ${audioName} not found`, where: getAudioPath.name });

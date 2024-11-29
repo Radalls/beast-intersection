@@ -1,5 +1,6 @@
 import { checkComponent, getComponent } from '@/engine/entities';
 import { error } from '@/engine/services/error';
+import { onInputKeyDown } from '@/engine/services/event';
 import { getState, setState } from '@/engine/services/state';
 import { clearStore } from '@/engine/services/store';
 import { completeQuest } from '@/engine/systems/manager';
@@ -27,7 +28,7 @@ const cycle = {
     elapsedTimeSinceActivityFishInputTick: 0,
     elapsedTimeSinceActivityWinTick: 0,
     elapsedTimeSinceInputTick: 0,
-    inputTickInterval: 1 / 8,
+    inputTickInterval: 1 / 20,
 };
 let cycleInterval: NodeJS.Timeout;
 
@@ -127,6 +128,8 @@ const runCycle = () => {
     }
 
     cycle.elapsedTimeSinceInputTick += cycle.deltaTime;
+
+    onInputKeyDown();
 
     if (getState('isGameRunning')) {
         if (getState('isActivityRunning')) {

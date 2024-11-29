@@ -58,7 +58,6 @@ export const run = ({ saveData }: { saveData?: SaveData }) => {
         spritePath: 'player_player1_down',
     });
 
-    startCycle();
     initState({});
     initQuest({});
 
@@ -75,4 +74,5 @@ export const launch = () => {
 
     createEntityManager({});
     initState({});
+    startCycle();
 };

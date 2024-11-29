@@ -6,12 +6,12 @@ import { setDayTime } from './manager.time';
 
 import { getComponent } from '@/engine/entities';
 import { run } from '@/engine/main';
+import { setVolumeAudio as setAudioVolume } from '@/engine/services/audio';
 import { error } from '@/engine/services/error';
 import { EventTypes } from '@/engine/services/event';
 import { setState, getState } from '@/engine/services/state';
 import { getStore } from '@/engine/services/store';
 import { findTileByEntityId } from '@/engine/systems/tilemap';
-import { setVolumeAudio as setAudioVolume } from '@/render/audio';
 import { event } from '@/render/events';
 
 //#region CONSTANTS
