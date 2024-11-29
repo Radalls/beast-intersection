@@ -1,5 +1,5 @@
+import { playAudio, stopAudio } from '@/engine/services/audio';
 import { getState } from '@/engine/services/state';
-import { playAudio, stopAudio } from '@/render/audio';
 
 //#region EVENTS
 export const onAudioPlay = ({ audioName, loop = false, volume = 0.5 }: {

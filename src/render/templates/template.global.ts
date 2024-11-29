@@ -20,11 +20,12 @@ export const createFrame = () => {
     });
 };
 
-// export const displayUI = () => {
-//     const ui = getElement({ elementId: 'UI' });
+//TODO: use this
+export const displayUI = () => {
+    const ui = getElement({ elementId: 'UI' });
 
-//     ui.style.display = (ui.style.display === 'block') ? 'none' : 'block';
-// };
+    ui.style.display = (ui.style.display === 'block') ? 'none' : 'block';
+};
 //#endregion
 
 //#region LOADING

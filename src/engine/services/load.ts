@@ -72,6 +72,7 @@ const preloadAssets = async (): Promise<boolean> => {
 const loadSprites = async (): Promise<boolean> => {
     const sprites = Object.entries(spriteFiles).map(([path, module]) => {
         const img = new Image();
+
         return new Promise<boolean>((resolve) => {
             img.onload = () => resolve(true);
             img.onerror = () => {
@@ -83,6 +84,7 @@ const loadSprites = async (): Promise<boolean> => {
     });
 
     const results = await Promise.all(sprites);
+
     return results.every(result => result);
 };
 
@@ -91,17 +93,20 @@ const loadAudio = async (): Promise<boolean> => {
         const audio = new Audio();
         return new Promise<boolean>((resolve) => {
             audio.oncanplaythrough = () => resolve(true);
+
             audio.onerror = () => {
                 console.error(`Failed to load audio: ${path}`);
                 resolve(false);
             };
+
             audio.src = (module as { default: string }).default;
-            // Preload but don't play
+
             audio.load();
         });
     });
 
     const results = await Promise.all(audio);
+
     return results.every(result => result);
 };
 

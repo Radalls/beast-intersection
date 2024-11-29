@@ -38,24 +38,6 @@ export const isFacingPosition = ({ entityId, targetPosition }: {
     }
 };
 
-export const getFacingPosition = ({ entityId }: { entityId?: string | null }) => {
-    if (!(entityId)) entityId = getStore('playerId')
-        ?? error({ message: 'Store playerId is undefined', where: getFacingPosition.name });
-
-    const position = getComponent({ componentId: 'Position', entityId });
-    const sprite = getComponent({ componentId: 'Sprite', entityId });
-
-    if (!(sprite._direction)) error({
-        message: 'Sprite direction is undefined',
-        where: getFacingPosition.name,
-    });
-
-    if (sprite._direction === 'up') return { x: position._x, y: position._y - 1 };
-    else if (sprite._direction === 'down') return { x: position._x, y: position._y + 1 };
-    else if (sprite._direction === 'left') return { x: position._x - 1, y: position._y };
-    else if (sprite._direction === 'right') return { x: position._x + 1, y: position._y };
-};
-
 export const validItemPosition = ({ entityId }: { entityId?: string | null }) => {
     if (!(entityId)) entityId = getStore('playerId')
         ?? error({ message: 'Store playerId is undefined', where: validItemPosition.name });
@@ -101,6 +83,62 @@ export const validPlacePosition = ({
 
     return true;
 };
+//#endregion
+
+//#region UTILS
+export const updatePositionXY = ({ entityId, x, y, subX = 0, subY = 0 }: {
+    entityId?: string | null,
+    subX?: number,
+    subY?: number,
+    x: number,
+    y: number,
+}) => {
+    if (!(entityId)) entityId = getStore('playerId')
+        ?? error({ message: 'Store playerId is undefined', where: updatePositionXY.name });
+
+    const position = getComponent({ componentId: 'Position', entityId });
+
+    position._x = x;
+    position._y = y;
+    position._subX = subX;
+    position._subY = subY;
+
+    if (subX >= 1) {
+        position._x += 1;
+        position._subX = 0;
+    }
+    else if (subX < 0) {
+        position._x -= 1;
+        position._subX = 1;
+    }
+
+    if (subY >= 1) {
+        position._y += 1;
+        position._subY = 0;
+    }
+    else if (subY < 0) {
+        position._y -= 1;
+        position._subY = 1;
+    }
+};
+
+export const getFacingPosition = ({ entityId }: { entityId?: string | null }) => {
+    if (!(entityId)) entityId = getStore('playerId')
+        ?? error({ message: 'Store playerId is undefined', where: getFacingPosition.name });
+
+    const position = getComponent({ componentId: 'Position', entityId });
+    const sprite = getComponent({ componentId: 'Sprite', entityId });
+
+    if (!(sprite._direction)) error({
+        message: 'Sprite direction is undefined',
+        where: getFacingPosition.name,
+    });
+
+    if (sprite._direction === 'up') return { x: position._x, y: position._y - 1 };
+    else if (sprite._direction === 'down') return { x: position._x, y: position._y + 1 };
+    else if (sprite._direction === 'left') return { x: position._x - 1, y: position._y };
+    else if (sprite._direction === 'right') return { x: position._x + 1, y: position._y };
+};
 
 export const getOriginPlacePosition = ({
     entityId,
@@ -141,7 +179,4 @@ export const getOriginPlacePosition = ({
 
     return originPlacePosition;
 };
-//#endregion
-
-//#region UTILS
 //#endregion

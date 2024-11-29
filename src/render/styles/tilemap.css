@@ -3,7 +3,8 @@
     grid-template-columns: repeat(10, 1fr);
     left: 50%;
     top: 50%;
-    transition: 0.2s transform;
+    padding: 36px 0px 0px 36px;
+    transition: 0.1s transform;
 }
 
 .tilemap-chunk {

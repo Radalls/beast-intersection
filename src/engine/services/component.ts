@@ -157,6 +157,8 @@ export const addPosition = ({ entityId, savedPosition, x = 0, y = 0 }: {
 
     const position: Position = savedPosition ?? {
         _: 'Position',
+        _subX: 0.5,
+        _subY: 0.5,
         _tileMapName: tileMap._name,
         _x: x,
         _y: y,
@@ -238,8 +240,8 @@ export const addResourceFish = ({
         _frenzyInterval: resourceData.data.frenzyInterval,
         _hp: resourceData.data.maxHp,
         _maxHp: resourceData.data.maxHp,
-        _rodDamage: 2,
-        _rodMaxTension: 100,
+        _rodDamage: 8,
+        _rodMaxTension: 1000,
         _rodTension: 0,
     };
     resource.activityData = activityFishData;
