@@ -4,6 +4,7 @@ import { canPlay, loseActivity, startActivity, winActivity } from './activity';
 
 import { ActivityFishData } from '@/engine/components/resource';
 import { getComponent } from '@/engine/entities';
+import { randAudio } from '@/engine/services/audio';
 import { clearCycle, setCooldown, setCycle } from '@/engine/services/cycle';
 import { error } from '@/engine/services/error';
 import { EventTypes } from '@/engine/services/event';
@@ -11,7 +12,6 @@ import { setState } from '@/engine/services/state';
 import { getStore } from '@/engine/services/store';
 import { playerInventoryFull } from '@/engine/systems/inventory';
 import { setEntityCooldown } from '@/engine/systems/state';
-import { randAudio } from '@/render/audio';
 import { event } from '@/render/events';
 
 //#region SERVICES
@@ -97,8 +97,8 @@ export const updateActivityFish = ({ activityId }: { activityId: string }) => {
         _frenzyInterval: activityResourceData.data.frenzyInterval,
         _hp: activityResourceData.data.maxHp,
         _maxHp: activityResourceData.data.maxHp,
-        _rodDamage: 2,
-        _rodMaxTension: 100,
+        _rodDamage: 8,
+        _rodMaxTension: 1000,
         _rodTension: 0,
     };
 
@@ -115,7 +115,7 @@ export const tickActivityFish = ({ activityId }: { activityId?: string | null })
     const activityFishData = activityResource.activityData as ActivityFishData;
     activityFishData._hp += Math.floor(activityFishData._rodDamage / 2);
     activityFishData._hp = Math.min(activityFishData._hp, activityFishData._maxHp);
-    activityFishData._rodTension -= activityFishData._damage * 2;
+    activityFishData._rodTension -= activityFishData._damage * 3;
     activityFishData._rodTension = Math.max(activityFishData._rodTension, 0);
 
     event({ type: EventTypes.ACTIVITY_FISH_UPDATE });

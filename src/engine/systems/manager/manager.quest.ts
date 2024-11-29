@@ -48,7 +48,7 @@ type QuestPlace = {
 }
 //#endregion
 
-//#region SERVICES
+//#region SYSTEMS
 export const initQuest = ({ managerEntityId }: { managerEntityId?: string | null }) => {
     if (!(managerEntityId)) managerEntityId = getStore('managerId')
         ?? error({ message: 'Store managerId is undefined', where: initQuest.name });

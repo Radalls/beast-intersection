@@ -14,15 +14,43 @@ import {
 import { getComponent } from '@/engine/entities';
 import { error } from '@/engine/services/error';
 import { EventTypes } from '@/engine/services/event';
+import { consumeFirstKeyPress } from '@/engine/services/input';
 import { setState } from '@/engine/services/state';
-import { clearStore, setStore } from '@/engine/services/store';
+import { clearStore, getStore, setStore } from '@/engine/services/store';
 import { fillEnergy } from '@/engine/systems/energy';
 import { emptyPlayerInventory } from '@/engine/systems/inventory';
-import { endQuest } from '@/engine/systems/manager';
+import { endQuest, getKeyMoveOffset } from '@/engine/systems/manager';
 import { setEntityActive } from '@/engine/systems/state';
 import { event } from '@/render/events';
 
 //#region SYSTEMS
+export const onDialogInput = ({ inputKey, dialogEntityId, managerEntityId }: {
+    dialogEntityId?: string | null,
+    inputKey: string,
+    managerEntityId?: string | null,
+}) => {
+    if (!(managerEntityId)) managerEntityId = getStore('managerId')
+        ?? error({ message: 'Store managerId is undefined', where: onDialogInput.name });
+
+    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
+
+    if (!(dialogEntityId)) dialogEntityId = getStore('dialogId')
+        ?? error({ message: 'Store dialogId is undefined', where: onDialogInput.name });
+
+    if (!(consumeFirstKeyPress(inputKey))) return;
+
+    if (inputKey === manager.settings.keys.action._act) {
+        nextDialog({ entityId: dialogEntityId });
+        return;
+    }
+    else {
+        const inputOffset = getKeyMoveOffset({ inputKey, managerEntityId });
+        if (!(inputOffset)) return;
+
+        selectDialogOption({ entityId: dialogEntityId, offset: inputOffset });
+    }
+};
+
 export const startDialog = ({ entityId }: { entityId: string }) => {
     const entityDialog = getComponent({ componentId: 'Dialog', entityId });
     if (invalidDialog(entityDialog)) {

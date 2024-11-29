@@ -1,6 +1,5 @@
-import { initAudios } from './audio';
-import { onInputKeyDown } from './events';
 import {
+    createDayTime,
     createError,
     createFrame,
     createLaunchMenu,
@@ -8,6 +7,9 @@ import {
     createQuestMenu,
     createSettingsMenu,
 } from './templates';
+
+import { initAudios } from '@/engine/services/audio';
+import { onKeyDown, onKeyUp } from '@/engine/services/input';
 
 //#region CONSTANTS
 export const app = document.getElementById('app')!;
@@ -32,7 +34,8 @@ const launch = () => {
 };
 
 const initEvents = () => {
-    document.addEventListener('keydown', onInputKeyDown);
+    document.addEventListener('keydown', (event) => onKeyDown(event.key));
+    document.addEventListener('keyup', (event) => onKeyUp(event.key));
 };
 
 const initMenus = () => {
@@ -42,5 +45,6 @@ const initMenus = () => {
 
 const initGameMenus = () => {
     createQuestMenu();
+    createDayTime();
 };
 

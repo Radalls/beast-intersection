@@ -83,8 +83,8 @@ export const updateCamera = () => {
 
     const tilemapElement = getElement({ elementId: tileMapEntityId });
 
-    const offsetX = -(playerPosition._x * TILE_PIXEL_SIZE + TILE_PIXEL_SIZE / 2);
-    const offsetY = -(playerPosition._y * TILE_PIXEL_SIZE);
+    const offsetX = -((playerPosition._x + playerPosition._subX) * TILE_PIXEL_SIZE + TILE_PIXEL_SIZE / 2);
+    const offsetY = -((playerPosition._y + playerPosition._subY) * TILE_PIXEL_SIZE);
 
     updatePosition({ elementId: playerEntityId });
 
@@ -98,13 +98,23 @@ export const updatePosition = ({ elementId }: { elementId: string }) => {
 
     const element = getElement({ elementId });
 
-    element.style.left = `${position._x * TILE_PIXEL_SIZE}px`;
-    element.style.top = `${position._y * TILE_PIXEL_SIZE
-        - (((parseInt(element.style.height) / TILE_PIXEL_SIZE) - 1) * TILE_PIXEL_SIZE)}px`;
+    const pixelOffsetX = position._subX * TILE_PIXEL_SIZE;
+    const pixelOffsetY = position._subY * TILE_PIXEL_SIZE;
+
+    const basePosX = position._x * TILE_PIXEL_SIZE;
+    const basePosY = position._y * TILE_PIXEL_SIZE;
+
+    const elementHeight = parseInt(element.style.height);
+    const verticalAdjustment = elementHeight > TILE_PIXEL_SIZE
+        ? ((elementHeight / TILE_PIXEL_SIZE) - 1) * TILE_PIXEL_SIZE
+        : 0;
+
+    element.style.left = `${basePosX + pixelOffsetX}px`;
+    element.style.top = `${basePosY - verticalAdjustment + pixelOffsetY}px`;
 
     element.style.zIndex = (isPlayer({ entityId: elementId }) || isPlace({ entityId: elementId }))
-        ? `${position._y - 1}`
-        : `${position._y}`;
+        ? `${(position._y * 10 + (position._subY * 10)) - 1}`
+        : `${(position._y * 10 + (position._subY * 10))}`;
 };
 
 export const createSprite = ({ elementId }: { elementId: string }) => {

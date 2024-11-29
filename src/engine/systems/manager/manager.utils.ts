@@ -2,15 +2,16 @@ import pkg from '../../../../package.json';
 
 import { openSettings } from './manager';
 import { loadSave } from './manager.data';
+import { setDayTime } from './manager.time';
 
 import { getComponent } from '@/engine/entities';
 import { run } from '@/engine/main';
+import { setVolumeAudio as setAudioVolume } from '@/engine/services/audio';
 import { error } from '@/engine/services/error';
 import { EventTypes } from '@/engine/services/event';
 import { setState, getState } from '@/engine/services/state';
 import { getStore } from '@/engine/services/store';
 import { findTileByEntityId } from '@/engine/systems/tilemap';
-import { setVolumeAudio as setAudioVolume } from '@/render/audio';
 import { event } from '@/render/events';
 
 //#region CONSTANTS
@@ -81,6 +82,19 @@ export const getKeyMoveOffset = ({ inputKey, managerEntityId }: {
     return null;
 };
 
+export const upActionCount = ({ managerEntityId }: { managerEntityId?: string | null }) => {
+    if (!(managerEntityId)) managerEntityId = getStore('managerId')
+        ?? error({ message: 'Store managerId is undefined', where: upActionCount.name });
+
+    const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
+
+    manager._actionCount += 1;
+
+    if (manager._actionCount % 2 === 0) {
+        setDayTime({ managerEntityId });
+    }
+};
+
 //#region LAUNCH
 export const selectLaunchOption = ({ managerEntityId, offset }: {
     managerEntityId?: string | null,
@@ -118,6 +132,7 @@ export const confirmLaunchOption = ({ managerEntityId }: { managerEntityId?: str
 
         run({});
 
+        event({ type: EventTypes.TIME_DAY_DISPLAY });
         event({ type: EventTypes.QUEST_DISPLAY });
         event({ data: { audioName: 'menu_launch_start' }, type: EventTypes.AUDIO_PLAY });
         event({ data: { audioName: 'bgm_map1', loop: true }, type: EventTypes.AUDIO_PLAY });
@@ -148,6 +163,7 @@ export const confirmLaunchOption = ({ managerEntityId }: { managerEntityId?: str
 
             event({ type: EventTypes.MENU_LAUNCH_DISPLAY });
             event({ type: EventTypes.MENU_SETTINGS_UPDATE });
+            event({ type: EventTypes.TIME_DAY_DISPLAY });
             event({ type: EventTypes.QUEST_DISPLAY });
             event({ data: { audioName: 'menu_launch_start' }, type: EventTypes.AUDIO_PLAY });
             event({ data: { audioName: 'bgm_map1', loop: true }, type: EventTypes.AUDIO_PLAY });
@@ -172,6 +188,7 @@ export const closeSettings = () => {
 
         event({ type: EventTypes.ENERGY_DISPLAY });
         event({ type: EventTypes.INVENTORY_TOOL_ACTIVE_DISPLAY });
+        event({ type: EventTypes.TIME_DAY_DISPLAY });
         event({ type: EventTypes.QUEST_DISPLAY });
     }
 

@@ -12,6 +12,7 @@ import {
     loadEntityData,
     findEntitiesByMap,
 } from '@/engine/entities';
+import { randAudio } from '@/engine/services/audio';
 import {
     createEntityNpc,
     createEntityResourceItem,
@@ -28,7 +29,6 @@ import { createTileMapState, getTileMapState } from '@/engine/systems/manager';
 import { updatePosition } from '@/engine/systems/position';
 import { placeResource } from '@/engine/systems/resource';
 import { setEntityLoad } from '@/engine/systems/state';
-import { randAudio } from '@/render/audio';
 import { event } from '@/render/events';
 
 //#region CHECKS
@@ -79,18 +79,6 @@ export const tileIsSand = ({ tile }: { tile: Tile }) => tile._sound?.includes('s
 //#endregion
 
 //#region UTILS
-export const getTargetXY = ({ target, x, y }: {
-    target: 'up' | 'down' | 'left' | 'right',
-    x: number,
-    y: number,
-}) => {
-    if (target === 'up') return { targetX: x, targetY: y - 1 };
-    else if (target === 'down') return { targetX: x, targetY: y + 1 };
-    else if (target === 'left') return { targetX: x - 1, targetY: y };
-    else if (target === 'right') return { targetX: x + 1, targetY: y };
-    else throw error({ message: 'Invalid target', where: getTargetXY.name });
-};
-
 export const findTileByEntityId = ({ entityId, tileMapEntityId }: {
     entityId: string,
     tileMapEntityId?: string | null
@@ -234,8 +222,6 @@ export const generateTileMapEntities = ({ tileMapEntityId }: { tileMapEntityId?:
             throw error({ message: 'Invalid entity data', where: generateTileMapEntities.name });
         }
     }
-
-    // loadTileMapEntities({ tileMapEntityId });
 };
 
 //TODO: rework
@@ -353,8 +339,6 @@ export const destroyTileMap = ({ tileMapEntityId }: { tileMapEntityId?: string |
 
     const tileMap = getComponent({ componentId: 'TileMap', entityId: tileMapEntityId });
     createTileMapState({ tileMapEntityId });
-
-    // event({ type: EventTypes.TILEMAP_TILE_DESTROY });
 
     tileMap.tiles = [];
 

@@ -7,6 +7,7 @@ import { getComponent } from '@/engine/entities';
 import { clearCycle, setCooldown, setCycle } from '@/engine/services/cycle';
 import { error } from '@/engine/services/error';
 import { EventTypes } from '@/engine/services/event';
+import { consumeFirstKeyPress } from '@/engine/services/input';
 import { getState, setState } from '@/engine/services/state';
 import { getStore } from '@/engine/services/store';
 import { playerInventoryFull } from '@/engine/systems/inventory';
@@ -23,6 +24,8 @@ export const onActivityBugInput = ({ inputKey, activityId, managerEntityId }: {
         ?? error({ message: 'Store managerId is undefined', where: onActivityBugInput.name });
 
     const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
+
+    if (!(consumeFirstKeyPress(inputKey))) return;
 
     if (!(activityId)) activityId = getStore('activityId')
         ?? error({ message: 'Store activityId is undefined ', where: onActivityBugInput.name });

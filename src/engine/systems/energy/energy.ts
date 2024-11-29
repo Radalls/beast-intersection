@@ -2,6 +2,7 @@ import { getComponent } from '@/engine/entities';
 import { error } from '@/engine/services/error';
 import { EventTypes } from '@/engine/services/event';
 import { getStore } from '@/engine/services/store';
+import { upActionCount } from '@/engine/systems/manager';
 import { event } from '@/render/events';
 
 //#region SYSTEMS
@@ -28,6 +29,8 @@ export const useEnergy = ({ amount, entityId }: {
 
     if (energy._current >= amount) {
         energy._current -= amount;
+
+        upActionCount({});
 
         event({ type: EventTypes.ENERGY_UPDATE });
 

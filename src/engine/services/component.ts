@@ -19,6 +19,7 @@ import { error } from '@/engine/services/error';
 import { EventTypes } from '@/engine/services/event';
 import { getStore } from '@/engine/services/store';
 import { loadDialogData } from '@/engine/systems/dialog/dialog.data';
+import { DayTimes } from '@/engine/systems/manager';
 import { getResourceData, generateResourceItem } from '@/engine/systems/resource';
 import { event } from '@/render/events';
 
@@ -101,6 +102,8 @@ export const addManager = ({ entityId, savedManager }: {
 }) => {
     const manager: Manager = (savedManager) ?? {
         _: 'Manager',
+        _actionCount: 0,
+        _dayTime: DayTimes.NOON,
         _selectedCraftRecipe: 0,
         _selectedInventorySlot: 0,
         _selectedInventorySlotOption: 0,
@@ -154,6 +157,8 @@ export const addPosition = ({ entityId, savedPosition, x = 0, y = 0 }: {
 
     const position: Position = savedPosition ?? {
         _: 'Position',
+        _subX: 0.5,
+        _subY: 0.5,
         _tileMapName: tileMap._name,
         _x: x,
         _y: y,
@@ -235,8 +240,8 @@ export const addResourceFish = ({
         _frenzyInterval: resourceData.data.frenzyInterval,
         _hp: resourceData.data.maxHp,
         _maxHp: resourceData.data.maxHp,
-        _rodDamage: 2,
-        _rodMaxTension: 100,
+        _rodDamage: 8,
+        _rodMaxTension: 1000,
         _rodTension: 0,
     };
     resource.activityData = activityFishData;

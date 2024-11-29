@@ -1,4 +1,4 @@
-import { invalidPosition, samePosition } from './position.utils';
+import { invalidPosition, updatePositionXY } from './position.utils';
 
 import { getComponent, isPlayer } from '@/engine/entities';
 import { error } from '@/engine/services/error';
@@ -8,8 +8,10 @@ import { updateSpriteDirection } from '@/engine/systems/sprite';
 import { event } from '@/render/events';
 
 //#region SYSTEMS
-export const updatePosition = ({ entityId, tileMapEntityId, target, x, y }: {
+export const updatePosition = ({ entityId, tileMapEntityId, target, x, y, subX = 0, subY = 0 }: {
     entityId?: string | null,
+    subX?: number,
+    subY?: number,
     target?: 'up' | 'down' | 'left' | 'right',
     tileMapEntityId?: string | null,
     x: number,
@@ -27,13 +29,8 @@ export const updatePosition = ({ entityId, tileMapEntityId, target, x, y }: {
     }
 
     const position = getComponent({ componentId: 'Position', entityId });
-    if (samePosition({
-        entityPosition: { x: position._x, y: position._y },
-        targetPosition: { x, y },
-    })) throw error({ message: `Position (${x}-${y}) is invalid`, where: updatePosition.name });
 
-    position._x = x;
-    position._y = y;
+    updatePositionXY({ entityId, subX, subY, x, y });
 
     if (!(tileMapEntityId)) tileMapEntityId = getStore('tileMapId')
         ?? error({ message: 'Store tileMapId is undefined', where: updatePosition.name });
@@ -49,6 +46,71 @@ export const updatePosition = ({ entityId, tileMapEntityId, target, x, y }: {
     else {
         event({ entityId, type: EventTypes.ENTITY_POSITION_UPDATE });
     }
+
     event({ entityId, type: EventTypes.ENTITY_SPRITE_UPDATE });
+};
+
+export const getTargetPosition = ({
+    target,
+    x,
+    y,
+    subX = 0,
+    subY = 0,
+    step = 0.1,
+}: {
+    step?: number,
+    subX?: number,
+    subY?: number,
+    target: 'up' | 'down' | 'left' | 'right',
+    x: number,
+    y: number,
+}) => {
+    let targetX = x;
+    let targetY = y;
+    let targetSubX = subX;
+    let targetSubY = subY;
+
+    switch (target) {
+        case 'up':
+            targetSubY -= step;
+            if (targetSubY < 0) {
+                targetY -= 1;
+                targetSubY = 1 + targetSubY;
+            }
+            break;
+        case 'down':
+            targetSubY += step;
+            if (targetSubY >= 1) {
+                targetY += 1;
+                targetSubY -= 1;
+            }
+            break;
+        case 'left':
+            targetSubX -= step;
+            if (targetSubX < 0) {
+                targetX -= 1;
+                targetSubX = 1 + targetSubX;
+            }
+            break;
+        case 'right':
+            targetSubX += step;
+            if (targetSubX >= 1) {
+                targetX += 1;
+                targetSubX -= 1;
+            }
+            break;
+        default:
+            throw error({
+                message: 'Invalid movement target',
+                where: getTargetPosition.name,
+            });
+    }
+
+    return {
+        targetSubX,
+        targetSubY,
+        targetX,
+        targetY,
+    };
 };
 //#endregion

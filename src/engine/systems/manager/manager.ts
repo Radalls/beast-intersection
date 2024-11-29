@@ -15,6 +15,7 @@ import { launch } from '@/engine/main';
 import { stopCycle } from '@/engine/services/cycle';
 import { error } from '@/engine/services/error';
 import { EventTypes } from '@/engine/services/event';
+import { consumeFirstKeyPress } from '@/engine/services/input';
 import { getState, setState } from '@/engine/services/state';
 import { getStore, resetStore } from '@/engine/services/store';
 import { event } from '@/render/events';
@@ -29,6 +30,8 @@ export const onLaunchInput = ({ inputKey, managerEntityId }: {
         ?? error({ message: 'Store managerId is undefined', where: onSettingsInput.name });
 
     const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
+
+    if (!(consumeFirstKeyPress(inputKey))) return;
 
     if (inputKey === manager.settings.keys.action._act) {
         confirmLaunchOption({ managerEntityId });
@@ -78,6 +81,8 @@ export const onSettingsInput = ({ inputKey, managerEntityId }: {
         ?? error({ message: 'Store managerId is undefined', where: onSettingsInput.name });
 
     const manager = getComponent({ componentId: 'Manager', entityId: managerEntityId });
+
+    if (!(consumeFirstKeyPress(inputKey))) return;
 
     if (inputKey === manager.settings.keys.action._back) {
         if (getState('isSettingEditOpen')) {
@@ -151,6 +156,7 @@ export const openSettings = ({ managerEntityId }: { managerEntityId?: string | n
 
         event({ type: EventTypes.ENERGY_DISPLAY });
         event({ type: EventTypes.INVENTORY_TOOL_ACTIVE_DISPLAY });
+        event({ type: EventTypes.TIME_DAY_DISPLAY });
         event({ type: EventTypes.QUEST_DISPLAY });
     }
 

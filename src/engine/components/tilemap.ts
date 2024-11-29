@@ -20,7 +20,6 @@ export type Tile = {
     _sound?: string,
     exits?: TileExit[],
     position: TilePosition,
-    // sprite: TileSprite,
 };
 
 export type TileExit = {
